@@ -17,7 +17,7 @@
 | QA-09 | статичный B-static спрайт при перемещении не морфится, не вращается «перекатыванием», не эмитирует непрерывных частиц. | manual; e2e (движение), review rendering | S0 — статичные маркеры; движение S1; финальные спрайты S6 | partial_verified: статичный canvas S0; движение/финальные спрайты not_implemented |
 | QA-10 | отдельные отряды достигают разных флангов; карта позволяет минимум два осмысленных параллельных маршрута. | integration (независимые цели), manual, e2e по доступности | S2 — группы; полная планировка S4 | not_implemented |
 | QA-11 | HUD и выделение правильны после split/merge/смерти; результат матча не пересчитывается после окончания. | integration, e2e, manual | S2 — split; S3 merge; S4 outcome; S5 смерть | not_implemented |
-| QA-12 | Vercel preview и production работают с корректными ассетами, координатами мыши и resize. | e2e (Playwright), manual | S0 — preview; pointer S1; production S7, с разрешением | local_build_smoke_verified; Vercel preview not_run_not_authorized; pointer/production not_implemented |
+| QA-12 | Vercel preview и production работают с корректными ассетами, координатами мыши и resize. | e2e (Playwright), manual | S0 — preview; pointer S1; production S7, с разрешением | partial_verified: локальный smoke + Vercel manual checklist принят, READY/SHA проверены; external e2e not_run (SSO); pointer/полный production S7 not_implemented |
 
 Раннее частичное применение не означает закрытия всего QA. Новые проверки сохранять и повторять при изменении смежных механизмов. В частности, fixed steps S0 не заменяют replay S5, локальный preview не заменяет Vercel, а Vercel preview не заменяет production. Restart S0 также не закрывает QA-06 без окраски/win S4.
 
@@ -30,6 +30,14 @@
 - Vercel URL, Firefox, WebGPU, FPS/стресс, pointer/игровые действия: **not_run** либо **not_implemented** согласно этапу. Ранние sandbox/DNS/типовые ошибки и их устранение перечислены в отчёте.
 
 ## Дополнительные проверки по этапам
+
+### Приёмка и повторная проверка S0 — 2026-11-06
+
+Пользователь подтвердил весь ручной чеклист и предоставил Preview URL/скриншоты. **S0 accepted**, исходный коммит `29946cdefb1208c93b61303ed2fcd8dc984cbee1`; закрыт только гейт foundation/Preview S0, не весь QA-12.
+
+Агент повторил offline `npm ci --offline --cache /private/tmp/splat-npm-cache`, typecheck/lint/test/format:check/build и `PLAYWRIGHT_CHANNEL=chrome npm run test:smoke`: все exit 0, 23 unit/integration + 1 локальный smoke. GitHub SHA и Vercel Git metadata совпали; Preview READY, проект/Node/Vite/команды сборки/GitHub link и production branch main проверены через GET API. Анонимный запрос получает 302 на Vercel SSO: внешний Playwright не запускался, защита не менялась. Опубликованный browser checklist проверен **пользователем**. [Точные команды, ограничения и доказательства](S0_ACCEPTANCE.md).
+
+Первичный технический Production deployment в истории пользователя не означает полной QA-12/S7-приёмки: будущего pointer/resize при рисовании, Firefox, полного игрового сценария и финальной production-публикации ещё нет.
 
 - **S0:** уникальные ID, group.agentIds равны живым агентам своей фракции, одинаковый restart-state и повторяемые fixed steps, 40 видимых маркеров. Reset создаёт чистое состояние. Typecheck/lint/test/build и разрешённый preview; Playwright smoke по доступности.
 - **S1:** пустая/короткая/прямая/многоизломная линия, фильтрация дублей, лимиты точек/длины, world-координаты после resize, превью, выделение, без телепорта/дрожания, натяжение без auto-split.
@@ -65,4 +73,4 @@
 - [ ] Отчёт целостности и handoff просмотрены; исторические расхождения §8 отмечены.
 - [ ] Человек явно принял S−1; до этого поле manual_acceptance остаётся pending, принятый commit — not_available.
 
-Этот список не заполнен агентом от имени человека; общая приёмка S−1 получена 05.11.2026. Текущая ручная приёмка S0 ожидается; её отдельный чеклист находится в S0_REPORT. Автоматические результаты не означают accepted, S1 не разрешён.
+Этот исторический список S−1 не заполнялся агентом от имени человека; общая приёмка S−1 получена 05.11.2026. S0 принят пользователем 06.11.2026 подтверждением всех пунктов отдельного чеклиста в S0_REPORT. Основание и пределы — S0_ACCEPTANCE. Автоматические результаты сами по себе не означают accepted; S1 по-прежнему требует отдельного поручения.

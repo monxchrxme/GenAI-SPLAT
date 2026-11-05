@@ -1,5 +1,21 @@
 # SPLAT! — журнал выполненных изменений
 
+## 2026-11-06 — подготовлен промпт S1 и согласован порядок промежуточной работы
+
+- По прямому указанию пользователя в AGENTS/PLAN/STATUS/DECISIONS записан режим S1: первый ответ нового чата только read-only аудит/план, затем ровно одно согласованное промежуточное действие за ход с проверками/демо и остановкой для одобрения дизайна/функционала.
+- Подготовлен стартовый промпт с принятым S0 (29946cd), текущей feature/s0-foundation, main на S−1, незакоммиченными записями приёмки/доказательствами и пользовательским .gitignore. Сохранение этих записей и создание ветки S1 включены в будущее согласование, сейчас не выполнялись.
+- S1 остаётся not_started; исходные задачи/гейт, MASTER_SPEC, код, тесты и зависимости не менялись. Git commit/branch switch/push/merge и Vercel deployment не выполнялись.
+
+## 2026-11-06 — S0 принят; ручной GitHub/Vercel workflow пользователя проверен
+
+- Пользователь подтвердил все пункты checklist на опубликованном Preview и предоставил два скриншота. S0 переведён в accepted по этому сообщению; принятый source commit `29946cdefb1208c93b61303ed2fcd8dc984cbee1` проверен локально, на GitHub и в deployment metadata.
+- Проверены выполненные пользователем переименование репозитория/обновление origin на monxchrxme/GenAI-SPLAT, commit/push main и feature, проект genai-splat, GitHub-интеграция и production branch main. Merge не выполнен, main по-прежнему содержит только S−1.
+- Read-only Vercel API подтвердил первичный технический Production (01:24:26 MSK) и Preview (01:31:06 MSK), оба source CLI и READY, с тем же SHA S0. Preview created→ready 14 320 мс. Технический Production не объявлен релизом S7; агент новых деплоев/изменений настроек не выполнял.
+- Повторно прошли offline npm ci, typecheck/lint/test/build/format:check и local Playwright Chrome smoke: 23 unit/integration + 1 smoke. Remote e2e без SSO not_run; анонимный HTTP получает 302 на Vercel SSO. Browser checklist опубликованного приложения подтверждён пользователем, защита не менялась.
+- Созданы S0_ACCEPTANCE и docs/verification/s0-2026-11-06 с двумя оригинальными скриншотами пользователя и выбранными несекретными метаданными. Счётчики CDN 23 / Function Invocations 0 / Error Rate 0% записаны как снимок, не benchmark.
+- Синхронизированы STATUS/PLAN/README/SPEC/QA/ARCHITECTURE/DESIGN_GUIDE/S0_REPORT/DEPLOYMENT/DECISIONS и handoff. Runtime, tests, lockfile, MASTER_SPEC, AGENTS и moodboard не менялись; существующее дополнение .gitignore пользователя/CLI сохранено. Эти записи не закоммичены и не отправлены агентом.
+- D-06 Open, D-07—D-10 Proposed, S1–S7 not_started. Принятую основу для будущего S1 брать из 29946cd, а не старого main; новый этап — только в новом основном чате и по отдельному поручению.
+
 ## 2026-11-06 — уточнение ручного развёртывания S0
 
 - По запросу пользователя подготовлена последовательность ручных действий; Git проверен read-only, публикация и приёмка не выполнялись.

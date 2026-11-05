@@ -1,0 +1,75 @@
+{
+  "checkedAt": "2026-11-05T22:43:31.071Z",
+  "preview": "https://genai-splat-dqhs48lqm-great-chr.vercel.app/",
+  "deployment": {
+    "id": "dpl_67wGmHp1budVC1XHHGMtCUhmxzKY",
+    "url": "genai-splat-dqhs48lqm-great-chr.vercel.app",
+    "target": null,
+    "readyState": "READY",
+    "createdAt": 1793917866718,
+    "ready": 1793917881038,
+    "source": "cli",
+    "git": {
+      "sha": "29946cdefb1208c93b61303ed2fcd8dc984cbee1",
+      "branch": "feature/s0-foundation",
+      "repo": "GenAI-SPLAT",
+      "org": "monxchrxme"
+    },
+    "framework": "vite",
+    "nodeVersion": "24.x",
+    "buildCommand": "npm run build",
+    "installCommand": "npm ci",
+    "outputDirectory": "dist"
+  },
+  "project": {
+    "id": "prj_xY00Pd9x8HbmTJOGycXBJlXjSGbj",
+    "name": "genai-splat",
+    "framework": "vite",
+    "nodeVersion": "24.x",
+    "buildCommand": "npm run build",
+    "installCommand": "npm ci",
+    "outputDirectory": "dist",
+    "rootDirectory": null,
+    "ssoProtection": "all_except_custom_domains",
+    "link": {
+      "type": "github",
+      "org": "monxchrxme",
+      "repo": "GenAI-SPLAT",
+      "productionBranch": "main"
+    }
+  },
+  "recentDeployments": [
+    {
+      "id": "dpl_67wGmHp1budVC1XHHGMtCUhmxzKY",
+      "url": "genai-splat-dqhs48lqm-great-chr.vercel.app",
+      "target": null,
+      "state": "READY",
+      "createdAt": 1793917866718,
+      "source": "cli",
+      "git": {
+        "sha": "29946cdefb1208c93b61303ed2fcd8dc984cbee1",
+        "branch": "feature/s0-foundation",
+        "repo": "GenAI-SPLAT",
+        "org": "monxchrxme"
+      }
+    },
+    {
+      "id": "dpl_493p8K6LBVZby5Rr4YNMCE7sSLq1",
+      "url": "genai-splat-1uc34i4os-great-chr.vercel.app",
+      "target": "production",
+      "state": "READY",
+      "createdAt": 1793917466426,
+      "source": "cli",
+      "git": {
+        "sha": "29946cdefb1208c93b61303ed2fcd8dc984cbee1",
+        "branch": "feature/s0-foundation",
+        "repo": "GenAI-SPLAT",
+        "org": "monxchrxme"
+      }
+    }
+  ],
+  "anonymousHttp": {
+    "status": 302,
+    "redirect": "https://vercel.com/sso-api"
+  }
+}

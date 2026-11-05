@@ -22,7 +22,7 @@
 
 Локальный pipeline S0: установка по lockfile → проверки → `npm run build` → `dist/` → локальный preview статической сборки; фактически проверен. Vercel: Vite preset, `npm ci`, Build Command `npm run build`, Output Directory `dist`, подготовлен vercel.json. Это конфигурация для будущего подключения, не подтверждение Vercel deployment. Секреты не требуются клиентскому gameplay и не попадают в исходники/отчёты.
 
-GitHub → Vercel подключается с отдельного разрешения; S0 включает требование раннего preview, S7 — production-приёмку. Push/merge/remote/внешние аккаунты не разрешены фактом наличия этапа в плане. Без разрешения/доступа гейт деплоя остаётся открытым. На S0 Git инициализирован, по явному разрешению пользователя подключён origin; push/merge и Vercel не выполнялись. WebSim необязателен и не хранит бизнес-логику.
+GitHub → Vercel подключается с отдельного разрешения; S0 включает ранний preview, S7 — production-приёмку полного MVP. Пользователь вручную отправил main/feature, подключил GitHub/Vercel и развернул S0; приёмка получена 06.11.2026. Агент эти публикации не выполнял. Preview `genai-splat-dqhs48lqm-great-chr.vercel.app` — READY, source CLI, SHA `29946cd`; main пока S−1, production branch Vercel — main. В истории есть первичный технический Production, который не заменяет S7. Новые push/merge/публикации требуют своего разрешения; WebSim необязателен и не хранит бизнес-логику.
 
 ## Поток данных и зависимости
 
@@ -95,7 +95,7 @@ flowchart LR
 - `ui/hud.ts` читает snapshot для двух счётчиков; native HTML-кнопка поддерживает Enter/Space. В S0 нет Pause, прогресса победы и будущих органов управления. При недоступном WebGL показывается ошибка; Canvas2D fallback не заявлен. WebGPU и Firefox в этом срезе не проверялись.
 - `main.ts` владеет RAF, ResizeObserver и освобождением ресурсов при HMR/pagehide. DOM data-атрибуты canvas дают smoke только счётчики/размер/tick, без writable-ссылок на Simulation.
 
-23 unit/integration-теста и 1 production browser smoke прошли; Vercel preview не выполнен. Подробности и пределы проверки — [S0_REPORT](S0_REPORT.md), подключение — [DEPLOYMENT](DEPLOYMENT.md). AGENTS.md сверён и сохранён: действующие правила не требуют изменения для S0.
+23 unit/integration-теста и 1 локальный production browser smoke повторно прошли 06.11.2026. Vercel Preview опубликован пользователем, ручной checklist принят; агент проверил READY, Git SHA, настройки и GitHub link через read-only API. Анонимный доступ перенаправлен на SSO, remote automated smoke not_run. Подробности и пределы проверки — [S0_ACCEPTANCE](S0_ACCEPTANCE.md), исходная поставка — [S0_REPORT](S0_REPORT.md), конфигурация — [DEPLOYMENT](DEPLOYMENT.md). AGENTS.md сверён и сохранён: действующие правила не требуют изменения для S0.
 
 ## Обязательные инварианты
 
