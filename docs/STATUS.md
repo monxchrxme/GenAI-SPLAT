@@ -1,7 +1,7 @@
 ---
 updated_at: 2026-11-06
 current_stage: S1
-stage_state: preparation_complete_awaiting_action_0_review_and_step_1_approval
+stage_state: action_0_accepted; action_1_authorized_not_yet_implemented
 implemented: false
 implementation_scope: S1 gameplay not_started; action 0 local Git and documentation preparation only
 preparation_implemented: true
@@ -32,7 +32,9 @@ last_verified_checks:
   - Vercel inspect and GET API: READY, Preview, source CLI, SHA 29946cd, GitHub link and production branch main verified
   - anonymous HTTP: 302 to Vercel SSO; external Playwright not_run, user confirmed published browser checklist
   - final document integrity: exit 0; 9 original files unchanged, user gitignore preserved, 2 screenshot copies identical, 53 tasks/gates and 10 handoff lines intact, 102 local link targets valid
-manual_acceptance: awaiting_review_of_action_0; S1_not_accepted
+manual_acceptance: action_0_accepted_2026-11-06; S1_not_accepted
+last_accepted_intermediate_action: S1-0
+last_accepted_intermediate_commit: 5b5492d867db1ea481d7756b31b80362bf4ebcac
 last_accepted_at: 2026-11-06
 known_issues:
   - Historical MASTER_SPEC §8 uses old PRD.md and SPLAT_FINAL_TZ_v2.md names; see BOOTSTRAP_REPORT.
@@ -41,7 +43,7 @@ known_issues:
   - Main remains at S−1 (8519f19); no merge. Acceptance and user gitignore preserved in separate local commits; S1 branch has no upstream.
   - Node/npm absent from system PATH; temporary Node 24.22.2 is available in /private/tmp, see README.
   - Firefox, WebGPU and performance measurements not_run; gameplay S1-S7 not_implemented.
-next_stage: S1 action 1 pointer mapping and group selection; proposed, not_authorized until explicit confirmation
+next_stage: S1 action 1 pointer mapping, group selection and highlight; authorized, stop after local demo/checks
 next_stage_workflow: action 0 preparation only; stop after report; then one approved intermediate action per turn with local demo/checks and user approval before the next
 publication_workflow: local after S0; Vercel deferred to final stages and a separate explicit request; push and merge only as a separate requested action after acceptance of that action's changes
 handoff_notes:
@@ -72,6 +74,8 @@ handoff_notes:
 На первоначальном аудите S0 Git/runtime/package отсутствовали. Агент создал baseline принятого S−1 `8519f19` и feature-ветку. Затем **пользователь** переименовал репозиторий, создал `29946cd`, отправил main/feature и развернул Vercel. Текущий origin — `https://github.com/monxchrxme/GenAI-SPLAT.git`. Live `git ls-remote` и deployment metadata проверялись при приёмке S0; в действии 0 сетевые проверки не повторялись. `main`/`origin/main` остаются на S−1, merge не выполнен. Прежние записи приёмки сохранены локальным `8452ba0`, пользовательский `.gitignore` — отдельным `8fe235e`. Игровой код и lockfile совпадают с принятым `29946cd`.
 
 ## Подготовка S1 — действие 0, 06.11.2026
+
+**Обновление:** пользователь принял действие 0 (`5b5492d`) и отдельно запросил его push/необходимую подготовку ветки без deployment. В отдельный технический коммит включён запрет автодеплоя feature/s1-formations в vercel.json; фактический push/remote SHA ещё не проверены. Одновременно разрешено действие 1, его реализация и отчёт остаются локальными. Предыдущее ожидание приёмки в описании действия 0 ниже — историческое состояние поставки; общая приёмка S1 не получена.
 
 Пользователь подтвердил только сохранение записей приёмки S0 и .gitignore разными локальными коммитами, подготовку feature/s1-formations и запись правил дальнейшей работы. Первый docs-коммит `8452ba00fa30f8571f20625dbb0fd9bdb7d41084` сохранил все прежние 16 документов/доказательств без правки их содержимого; `8fe235ee7a630cb51751c0a450ede0dfda164efc` сохранил только две прежние строки .gitignore. После них выполнено `git switch --no-track -c feature/s1-formations 8fe235ee7a630cb51751c0a450ede0dfda164efc` (exit 0). Новая ветка — потомок принятого S0, без upstream; feature/s0-foundation содержит эти два локальных коммита и опережает свой upstream на 2. Main и локальные origin-ссылки не менялись.
 
