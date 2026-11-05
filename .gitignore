@@ -1,0 +1,26 @@
+# Dependencies and Vite output (introduced on S0)
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# Local secrets; a documented example may be committed later
+.env
+.env.*
+!.env.example
+*.local
+
+# Generated verification artifacts, not docs/QA.md or the bootstrap audit
+coverage/
+reports/
+test-results/
+playwright-report/
+blob-report/
+*.log
+
+# Local hosting metadata and OS/editor files
+.vercel/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
