@@ -24,3 +24,5 @@ blob-report/
 Thumbs.db
 .idea/
 .vscode/
+.vercel
+.env*
