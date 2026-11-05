@@ -1,5 +1,23 @@
 # SPLAT! — журнал выполненных изменений
 
+## 2026-11-06 — уточнение ручного развёртывания S0
+
+- По запросу пользователя подготовлена последовательность ручных действий; Git проверен read-only, публикация и приёмка не выполнялись.
+- По официальной документации уточнено, что первый Vercel deployment всегда Production, включая явный preview target. Исправлена прежняя неполная инструкция в DEPLOYMENT; ограничение зафиксировано в STATUS/DECISIONS (OBS-07).
+- Вариант первичного технического Production с --skip-domain оставлен Proposed для отдельного решения; это не разрешение, не выполненный деплой и не приватный preview. MASTER_SPEC, игровой код и S1–S7 не менялись.
+
+## 2026-11-05 — S0: локальная поставка проверена, ручная приёмка ожидается
+
+- По новому явному поручению реализован только S0: Vite/TS strict/PixiJS, точные зависимости и lockfile, npm-скрипты разработки/качества/сборки/smoke/форматирования.
+- Созданы чистые TS-типы и симуляция, seeded Mulberry32, fixed clock с ограничением catch-up, сессионная очередь Restart, глубокий замороженный snapshot и разделение Input → Commands → Simulation → Snapshot → Renderer/HUD.
+- Просторное поле 1600×1000 [P], 40 неподвижных синих маркеров/одна группа, минимальный HUD без логотипа; resize не меняет world-state. Restart создаёт новое начальное состояние и очищает очередь/журнал/таймер.
+- Фактически прошли npm ci, typecheck, lint, test (23), build и format/format:check; Playwright smoke production dist в установленном Chrome (1 passed) проверил статичность, Restart/Enter, resize, JS console и ассеты. Создан и просмотрен локальный снимок. Vercel не проверялся.
+- Начальные DNS/EPERM-ограничения устранены разрешённой эскалацией; исправлено optional-поле Playwright, dev-override minimatch убрал обнаруженные audit-замечания (итог 0). Точные команды, неуспешные попытки и ограничения — в S0_REPORT.
+- Подготовлены vercel.json, dist и DEPLOYMENT; **Vercel preview-гейт не выполнен, URL отсутствует**. Подключение Vercel, push/merge и публикация не выполнялись.
+- По разрешению пользователя создан Git: baseline принятого S−1 в main `8519f198f501e9fba3bfd32693f0306f0043ccd5`, работа S0 — feature/s0-foundation; origin подключён к указанному репозиторию, read-only ls-remote не обнаружил веток. S0 не закоммичен как принятый.
+- Обновлены README, STATUS, PLAN, SPEC, ARCHITECTURE, DESIGN_GUIDE, QA и DECISIONS; добавлены S0_REPORT и DEPLOYMENT. AGENTS, MASTER_SPEC, BOOTSTRAP_REPORT и референсы сохранены. D-06 Open и D-07—D-10 Proposed не закрывались.
+- `implemented` локально и `tests_verified` зафиксированы отдельно от `awaiting_manual_acceptance`; S0 не accepted, S1–S7 не начаты. Подготовлены ручной чеклист и handoff на 10 строк; работа остановлена на границе S0.
+
 ## 2026-11-05 — S−1 принят пользователем
 
 - Получена явная ручная приёмка в текущем чате: «S−1 принимаю».

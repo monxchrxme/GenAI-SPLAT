@@ -1,6 +1,6 @@
 # SPLAT! — архитектура
 
-Источник: [MASTER_SPEC §3](MASTER_SPEC.md#3-технологический-стек-и-архитектурные-ограничения), §4, §9 и задачи [PLAN](PLAN.md). Это спецификация будущей реализации: runtime и прототип на S−1 не создаются. `[A]` — утверждённая граница, `[P]` — непроверенная схема/число/деталь реализации, `[O]` — открытый выбор.
+Источник: [MASTER_SPEC §3](MASTER_SPEC.md#3-технологический-стек-и-архитектурные-ограничения), §4, §9 и задачи [PLAN](PLAN.md). Ниже общая архитектура MVP; фактический срез S0 описан отдельно в конце. `[A]` — утверждённая граница, `[P]` — гипотеза/деталь реализации до ручной приёмки, `[O]` — открытый выбор. Модули будущих этапов не считаются реализованными.
 
 ## Стек и доставка
 
@@ -18,11 +18,11 @@
 | Хостинг | Vercel | Статический Vite build, preview веток/PR, production main |
 | Backend | Нет | Нет серверной симуляции, API, БД и аккаунтов |
 
-[A] Базовый стек TS + PixiJS + Vite + статический Vercel закреплён D-04; инструменты качества и тестирования заданы §3. Номера версий и lockfile выбираются на S0, сейчас не установлены. Без React, SSR, serverless-функций и Python в runtime. Независимые локальные скрипты для баланса/ассетов разрешены вне игры. Runtime GenAI запрещён; EnemyController — обычный детерминированный контроллер.
+[A] Базовый стек TS + PixiJS + Vite + статический Vercel закреплён D-04; инструменты качества и тестирования заданы §3. Версии S0 закреплены в package.json и package-lock.json, приведены ниже. Без React, SSR, serverless-функций и Python в runtime. Независимые локальные скрипты для баланса/ассетов разрешены вне игры. Runtime GenAI запрещён; EnemyController будущего S5 — обычный детерминированный контроллер.
 
-Локальный pipeline после S0: установка по lockfile при необходимости → проверки → `npm run build` → `dist/` → локальный preview статической сборки. Vercel: Vite preset либо Build Command `npm run build`, Output Directory `dist`. Это настройки из ТЗ, а не подтверждение существующего билда. Совместимость и актуальные параметры проверяются на S0. Секреты не требуются клиентскому gameplay и не попадают в исходники/отчёты.
+Локальный pipeline S0: установка по lockfile → проверки → `npm run build` → `dist/` → локальный preview статической сборки; фактически проверен. Vercel: Vite preset, `npm ci`, Build Command `npm run build`, Output Directory `dist`, подготовлен vercel.json. Это конфигурация для будущего подключения, не подтверждение Vercel deployment. Секреты не требуются клиентскому gameplay и не попадают в исходники/отчёты.
 
-GitHub → Vercel подключается с отдельного разрешения; S0 включает требование раннего preview, S7 — production-приёмку. Push/merge/remote/внешние аккаунты не разрешены фактом наличия этапа в плане. Без разрешения/доступа гейт деплоя остаётся открытым. На S−1 `.git` отсутствует; локальный workflow Git предстоит оформить на S0. WebSim необязателен и не хранит бизнес-логику.
+GitHub → Vercel подключается с отдельного разрешения; S0 включает требование раннего preview, S7 — production-приёмку. Push/merge/remote/внешние аккаунты не разрешены фактом наличия этапа в плане. Без разрешения/доступа гейт деплоя остаётся открытым. На S0 Git инициализирован, по явному разрешению пользователя подключён origin; push/merge и Vercel не выполнялись. WebSim необязателен и не хранит бизнес-логику.
 
 ## Поток данных и зависимости
 
@@ -79,7 +79,23 @@ flowchart LR
 | `content/` | Ручная конфигурация уровня | Геометрия, spawns, баланс, цель | Runtime-генерация карт |
 | `tests/` | Фикстуры, seed, журнал команд | Unit/integration/browser smoke согласно QA | Зависимость unit-ядра от DOM/PixiJS |
 
-Статичные одобренные ресурсы — будущий `public/assets/`, а moodboard остаются только в `docs/design/references/`. `index.html`, конфиги TS/Vite, package/lockfile появятся на S0; `src/`, `tests/` и `public/assets/` на Bootstrap не созданы.
+Статичные одобренные ресурсы — будущий `public/assets/`, а moodboard остаются в `docs/design/references/` и исходном `visual_references/`. В S0 созданы index.html, TS/Vite-конфиги, package/lockfile, src и tests. `public/assets/` не нужен для примитивов S0 и не создан; moodboard не импортируются в runtime.
+
+## Реализованный срез S0 — 2026-11-05
+
+- Node.js 24.x (проверен 24.22.2), npm 11.19.1; Vite 8.3.6, TypeScript 5.9.3, PixiJS 8.22.0, Vitest 5.1.0, Playwright 1.64.1, ESLint 10.14.0, typescript-eslint 8.72.1, Prettier 3.9.10. Точные зависимости и транзитивный lockfile. TS 5.9.3 выбран в поддерживаемом диапазоне typescript-eslint; текущий TS 7 не используется.
+- `core/types.ts`: только необходимые S0 поля Agent/Group/World/MatchState/LevelConfig/GameCommand/Snapshot. Поля formation, paint, combat и outcome-логика добавляются по этапам, пустые модули будущих механизмов не создавались.
+- `core/config.ts`: [P] мир 1600×1000, seed 20261105, 40 агентов, сетка spawn 8×5 с интервалом 34 и seed-jitter ±2, HP 1 как доменное начальное поле без боя. Эти числа и камера не утверждены вместо D-10.
+- `core/rng.ts`: Mulberry32, явное uint32 состояние, без Math.random. RNG применяется к малому разбросу стартовых координат, не генерирует карту. Restart заново создаёт RNG из того же seed.
+- `core/fixedStepClock.ts`: [P] шаг 1000/60 мс, максимум 8 догоняющих шагов за кадр, входной delta ограничен 250 мс. После stall целые сверхлимитные шаги отбрасываются, дробный остаток сохраняется; проверена повторяемость одинаковых 120 шагов при 30/60/144 render FPS. Это не гарантия равенства wall-clock времени при длительных stalls. Browser visibilitychange сбрасывает кадровое время без рестарта матча.
+- `simulation/initialState.ts`, `simulation.ts`, `invariants.ts`: чистые TS-state и fixed tick, 40 неподвижных агентов, ID/членство/границы. `tsconfig.core.json` компилирует core/simulation/session **без DOM и Node types**; ESLint запрещает renderer/UI/input-импорты, браузерные часы и Math.random в ядре.
+- `simulation/snapshot.ts`: каждый snapshot — глубокая копия state, замороженная рекурсивным Object.freeze. Renderer/HUD получают только Snapshot; изменение вложенных полей отклоняется даже в runtime.
+- `input/sessionInput.ts` → `app/session.ts`: кнопка отправляет restart-команду с текущим tick в очередь. На ближайшем кадре до шагов Session создаёт новую Simulation, сбрасывает accumulator, очередь и журнал; кадр рестарта остаётся на tick 0. Повторные команды в одном кадре схлопываются в один чистый Restart. Журнал относится к текущей сессии; после Restart пуст. Полный gameplay replay относится к S5.
+- `rendering/viewport.ts`, `pixiRenderer.ts`: async Pixi Application, собственный RAF вместо Pixi ticker, WebGL. Равномерное вписывание всего мира с полями, логические координаты не зависят от окна; нет осевого растяжения, pan/zoom и pointer mapping не добавлялись. Примитив создаётся один раз на юнит/поколение сессии; в кадре меняется только position. Нет постоянных частиц/анимации/физики. Числа и палитра [P] — `rendering/presentation.ts`.
+- `ui/hud.ts` читает snapshot для двух счётчиков; native HTML-кнопка поддерживает Enter/Space. В S0 нет Pause, прогресса победы и будущих органов управления. При недоступном WebGL показывается ошибка; Canvas2D fallback не заявлен. WebGPU и Firefox в этом срезе не проверялись.
+- `main.ts` владеет RAF, ResizeObserver и освобождением ресурсов при HMR/pagehide. DOM data-атрибуты canvas дают smoke только счётчики/размер/tick, без writable-ссылок на Simulation.
+
+23 unit/integration-теста и 1 production browser smoke прошли; Vercel preview не выполнен. Подробности и пределы проверки — [S0_REPORT](S0_REPORT.md), подключение — [DEPLOYMENT](DEPLOYMENT.md). AGENTS.md сверён и сохранён: действующие правила не требуют изменения для S0.
 
 ## Обязательные инварианты
 

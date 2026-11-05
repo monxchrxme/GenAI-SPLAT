@@ -1,6 +1,6 @@
 # SPLAT! — проверки и ручная приёмка
 
-Источник: [MASTER_SPEC §6](MASTER_SPEC.md#6-регрессионный-набор-qa-все-тесты-сохранять), подробные задачи/гейты [PLAN](PLAN.md). На S−1 игровых проверок и тестового кода нет. Все QA-01—QA-12 имеют статус **not_implemented**; ниже ожидаемые результаты и будущие способы проверки, не результаты запуска. Документальные проверки Bootstrap описаны отдельно в [BOOTSTRAP_REPORT](BOOTSTRAP_REPORT.md).
+Источник: [MASTER_SPEC §6](MASTER_SPEC.md#6-регрессионный-набор-qa-все-тесты-сохранять), подробные задачи/гейты [PLAN](PLAN.md). S0 добавил локальные unit/integration и production browser smoke. Полностью ни один из будущих QA-01—QA-12 не закрыт; частичное покрытие указано явно. Документальные проверки Bootstrap — в [BOOTSTRAP_REPORT](BOOTSTRAP_REPORT.md); команды и ручной чеклист S0 — в [S0_REPORT](S0_REPORT.md).
 
 ## Регрессионный реестр
 
@@ -13,13 +13,21 @@
 | QA-05 | смерть агента во время независимых приказов, split или merge правильно очищает ссылки и счётчики. | unit, integration; manual (HUD/выделение) | S5 полностью; S3 — фикстура смерти при merge | not_implemented |
 | QA-06 | достижение порога окраски показывает один win-screen, Restart работает. | unit (порог), integration (outcome/reset), e2e, manual | S4 | not_implemented |
 | QA-07 | серия быстрых или пустых жестов не ломает состояние или UI. | unit (фильтрация), integration (команды), e2e, manual | S1; расширение S2/S3 | not_implemented |
-| QA-08 | одинаковые seed + журнал команд → одинаковый логический результат независимо от рендера/FPS. | unit, integration; e2e smoke по доступности | S0 — fixed-step/seed основа; полный replay S5 | not_implemented |
-| QA-09 | статичный B-static спрайт при перемещении не морфится, не вращается «перекатыванием», не эмитирует непрерывных частиц. | manual; e2e (движение), review rendering | S0 — статичные маркеры; движение S1; финальные спрайты S6 | not_implemented |
+| QA-08 | одинаковые seed + журнал команд → одинаковый логический результат независимо от рендера/FPS. | unit, integration; e2e smoke по доступности | S0 — fixed-step/seed основа; полный replay S5 | partial_verified: seed, restart, 120 ticks при 30/60/144 FPS; gameplay replay not_implemented |
+| QA-09 | статичный B-static спрайт при перемещении не морфится, не вращается «перекатыванием», не эмитирует непрерывных частиц. | manual; e2e (движение), review rendering | S0 — статичные маркеры; движение S1; финальные спрайты S6 | partial_verified: статичный canvas S0; движение/финальные спрайты not_implemented |
 | QA-10 | отдельные отряды достигают разных флангов; карта позволяет минимум два осмысленных параллельных маршрута. | integration (независимые цели), manual, e2e по доступности | S2 — группы; полная планировка S4 | not_implemented |
 | QA-11 | HUD и выделение правильны после split/merge/смерти; результат матча не пересчитывается после окончания. | integration, e2e, manual | S2 — split; S3 merge; S4 outcome; S5 смерть | not_implemented |
-| QA-12 | Vercel preview и production работают с корректными ассетами, координатами мыши и resize. | e2e (Playwright), manual | S0 — preview; pointer S1; production S7, с разрешением | not_implemented |
+| QA-12 | Vercel preview и production работают с корректными ассетами, координатами мыши и resize. | e2e (Playwright), manual | S0 — preview; pointer S1; production S7, с разрешением | local_build_smoke_verified; Vercel preview not_run_not_authorized; pointer/production not_implemented |
 
-Раннее частичное применение не означает закрытия всего QA. Новые проверки сохранять и повторять при изменении смежных механизмов. В частности, тест fixed steps S0 не заменяет полный replay S5, а preview не заменяет production. На S−1 обе части отсутствуют.
+Раннее частичное применение не означает закрытия всего QA. Новые проверки сохранять и повторять при изменении смежных механизмов. В частности, fixed steps S0 не заменяют replay S5, локальный preview не заменяет Vercel, а Vercel preview не заменяет production. Restart S0 также не закрывает QA-06 без окраски/win S4.
+
+## Выполненные проверки S0 — 2026-11-05
+
+- `npm ci`: exit 0, 147 пакетов установлено, audit 0 после точного dev-override minimatch. Необязательный install-script fsevents не разрешался; npm вывел предупреждение, не ошибку.
+- `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm run build`: exit 0. Дополнительный TS-project без DOM/Node types проверяет чистую границу core/simulation/session.
+- `npm run test`: exit 0, 2 файла / 23 теста. ID, группы, ошибочные членства, seed/RNG, frozen snapshot, Restart/очередь/журнал/accumulator, fixed steps и stall, viewport/видимость всех маркеров в четырёх размерах.
+- `PLAYWRIGHT_CHANNEL=chrome npm run test:smoke`: exit 0, 1 тест на production dist; macOS 26.6.2 arm64, Google Chrome 156.0.8078.80. 40 объектов рендера, HUD 40/1, статичный canvas по сравнению скриншотов, три Restart и Enter, resize 1440×900 → 900×650 → 1920×1080 → 1440×900, ошибки JS/console/request/HTTP отсутствуют. Снимок просмотрен агентом, не является ручной приёмкой пользователя.
+- Vercel URL, Firefox, WebGPU, FPS/стресс, pointer/игровые действия: **not_run** либо **not_implemented** согласно этапу. Ранние sandbox/DNS/типовые ошибки и их устранение перечислены в отчёте.
 
 ## Дополнительные проверки по этапам
 
@@ -47,7 +55,7 @@
 5. Обновить STATUS/CHANGELOG, отметить Proposed/Open в DECISIONS. Записать implemented и tests_verified отдельно; ожидать ручной приёмки, не переводить в accepted самостоятельно.
 6. После явной приёмки записать подтверждение и фактический commit hash при наличии Git, затем новый чат для следующего этапа. Push/merge, remote, подключение аккаунтов и production требуют отдельного разрешения. URL проверить фактически.
 
-## Чеклист ручной приёмки S−1
+## Исторический чеклист ручной приёмки S−1
 
 - [ ] Просмотрены AGENTS, навигация README/SPEC и полное MASTER_SPEC.
 - [ ] План содержит S−1.1—S−1.4 и все подзадачи/гейты S0–S7, будущие этапы не запущены.
@@ -57,4 +65,4 @@
 - [ ] Отчёт целостности и handoff просмотрены; исторические расхождения §8 отмечены.
 - [ ] Человек явно принял S−1; до этого поле manual_acceptance остаётся pending, принятый commit — not_available.
 
-Этот чеклист не заполнен агентом от имени человека. Следующее действие до приёмки — ожидание решения пользователя, а не S0.
+Этот список не заполнен агентом от имени человека; общая приёмка S−1 получена 05.11.2026. Текущая ручная приёмка S0 ожидается; её отдельный чеклист находится в S0_REPORT. Автоматические результаты не означают accepted, S1 не разрешён.

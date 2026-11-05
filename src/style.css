@@ -1,0 +1,145 @@
+:root {
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  color: #373d46;
+  background: #ece9e0;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+#app {
+  height: 100dvh;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+}
+.hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 32px;
+  border-bottom: 1px solid #d8d4c9;
+}
+.counters {
+  display: flex;
+  gap: 32px;
+  margin: 0;
+}
+.counter {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+dt {
+  font-size: 13px;
+  color: #686d72;
+}
+dd {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.6px;
+}
+.blue-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 5px;
+  background: #2866dc;
+  border-radius: 50%;
+}
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 1px solid #c6c4bb;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 13px;
+  color: #373d46;
+  background: #f7f5ef;
+  cursor: pointer;
+}
+button span {
+  font-size: 20px;
+  line-height: 1;
+}
+button:hover {
+  background: #fffdf7;
+  border-color: #8f959d;
+}
+button:focus-visible {
+  outline: 3px solid #2866dc;
+  outline-offset: 3px;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+#arena {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+canvas {
+  display: block;
+}
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  min-height: 48px;
+  padding: 12px 32px;
+  border-top: 1px solid #d8d4c9;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #74766f;
+}
+.footer p {
+  margin: 0;
+}
+.stage-label {
+  white-space: nowrap;
+  color: #8b8b80;
+}
+.error {
+  color: #a33d32;
+}
+@media (max-width: 600px) {
+  .hud {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+  .counters {
+    gap: 16px;
+  }
+  .counter {
+    gap: 6px;
+  }
+  dd {
+    font-size: 20px;
+  }
+  .footer {
+    padding: 10px 16px;
+  }
+  .stage-label {
+    display: none;
+  }
+}

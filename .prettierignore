@@ -1,0 +1,11 @@
+node_modules/
+dist/
+reports/
+test-results/
+playwright-report/
+package-lock.json
+# Preserve accepted source documents and moodboard inventory verbatim.
+AGENTS.md
+README.md
+docs/
+visual_references/
