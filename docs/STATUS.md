@@ -6,12 +6,12 @@ implemented: true
 implementation_scope: S1 actions 1-6 implemented, locally verified and accepted by user on 2026-11-06
 preparation_implemented: true
 tests_verified: local_pass; 80 unit/integration and 15 Chrome smoke, including S0/action 1 regression
-document_checks_verified: action 6 pass; 154 local file links, 53 original tasks and gates/artifacts, D-register/protected files/HEAD preserved, 10 handoff lines; nothing staged
+document_checks_verified: closure pass; 159 local links, 53 original tasks/gates/artifacts, unchanged D-register/protected files, 10 handoff lines, accepted runtime/tests unchanged, deploy guard false, source SHA verified
 awaiting_manual_acceptance: false
 preview_gate: verified_for_S0_only
 preview_gate_evidence: user browser checklist and agent READY/commit inspection
 external_automated_smoke: not_run_due_to_sso
-last_accepted_commit: pending_local_commit
+last_accepted_commit: 8330ed31ba94b8899889aea58b7c5cdbe420e290
 last_accepted_stage: S1
 working_branch: feature/s1-formations
 upstream: origin/feature/s1-formations
@@ -40,7 +40,7 @@ known_issues:
   - Historical MASTER_SPEC §8 uses old PRD.md and SPLAT_FINAL_TZ_v2.md names; see BOOTSTRAP_REPORT.
   - Preview requires Vercel SSO for anonymous access; external automated smoke not_run, manual user smoke accepted.
   - User created a technical Production bootstrap and a Preview via CLI; this is not the final S7 release.
-  - Main remains at S−1 (8519f19); no merge. Accepted preparation f64af0a has branch auto-deploy guard; user authorized closing S1 commit/push, verify actual Git.
+  - Main remains at S−1 (8519f19); no merge. Accepted S1 source 8330ed3 committed; user authorized push on feature/s1-formations with deploy disabled; verify actual Git.
   - Node/npm absent from system PATH; temporary Node 24.22.2 is available in /private/tmp, see README.
   - Firefox, WebGPU and performance measurements not_run; S1 accepted on current prototype stage; S2-S7 not_implemented.
 next_stage: S2 new chat; handoff preparation authorized; no S2 implementation in this chat
@@ -147,12 +147,12 @@ handoff_notes:
 ## Handoff (10 строк)
 
 1. S1 принят пользователем 06.11.2026 на текущей стадии; S0/source 29946cd остаётся исторической принятой основой.
-2. Принятый исходник S1: pending_local_commit; рабочая ветка feature/s1-formations, upstream origin/feature/s1-formations — сверить Git.
+2. Принятый исходник S1: 8330ed31ba94b8899889aea58b7c5cdbe420e290; рабочая ветка feature/s1-formations, upstream origin/feature/s1-formations — сверить Git.
 3. Пользователь отдельно разрешил commit/push всего S1 и подготовку промпта нового чата S2; merge/deploy не разрешены.
 4. vercel.json запрещает автодеплой только feature/s1-formations; будущая feature/s2-split пока этим правилом не покрыта, без push/настроек самостоятельно.
 5. S1: world pointer, выбор/подсветка и плотные промежутки, полилиния/лимиты/слоты, стабильные ID, плавное движение, временное натяжение без split.
 6. Проверки действия 6: 80 unit/integration / 10 files, 15 Chrome smoke, typecheck/lint/format:check/build pass; runtime/tests при закрытии не менялись.
 7. Firefox/WebGPU/FPS/external S1 smoke not_run; S0 Preview требует SSO; новые deployment при закрытии не разрешены.
 8. Карта/окраска — S4, финальный арт/окружение — S6; угол/проекция из moodboard требуют отдельного визуального согласования, ядро остаётся в world.
-9. S2 только в новом чате: сначала аудит/план и согласование ближайшего действия, ветку предлагать от S1 с актуальными документами, не от старого main.
+9. Новый чат: docs/S2_HANDOFF_PROMPT.md; сначала read-only аудит/план, затем согласованный шаг; ветку предлагать от S1 с документами, не от main.
 10. D-06 Open, D-07—D-10 Proposed; S2 не реализован, main остаётся S−1; история/доказательства S0/S1 сохранены.
