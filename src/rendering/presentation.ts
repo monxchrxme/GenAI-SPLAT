@@ -8,6 +8,13 @@ export const PRESENTATION = Object.freeze({
   shadowScaleY: 0.65,
   highlightRadius: 3,
   highlightOffset: -3,
+  // [P] S1 action 1: static selection overlay, separate from B-static markers.
+  selectionPadding: 5,
+  selectionStrokeWidth: 1.5,
+  previewStrokeWidth: 2.5,
+  slotRadius: 3,
+  slotStrokeWidth: 1.25,
+  tensionStrokeWidth: 3.5,
   colors: {
     background: 0xece9e0,
     arena: 0xf3f0e7,
@@ -17,5 +24,8 @@ export const PRESENTATION = Object.freeze({
     blueEdge: 0x1e4eb1,
     highlight: 0x8bb7ff,
     shadow: 0x313c52,
+    selection: 0x087f7a,
+    preview: 0x986523,
+    tension: 0xd64a3b,
   },
 });

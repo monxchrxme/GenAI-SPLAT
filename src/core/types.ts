@@ -2,6 +2,11 @@ export type AgentId = `agent-${number}`;
 export type GroupId = `group-${number}`;
 export type FactionId = 'blue' | 'red';
 
+export interface Point {
+  readonly x: number;
+  readonly y: number;
+}
+
 export interface Agent {
   id: AgentId;
   factionId: FactionId;
@@ -18,6 +23,18 @@ export interface Group {
   id: GroupId;
   factionId: FactionId;
   agentIds: AgentId[];
+  formation?: Formation;
+  tensionUntilTick?: number;
+}
+
+export interface FormationSlot extends Point {
+  readonly agentId: AgentId;
+  readonly index: number;
+}
+
+export interface Formation {
+  points: Point[];
+  slots: FormationSlot[];
 }
 
 export interface World {
@@ -34,9 +51,12 @@ export interface MatchState {
   world: World;
   agents: Agent[];
   groups: Group[];
+  selectedGroupId: GroupId | null;
 }
 
 export interface LevelConfig {
+  readonly tension: TensionConfig;
+  readonly movement: MovementConfig;
   readonly seed: number;
   readonly fixedStepMs: number;
   readonly world: Readonly<World>;
@@ -49,6 +69,25 @@ export interface LevelConfig {
     readonly jitter: number;
   };
   readonly initialHp: number;
+  readonly selection: SelectionConfig;
+}
+
+export interface SelectionConfig {
+  readonly hitRadius: number;
+  readonly neighborDistance: number;
+}
+
+export interface TensionConfig {
+  readonly neighborGap: number;
+  readonly durationTicks: number;
+}
+
+export interface MovementConfig {
+  readonly maxSpeed: number;
+  readonly arrivalGain: number;
+  readonly settleDistance: number;
+  readonly separationRadius: number;
+  readonly separationStrength: number;
 }
 
 export interface ClockConfig {
@@ -57,11 +96,17 @@ export interface ClockConfig {
   readonly maxStepsPerFrame: number;
 }
 
-// S0 has only a session command. Gameplay commands are introduced in their stages.
-export interface GameCommand {
-  readonly type: 'restart';
-  readonly tick: number;
-}
+export type CommandIntent =
+  | { readonly type: 'restart' }
+  | { readonly type: 'select-group'; readonly point: Point }
+  | { readonly type: 'select-group-id'; readonly groupId: GroupId | null }
+  | {
+      readonly type: 'set-formation';
+      readonly groupId: GroupId;
+      readonly points: readonly Point[];
+    };
+
+export type GameCommand = CommandIntent & { readonly tick: number };
 
 export type DeepReadonly<T> = T extends object
   ? { readonly [K in keyof T]: DeepReadonly<T[K]> }

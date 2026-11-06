@@ -1,6 +1,7 @@
 import { Session } from './app/session';
 import { S0_CLOCK, S0_LEVEL } from './core/config';
 import { bindSessionInput } from './input/sessionInput';
+import { bindGroupSelectionInput } from './input/groupSelectionInput';
 import { PixiRenderer } from './rendering/pixiRenderer';
 import { Hud } from './ui/hud';
 import './style.css';
@@ -17,7 +18,7 @@ async function start(): Promise<void> {
   const restart = requiredElement<HTMLButtonElement>('restart');
   const session = new Session(S0_LEVEL, S0_CLOCK);
   const renderer = new PixiRenderer();
-  const hud = new Hud(requiredElement('agent-count'), requiredElement('group-count'));
+  const hud = new Hud(requiredElement('agent-count'), requiredElement('group-count'), hint);
 
   try {
     await renderer.init(arena, session.getSnapshot());
@@ -28,8 +29,25 @@ async function start(): Promise<void> {
     return;
   }
 
-  const unbindInput = bindSessionInput(restart, (type) => session.submit(type));
-  const observer = new ResizeObserver(() => renderer.resize(arena.clientWidth, arena.clientHeight));
+  const unbindInput = bindSessionInput(restart, (type) => {
+    drawing.reset();
+    session.submit(type);
+  });
+  const drawing = bindGroupSelectionInput(
+    renderer.canvas,
+    (point) => renderer.toWorld(point),
+    (intent) => session.submit(intent),
+    () => session.getSnapshot(),
+  );
+  let arenaWidth = arena.clientWidth;
+  let arenaHeight = arena.clientHeight;
+  const observer = new ResizeObserver(() => {
+    if (arenaWidth === arena.clientWidth && arenaHeight === arena.clientHeight) return;
+    arenaWidth = arena.clientWidth;
+    arenaHeight = arena.clientHeight;
+    drawing.cancel();
+    renderer.resize(arenaWidth, arenaHeight);
+  });
   observer.observe(arena);
   let lastTime: number | null = null;
   let frameId = 0;
@@ -39,8 +57,9 @@ async function start(): Promise<void> {
     if (disposed) return;
     const snapshot = session.advance(lastTime === null ? 0 : time - lastTime);
     lastTime = time;
-    renderer.draw(snapshot, session.restartCount);
-    hud.draw(snapshot);
+    const preview = drawing.preview();
+    renderer.draw(snapshot, session.restartCount, preview);
+    hud.draw(snapshot, preview);
     frameId = requestAnimationFrame(frame);
   };
   const discardHiddenTime = () => {
@@ -51,7 +70,6 @@ async function start(): Promise<void> {
   renderer.draw(session.getSnapshot(), session.restartCount);
   hud.draw(session.getSnapshot());
   restart.disabled = false;
-  hint.textContent = '40 маркеров · одна группа. «Заново» восстанавливает начальное поле.';
   arena.dataset.ready = 'true';
   frameId = requestAnimationFrame(frame);
 
@@ -61,6 +79,7 @@ async function start(): Promise<void> {
     cancelAnimationFrame(frameId);
     observer.disconnect();
     unbindInput();
+    drawing.dispose();
     document.removeEventListener('visibilitychange', discardHiddenTime);
     window.removeEventListener('pagehide', dispose);
     renderer.destroy();

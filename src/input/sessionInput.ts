@@ -1,10 +1,10 @@
-import type { GameCommand } from '../core/types';
+import type { CommandIntent } from '../core/types';
 
 export function bindSessionInput(
   button: HTMLButtonElement,
-  submit: (type: GameCommand['type']) => void,
+  submit: (intent: CommandIntent) => void,
 ): () => void {
-  const restart = () => submit('restart');
+  const restart = () => submit({ type: 'restart' });
   button.addEventListener('click', restart);
   // Native button keyboard activation covers Enter/Space without gameplay gestures.
   return () => button.removeEventListener('click', restart);

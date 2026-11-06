@@ -42,5 +42,6 @@ export function createInitialState(config: LevelConfig): MatchState {
     world: { ...config.world },
     agents,
     groups: [{ id: groupId, factionId: 'blue', agentIds: agents.map((agent) => agent.id) }],
+    selectedGroupId: null,
   };
 }

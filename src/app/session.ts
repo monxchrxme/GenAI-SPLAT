@@ -1,5 +1,5 @@
 import { FixedStepClock } from '../core/fixedStepClock';
-import type { ClockConfig, GameCommand, LevelConfig, Snapshot } from '../core/types';
+import type { ClockConfig, CommandIntent, GameCommand, LevelConfig, Snapshot } from '../core/types';
 import { Simulation } from '../simulation/simulation';
 
 export class Session {
@@ -18,8 +18,22 @@ export class Session {
     this.clock = new FixedStepClock(clockConfig);
   }
 
-  submit(type: GameCommand['type']): void {
-    const command: GameCommand = Object.freeze({ type, tick: this.simulation.tick });
+  submit(intent: CommandIntent | 'restart'): void {
+    const value = typeof intent === 'string' ? { type: intent } : intent;
+    const tick = this.simulation.tick;
+    const command: GameCommand =
+      value.type === 'restart'
+        ? Object.freeze({ type: value.type, tick })
+        : value.type === 'select-group-id'
+          ? Object.freeze({ type: value.type, tick, groupId: value.groupId })
+          : value.type === 'select-group'
+            ? Object.freeze({ type: value.type, tick, point: Object.freeze({ ...value.point }) })
+            : Object.freeze({
+                type: value.type,
+                tick,
+                groupId: value.groupId,
+                points: Object.freeze(value.points.map((point) => Object.freeze({ ...point }))),
+              });
     this.pending.push(command);
     this.history.push(command);
   }
@@ -32,7 +46,10 @@ export class Session {
       this.history = [];
       this.generation++;
     } else {
-      this.clock.advance(elapsedMs, () => this.simulation.step());
+      this.clock.advance(elapsedMs, () => {
+        this.simulation.step(this.pending);
+        this.pending = [];
+      });
     }
     return this.getSnapshot();
   }

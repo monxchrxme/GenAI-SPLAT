@@ -12,6 +12,17 @@ export function createSnapshot(state: MatchState): Snapshot {
     ...state,
     world: { ...state.world },
     agents: state.agents.map((agent) => ({ ...agent })),
-    groups: state.groups.map((group) => ({ ...group, agentIds: [...group.agentIds] })),
+    groups: state.groups.map((group) => ({
+      ...group,
+      agentIds: [...group.agentIds],
+      ...(group.formation
+        ? {
+            formation: {
+              points: group.formation.points.map((point) => ({ ...point })),
+              slots: group.formation.slots.map((slot) => ({ ...slot })),
+            },
+          }
+        : {}),
+    })),
   });
 }

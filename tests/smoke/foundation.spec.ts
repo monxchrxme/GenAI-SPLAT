@@ -16,7 +16,7 @@ test('S0 production build: 40 static markers, clean restart, keyboard, resize, c
   });
   await page.goto('/');
   await expect(page.locator('#arena')).toHaveAttribute('data-ready', 'true');
-  const canvas = page.getByRole('img', { name: 'Поле с 40 синими статичными маркерами' });
+  const canvas = page.getByRole('img', { name: 'Поле с 40 синими маркерами' });
   await expect(canvas).toBeVisible();
   await expect(canvas).toHaveAttribute('data-marker-count', '40');
   await expect(canvas).toHaveAttribute('data-world-size', '1600×1000');

@@ -1,65 +1,87 @@
 ---
 updated_at: 2026-11-06
 current_stage: S1
-stage_state: action_0_accepted; action_1_authorized_not_yet_implemented
-implemented: false
-implementation_scope: S1 gameplay not_started; action 0 local Git and documentation preparation only
+stage_state: accepted
+implemented: true
+implementation_scope: S1 actions 1-6 implemented, locally verified and accepted by user on 2026-11-06
 preparation_implemented: true
-tests_verified: not_run_in_action_0; historical S0 results retained below
-document_checks_verified: passed; preservation, local links, plan tasks and gates, Git ancestry and scope
-awaiting_manual_acceptance: true
-preview_gate: verified
+tests_verified: local_pass; 80 unit/integration and 15 Chrome smoke, including S0/action 1 regression
+document_checks_verified: action 6 pass; 154 local file links, 53 original tasks and gates/artifacts, D-register/protected files/HEAD preserved, 10 handoff lines; nothing staged
+awaiting_manual_acceptance: false
+preview_gate: verified_for_S0_only
 preview_gate_evidence: user browser checklist and agent READY/commit inspection
 external_automated_smoke: not_run_due_to_sso
-last_accepted_commit: 29946cdefb1208c93b61303ed2fcd8dc984cbee1
-last_accepted_stage: S0
+last_accepted_commit: pending_local_commit
+last_accepted_stage: S1
 working_branch: feature/s1-formations
-upstream: not_set
+upstream: origin/feature/s1-formations
+last_pushed_preparation_commit: f64af0adf12f87f295122066ecc283c363c219b7
 local_s0_acceptance_commit: 8452ba00fa30f8571f20625dbb0fd9bdb7d41084
 local_gitignore_commit: 8fe235ee7a630cb51751c0a450ede0dfda164efc
 preview_url: https://genai-splat-dqhs48lqm-great-chr.vercel.app/
 preview_deployment: dpl_67wGmHp1budVC1XHHGMtCUhmxzKY
-last_verified_checks_scope: historical S0; not rerun in action 0
+last_verified_checks_scope: S1 action 6 local QA-01/QA-07 and S0 regression checks on 2026-11-06; historical S0 results retained in S0_ACCEPTANCE and sections below
 last_verified_checks:
-  - npm ci --offline --cache /private/tmp/splat-npm-cache: exit 0; 147 installed, audit reported 0 from offline cache
-  - npm run typecheck: exit 0; strict app and DOM-free core project
+  - npm run typecheck: exit 0; strict app and DOM/Node-free core project
   - npm run lint: exit 0; zero warnings
-  - npm run test: exit 0; 23 tests, 2 files, 103 ms on 2026-11-06
+  - npm run test: exit 0; 80 tests, 10 files, 351 ms
   - npm run format:check: exit 0
-  - npm run build: exit 0; static dist generated, Vite 277 ms
-  - PLAYWRIGHT_CHANNEL=chrome npm run test:smoke: exit 0; 1 passed, 3.4 s, local production dist
-  - git ls-remote --heads origin: exit 0; feature 29946cd and main 8519f19 verified against GitHub
-  - Vercel inspect and GET API: READY, Preview, source CLI, SHA 29946cd, GitHub link and production branch main verified
-  - anonymous HTTP: 302 to Vercel SSO; external Playwright not_run, user confirmed published browser checklist
-  - final document integrity: exit 0; 9 original files unchanged, user gitignore preserved, 2 screenshot copies identical, 53 tasks/gates and 10 handoff lines intact, 102 local link targets valid
-manual_acceptance: action_0_accepted_2026-11-06; S1_not_accepted
-last_accepted_intermediate_action: S1-0
-last_accepted_intermediate_commit: 5b5492d867db1ea481d7756b31b80362bf4ebcac
+  - npm run build: exit 0; static dist generated, Vite 96 ms
+  - PLAYWRIGHT_CHANNEL=chrome npm run test:smoke: exit 0; 15 passed, 33.6 s, local production dist, DPR 1/2 and S0 regression
+  - git diff --check: exit 0 including document updates
+  - python3 /private/tmp/splat-input-doccheck.py: exit 0; 154 local file links, 53 original tasks and gates/artifacts, unchanged D-register/protected files/HEAD, 10 handoff lines; nothing staged
+  - historical remote verification before action 1: git ls-remote exit 0; f64af0a / 8519f19 / 29946cd; not rerun in action 5
+  - historical Vercel verification before action 1: CLI list exit 0; only two S0 deployments; not rerun in action 5
+manual_acceptance: S1_accepted_by_user_on_2026-11-06
+last_accepted_intermediate_action: S1-5
+last_accepted_intermediate_commit: not_available_for_action_5; approved uncommitted working tree
 last_accepted_at: 2026-11-06
 known_issues:
   - Historical MASTER_SPEC §8 uses old PRD.md and SPLAT_FINAL_TZ_v2.md names; see BOOTSTRAP_REPORT.
   - Preview requires Vercel SSO for anonymous access; external automated smoke not_run, manual user smoke accepted.
   - User created a technical Production bootstrap and a Preview via CLI; this is not the final S7 release.
-  - Main remains at S−1 (8519f19); no merge. Acceptance and user gitignore preserved in separate local commits; S1 branch has no upstream.
+  - Main remains at S−1 (8519f19); no merge. Accepted preparation f64af0a has branch auto-deploy guard; user authorized closing S1 commit/push, verify actual Git.
   - Node/npm absent from system PATH; temporary Node 24.22.2 is available in /private/tmp, see README.
-  - Firefox, WebGPU and performance measurements not_run; gameplay S1-S7 not_implemented.
-next_stage: S1 action 1 pointer mapping, group selection and highlight; authorized, stop after local demo/checks
-next_stage_workflow: action 0 preparation only; stop after report; then one approved intermediate action per turn with local demo/checks and user approval before the next
+  - Firefox, WebGPU and performance measurements not_run; S1 accepted on current prototype stage; S2-S7 not_implemented.
+next_stage: S2 new chat; handoff preparation authorized; no S2 implementation in this chat
+next_stage_workflow: close S1, authorized commit/push on feature/s1-formations, prepare new-chat prompt; no merge/deploy or S2 implementation
 publication_workflow: local after S0; Vercel deferred to final stages and a separate explicit request; push and merge only as a separate requested action after acceptance of that action's changes
 handoff_notes:
   - S0 explicitly accepted through user confirmation of all checklist items on 2026-11-06.
-  - Action 0 approved for local Git/docs only; implementation of S1 gameplay not authorized, stop after preparation.
+  - S1 accepted; user separately authorized S1 push and S2 prompt; S2 implementation remains for a new chat.
 ---
 
 # Состояние SPLAT!
 
-**S0 принят пользователем 06.11.2026** сообщением «все пункты чеклиста подтверждаю, все хорошо» вместе с URL и скриншотами. Пользователь выполнил GitHub/Vercel-настройку и публикацию вручную; агент повторил локальные проверки и проверил метаданные remote. Принятый source commit — `29946cdefb1208c93b61303ed2fcd8dc984cbee1`. Preview-гейт S0 закрыт: пользователь подтвердил browser checklist, агент подтвердил Preview/READY и совпадение SHA. Внешний Playwright без SSO не запускался и не засчитывается как pass. Подробная [запись приёмки и статистика](S0_ACCEPTANCE.md); [исходный отчёт поставки](S0_REPORT.md). В новом основном чате S1 выполнено только явно разрешённое действие 0 — локальная подготовка Git/документов. Игровая реализация S1–S7 не начата; действие 1 требует отдельного подтверждения.
+**S1 принят пользователем 06.11.2026 на текущей стадии.** Приняты локальные построения/управление и результаты действия 6: 80 unit/integration, 15 Chrome smoke, typecheck/lint/format:check/build pass. Пользователь отдельно поручил сохранить и отправить весь S1 в feature/s1-formations, подготовить передачу новому чату S2. Merge/deploy и реализация S2 здесь не разрешены; запрет автодеплоя S1 сохраняется. [Приёмка](S1_ACCEPTANCE.md), [отчёт](S1_REPORT.md).
+
+## История промежуточных поставок
+
+Сведения об ожидании одобрения ниже относятся к моменту соответствующей поставки; актуальный статус выше и в таблице этапов.
+
+
+**Выбор плотной группы, 06.11.2026:** по запросу пользователя можно выбирать группу кликом между близкими агентами и начинать оттуда drag. Прямое попадание имеет приоритет; локальные промежутки проверяются по текущим координатам, большие разрывы остаются пустым полем. Предел близости 60 world units и геометрия [P], hitRadius 16 сохранён. 72 unit/integration, 15 Chrome smoke и typecheck/lint/format:check/build прошли. Действие 5 и весь S1 ждут ручной оценки; новых commit/push/merge/deploy нет. [Отчёт, проверки и ручной чеклист](S1_ACTION_5_FIX_REPORT.md). Предыдущие записи ниже — история.
+
+
+**Обновление 06.11.2026 — действие 5:** действие 4 принято пользователем. Добавлен временный сигнал растянутого построения: при промежутке соседних целевых слотов >48 world units линия/слоты на 90 fixed ticks становятся коралловыми, появляется текст. Движение/численность/группа не меняются, автоматического split нет. 61 unit/integration + 8 Chrome smoke и typecheck/lint/format:check/build прошли. Действие 5 ожидает одобрения, общая приёмка S1 отдельно; S2 не разрешён. Новых commit/push/merge/deploy нет. [Отчёт действия 5](S1_ACTION_5_REPORT.md). Предыдущие записи ниже — история.
+
+
+**Обновление 06.11.2026 — действие 4:** действие 3 принято пользователем. Реализовано плавное движение 40 агентов к стабильным слотам с ограничением скорости, замедлением и мягким разведением; после прибытия покой. 54 unit/integration + 6 Chrome smoke, typecheck/lint/format:check/build прошли. Действие 4 ожидает одобрения, весь S1 не принят; действие 5 не разрешено. Новых commit/push/merge/deploy нет. [Отчёт действия 4](S1_ACTION_4_REPORT.md). Предыдущие записи ниже — исторические поставки.
+
+
+**Обновление 06.11.2026 — действие 3:** пользователь разрешил слоты/стабильное назначение без движения. Замечание Esc уточнено: отмена только текущего жеста сохраняет прежнюю линию, пустой клик очищает её; подсказка уточнена. Реализованы 40 равномерных по длине слотов, стабильный ID → индекс и сохранение плана через fixed-step команду/frozen snapshot. 47 unit/integration + 5 Chrome smoke и typecheck/lint/format:check/build прошли. Действие 3 ожидает одобрения, действие 4 не разрешено. Новых commit/push/merge/deploy нет. [Отчёт действия 3](S1_ACTION_3_REPORT.md). Предыдущие записи ниже описывают прошлые поставки.
+
+
+**Актуально после действия 2:** действие 1 одобрено пользователем. Только drag/фильтрация/лимиты и превью полилинии реализованы локально; 40 unit/integration + 5 Chrome smoke, typecheck/lint/format:check/build прошли. Действие 2 ожидает одобрения, весь S1 не принят. [Отчёт и ручной чеклист](S1_ACTION_2_REPORT.md). Пустой клик теперь снимает выбор на release, текущий drag отменяется Esc/выходом за поле/resize. Нет слотов/движения; HEAD/upstream f64af0a без новых commit/push/merge/deploy. Детали действия 1 ниже — историческая поставка.
+
+
+**S0 принят пользователем 06.11.2026**, source commit — `29946cdefb1208c93b61303ed2fcd8dc984cbee1`. [Приёмка и доказательства](S0_ACCEPTANCE.md), [исходный отчёт](S0_REPORT.md) сохраняют основание закрытия foundation/Preview-гейта; внешний Playwright без SSO не выполнялся. В S1 действие 0 принято пользователем, его отдельно запрошенный push выполнен вместе с запретом автодеплоя текущей ветки (`f64af0a`). **Действие 1 реализовано и проверено только локально**, ожидает одобрения дизайна и функционала; весь S1 не принят. [Отчёт, команды, файлы и ручной чеклист действия 1](S1_ACTION_1_REPORT.md).
 
 | Этап | status | implemented | tests_verified | manual_acceptance | Результат / следующий гейт |
 |---|---|---|---|---|---|
 | S−1 | accepted | true (documentation only) | not_applicable (documentation checks separate) | accepted (2026-11-05) | Документация принята пользователем; следующий этап — только по отдельному поручению в новом чате |
 | S0 | accepted | true; Preview deployed by user | local pass: 23 unit/integration + 1 smoke; remote metadata verified; remote e2e not_run (SSO) | accepted (2026-11-06) | Пользователь подтвердил весь чеклист; Preview READY, SHA 29946cd; остановка перед S1 |
-| S1 | preparation_complete; gameplay_not_started | false (gameplay); true (action 0 preparation) | gameplay not_run; documentation checks separate | awaiting_review_of_action_0; S1_not_accepted | Ветка подготовлена; остановка перед подтверждением действия 1 |
+| S1 | accepted (2026-11-06) | true (actions 1-6) | local pass: 80 unit/integration + 15 Chrome smoke | S1 accepted by user, current prototype scope | Приёмка S1_ACCEPTANCE; подготовка нового чата S2 |
 | S2 | not_started | false | not_run | not_requested | Две корректные независимо управляемые группы |
 | S3 | not_started | false | not_run | not_requested | Однократный merge без дублей/сирот |
 | S4 | not_started | false | not_run | not_requested | Окраска, однократный win, чистый Restart |
@@ -69,13 +91,21 @@ handoff_notes:
 
 ## Фактическое состояние S0
 
-Созданы package/lockfile и конфиги, src/core/simulation/app/rendering/input/ui, unit/integration и Playwright smoke, статическая сборка dist, vercel.json и инструкции. Зависимости установлены только после разрешения S0; игровая реализация S1–S7 отсутствует. MASTER_SPEC, BOOTSTRAP_REPORT и референсы сохранены без изменения; AGENTS позднее дополнен явными правилами процесса пользователя. Размер мира и timing — [P], не новые Approved-решения.
+Исторический срез S0 создал package/lockfile и конфиги, src/core/simulation/app/rendering/input/ui, unit/integration и Playwright smoke, dist, vercel.json и инструкции. Зависимости установлены после разрешения S0. В действии 0 код не менялся; в действии 1 добавлены только указатель/выбор/подсветка. MASTER_SPEC, BOOTSTRAP_REPORT и референсы сохранены; AGENTS дополнен явными правилами процесса пользователя. Размер мира, timing и новые числа выделения — [P].
 
-На первоначальном аудите S0 Git/runtime/package отсутствовали. Агент создал baseline принятого S−1 `8519f19` и feature-ветку. Затем **пользователь** переименовал репозиторий, создал `29946cd`, отправил main/feature и развернул Vercel. Текущий origin — `https://github.com/monxchrxme/GenAI-SPLAT.git`. Live `git ls-remote` и deployment metadata проверялись при приёмке S0; в действии 0 сетевые проверки не повторялись. `main`/`origin/main` остаются на S−1, merge не выполнен. Прежние записи приёмки сохранены локальным `8452ba0`, пользовательский `.gitignore` — отдельным `8fe235e`. Игровой код и lockfile совпадают с принятым `29946cd`.
+На первоначальном аудите S0 Git/runtime/package отсутствовали. Агент создал baseline S−1 `8519f19`, затем пользователь создал/отправил `29946cd` и развернул S0. Origin — `https://github.com/monxchrxme/GenAI-SPLAT.git`, main/origin/main остаются S−1 без merge. Прежние записи приёмки сохранены `8452ba0`, пользовательский .gitignore — `8fe235e`, действие 0 — `5b5492d`. Отдельно запрошенная отправка подготовки S1 выполнена до начала правок действия 1: GitHub feature/s1-formations = `f64af0a`, upstream настроен. Только принятая подготовка и запрет автодеплоя входят в этот push; gameplay действия 1 остаётся локальным, lockfile не менялся.
+
+## S1 — действие 1, 06.11.2026
+
+Реализованы обратное преобразование client/CSS → viewport → world, выбор группы командой fixed step и статичные кольца выбранных агентов. Клик по пустой области мира снимает выбор, letterbox/неосновной указатель/правая кнопка игнорируются; Restart очищает выбор, очередь и журнал. Агентам не меняются координаты/форма/поза; drag, линии, слоты, движение и натяжение не реализованы. UX и числовые параметры — Proposed, D-06 Open, D-07—D-10 Proposed.
+
+Проверены 35 unit/integration и 3 Chrome smoke (включая прежний S0), typecheck/lint/build/format:check; ошибок JS/console/request/HTTP в smoke нет. Первый smoke в песочнице не смог слушать localhost (EPERM); разрешённый повтор прошёл. Снимок выделения просмотрен агентом, локальная вкладка открыта для пользователя; это не его ручная приёмка. Демо `http://127.0.0.1:4173/` оставлено работающим локально. [Отчёт](S1_ACTION_1_REPORT.md), [снимок](verification/s1-action1/selected.png), [проверка отдельно запрошенного push и отсутствия нового deployment](verification/s1-action1/push-verification.json).
+
+`python3 /private/tmp/splat_s1_action1_docs_verify.py` (стандартная библиотека, временный скрипт вне репозитория) и `git diff --check` завершились exit 0: ровно 30 ожидаемых файлов (18 кода/тестов, 12 документов/доказательств), 53 исходные задачи, 8 гейтов и 8 блоков артефактов, 114 локальных файловых целей ссылок и 10 строк handoff. MASTER_SPEC, package/lockfile, AGENTS, S0-отчёты/доказательства, референсы и текущий vercel.json сохранены относительно f64af0a; HEAD/upstream на f64af0a, staged-файлов нет. Markdown-якоря отдельно не проверялись.
 
 ## Подготовка S1 — действие 0, 06.11.2026
 
-**Обновление:** пользователь принял действие 0 (`5b5492d`) и отдельно запросил его push/необходимую подготовку ветки без deployment. В отдельный технический коммит включён запрет автодеплоя feature/s1-formations в vercel.json; фактический push/remote SHA ещё не проверены. Одновременно разрешено действие 1, его реализация и отчёт остаются локальными. Предыдущее ожидание приёмки в описании действия 0 ниже — историческое состояние поставки; общая приёмка S1 не получена.
+**Обновление:** пользователь принял действие 0 (`5b5492d`) и отдельно запросил push/подготовку ветки без deployment. Коммит `f64af0adf12f87f295122066ecc283c363c219b7` добавил запрет автодеплоя feature/s1-formations; push и GitHub SHA проверены, upstream настроен. Read-only Vercel list показал только прежние два deployment S0. Действие 1 отдельно разрешено и выполнено локально. Ожидание приёмки/отсутствие upstream в описании исходной поставки ниже — история; общая приёмка S1 не получена.
 
 Пользователь подтвердил только сохранение записей приёмки S0 и .gitignore разными локальными коммитами, подготовку feature/s1-formations и запись правил дальнейшей работы. Первый docs-коммит `8452ba00fa30f8571f20625dbb0fd9bdb7d41084` сохранил все прежние 16 документов/доказательств без правки их содержимого; `8fe235ee7a630cb51751c0a450ede0dfda164efc` сохранил только две прежние строки .gitignore. После них выполнено `git switch --no-track -c feature/s1-formations 8fe235ee7a630cb51751c0a450ede0dfda164efc` (exit 0). Новая ветка — потомок принятого S0, без upstream; feature/s0-foundation содержит эти два локальных коммита и опережает свой upstream на 2. Main и локальные origin-ссылки не менялись.
 
@@ -116,13 +146,13 @@ handoff_notes:
 
 ## Handoff (10 строк)
 
-1. S0 принят 06.11.2026; принятый source SHA 29946cdefb1208c93b61303ed2fcd8dc984cbee1 не изменён.
-2. В S1 разрешено и выполнено только действие 0: локальная подготовка Git/документов; gameplay implemented=false, S1 не принят.
-3. Приёмка/доказательства и прежние правила S1 сохранены в 8452ba0, пользовательский .gitignore отдельно в 8fe235e.
-4. Текущая feature/s1-formations создана от 8fe235e, без upstream; main/origin/main остаются 8519f19, новых push/merge нет.
-5. Origin прежний monxchrxme/GenAI-SPLAT; feature/s0-foundation на 8fe235e, её локальный upstream остаётся 29946cd.
-6. Сохранённый Preview S0 защищён SSO; READY/SHA/manual smoke подтверждены при S0, сетевые проверки в действии 0 не повторялись.
-7. Прежние 23 теста + 1 Chrome smoke относятся к S0; в действии 0 npm/typecheck/lint/test/build/smoke не запускались, Node 24.22.2 доступен в /private/tmp.
-8. После S0 разработка/демо/проверки локальные; Vercel отложен до последних стадий и отдельного поручения, автоматические deployments учитывать.
-9. Push/merge только отдельным шагом по запросу после приёмки изменений соответствующего действия; D-06 Open, D-07—D-10 Proposed, финальные спрайты S6.
-10. После отчёта действия 0 остановиться; действие 1 — указатель/выбор/подсветка — требует отдельного подтверждения, далее ровно одно согласованное действие за ход.
+1. S1 принят пользователем 06.11.2026 на текущей стадии; S0/source 29946cd остаётся исторической принятой основой.
+2. Принятый исходник S1: pending_local_commit; рабочая ветка feature/s1-formations, upstream origin/feature/s1-formations — сверить Git.
+3. Пользователь отдельно разрешил commit/push всего S1 и подготовку промпта нового чата S2; merge/deploy не разрешены.
+4. vercel.json запрещает автодеплой только feature/s1-formations; будущая feature/s2-split пока этим правилом не покрыта, без push/настроек самостоятельно.
+5. S1: world pointer, выбор/подсветка и плотные промежутки, полилиния/лимиты/слоты, стабильные ID, плавное движение, временное натяжение без split.
+6. Проверки действия 6: 80 unit/integration / 10 files, 15 Chrome smoke, typecheck/lint/format:check/build pass; runtime/tests при закрытии не менялись.
+7. Firefox/WebGPU/FPS/external S1 smoke not_run; S0 Preview требует SSO; новые deployment при закрытии не разрешены.
+8. Карта/окраска — S4, финальный арт/окружение — S6; угол/проекция из moodboard требуют отдельного визуального согласования, ядро остаётся в world.
+9. S2 только в новом чате: сначала аудит/план и согласование ближайшего действия, ветку предлагать от S1 с актуальными документами, не от старого main.
+10. D-06 Open, D-07—D-10 Proposed; S2 не реализован, main остаётся S−1; история/доказательства S0/S1 сохранены.
