@@ -1,4 +1,5 @@
 import type { GameCommand, GroupId, LevelConfig, MatchState, Snapshot } from '../core/types';
+import { advanceMerge, startMerge } from './merge';
 import { splitFormation } from './split';
 import { createInitialState } from './initialState';
 import { assertInvariants } from './invariants';
@@ -14,7 +15,11 @@ export class Simulation {
 
   constructor(private readonly config: LevelConfig) {
     validateMovement(config);
+    if (!Number.isFinite(config.mergeDistance) || config.mergeDistance <= 0)
+      throw new Error('Invalid merge distance');
     validateTension(config.tension);
+    if (!Number.isSafeInteger(config.mergeHighlightTicks) || config.mergeHighlightTicks < 1)
+      throw new Error('Invalid merge highlight');
     if (
       !Number.isFinite(config.selection.hitRadius) ||
       config.selection.hitRadius <= 0 ||
@@ -40,6 +45,10 @@ export class Simulation {
           this.select(command.groupId);
         continue;
       }
+      if (command.type === 'merge') {
+        startMerge(this.state, command.groupId, command.targetGroupId);
+        continue;
+      }
       if (command.type === 'cut') {
         const group = this.state.groups.find((g) => g.id === command.groupId);
         if (
@@ -50,6 +59,11 @@ export class Simulation {
             (p) =>
               p.x < 0 || p.y < 0 || p.x > this.state.world.width || p.y > this.state.world.height,
           )
+        )
+          continue;
+        if (
+          this.state.merge &&
+          [this.state.merge.first, this.state.merge.second].includes(group.id)
         )
           continue;
         const parts = splitFormation(group.formation, command.points);
@@ -81,6 +95,11 @@ export class Simulation {
           continue;
         const formation = createFormation(command.points, group.agentIds);
         if (formation) {
+          if (
+            this.state.merge &&
+            [this.state.merge.first, this.state.merge.second].includes(group.id)
+          )
+            this.state.merge = null;
           group.formation = formation;
           if (isStretched(formation, this.config.tension)) {
             // The first published snapshot starts a full duration of fixed ticks.
@@ -103,12 +122,23 @@ export class Simulation {
       const selected = pickGroupAtPoint(this.state, command.point, this.config.selection);
       this.select(selected);
     }
-    moveAgents(this.state, this.config);
+    const targets = advanceMerge(
+      this.state,
+      this.config.mergeDistance,
+      this.config.mergeHighlightTicks,
+    );
+    moveAgents(this.state, this.config, targets);
     this.state.tick++;
   }
 
   private select(selected: GroupId | null): void {
     if (selected === null) {
+      if (
+        this.state.merge &&
+        this.state.selectedGroupId &&
+        [this.state.merge.first, this.state.merge.second].includes(this.state.selectedGroupId)
+      )
+        this.state.merge = null;
       const previous = this.state.groups.find((group) => group.id === this.state.selectedGroupId);
       if (previous) {
         delete previous.formation;

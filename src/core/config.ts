@@ -13,6 +13,8 @@ export const DRAWING: DrawingConfig = Object.freeze({
 // [P] D-10: reversible S0 test dimensions, spawn and technical timing.
 export const S0_LEVEL: LevelConfig = Object.freeze({
   // [P] S1 action 5: a visual cue for stretched target spacing, never a split threshold.
+  mergeHighlightTicks: 45, // [P] short feedback after merging
+  mergeDistance: 80, // [P] centre-to-centre distance in world units
   tension: Object.freeze({ neighborGap: 48, durationTicks: 90 }),
   // [P] S1 action 4, world units / seconds. Soft steering, not rigid collision physics.
   movement: Object.freeze({

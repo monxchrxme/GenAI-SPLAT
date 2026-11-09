@@ -29,6 +29,7 @@ export function bindGroupSelectionInput(
 ) {
   let draft: PolylineDraft | null = null;
   let cutMode = false;
+  let mergeMode = false;
   let gestureCut = false;
   let pointerId: number | null = null;
   let origin: Point = { x: 0, y: 0 };
@@ -57,6 +58,7 @@ export function bindGroupSelectionInput(
     cancel();
     completedLimited = false;
     cutMode = false;
+    mergeMode = false;
     pendingSelection = null;
     pendingFormation = null;
   };
@@ -66,6 +68,16 @@ export function bindGroupSelectionInput(
     if (point === null) return;
     event.preventDefault();
     const state = snapshot();
+    if (mergeMode) {
+      const first = effectiveSelection(state);
+      const second = pickGroupAtPoint(state, point, S0_LEVEL.selection);
+      if (first && second && first !== second) {
+        submit({ type: 'merge', groupId: first, targetGroupId: second });
+        pendingFormation = null;
+        mergeMode = false;
+      }
+      return;
+    }
     gestureCut = cutMode;
     if (gestureCut) {
       gestureGroup = effectiveSelection(state);
@@ -135,6 +147,7 @@ export function bindGroupSelectionInput(
     if (event.key === 'Escape') {
       cancel();
       cutMode = false;
+      mergeMode = false;
     }
     if (
       event.key.toLowerCase() === 'x' &&
@@ -143,6 +156,7 @@ export function bindGroupSelectionInput(
     ) {
       cancel();
       cutMode = !cutMode;
+      mergeMode = false;
     }
   };
   const hide = () => {
@@ -168,6 +182,15 @@ export function bindGroupSelectionInput(
     toggleCut() {
       cancel();
       cutMode = !cutMode;
+      mergeMode = false;
+    },
+    toggleMerge() {
+      cancel();
+      mergeMode = !mergeMode;
+      cutMode = false;
+    },
+    get mergeMode() {
+      return mergeMode;
     },
     get cutMode() {
       return cutMode;

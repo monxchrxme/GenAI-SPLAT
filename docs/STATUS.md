@@ -1,11 +1,11 @@
 ---
 updated_at: 2026-11-09
-current_stage: delivery_1_cut
-stage_state: cut_accepted
+current_stage: delivery_1_merge
+stage_state: merge_accepted
 implemented: true
-implementation_scope: S2 Cut prototype; S1 accepted by user on 2026-11-06
+implementation_scope: S3 Merge prototype; Cut accepted 2026-11-09 and S1 accepted 2026-11-06
 preparation_implemented: true
-tests_verified: local_pass; 83 unit/integration and 16 Chrome smoke, including S0/S1 regression
+tests_verified: local_pass; 86 unit/integration and 17 Chrome smoke, including S0/S1/Cut regression
 document_checks_verified: closure pass; 159 local links, 53 original tasks/gates/artifacts, unchanged D-register/protected files, 10 handoff lines, accepted runtime/tests unchanged, deploy guard false, source SHA verified
 awaiting_manual_acceptance: false
 preview_gate: verified_for_S0_only
@@ -32,7 +32,7 @@ last_verified_checks:
   - python3 /private/tmp/splat-input-doccheck.py: exit 0; 154 local file links, 53 original tasks and gates/artifacts, unchanged D-register/protected files/HEAD, 10 handoff lines; nothing staged
   - historical remote verification before action 1: git ls-remote exit 0; f64af0a / 8519f19 / 29946cd; not rerun in action 5
   - historical Vercel verification before action 1: CLI list exit 0; only two S0 deployments; not rerun in action 5
-manual_acceptance: Cut_accepted_by_user_on_2026-11-09; S1_accepted_by_user_on_2026-11-06
+manual_acceptance: Merge_and_Cut_accepted_by_user_on_2026-11-09
 last_accepted_intermediate_action: S1-5
 last_accepted_intermediate_commit: not_available_for_action_5; approved uncommitted working tree
 last_accepted_at: 2026-11-06
@@ -43,13 +43,22 @@ known_issues:
   - Main remains at S−1 (8519f19); no merge. Accepted S1 source 8330ed3 committed; user authorized push on feature/s1-formations with deploy disabled; verify actual Git.
   - Node/npm absent from system PATH; temporary Node 24.22.2 is available in /private/tmp, see README.
   - Firefox, WebGPU and performance measurements not_run; S1 accepted on current prototype stage; S2-S7 not_implemented.
-next_stage: combined delivery 1 S2+S3 and early visual prototype; new chat read-only audit first
-next_stage_workflow: agreed replan documented locally; new chat audits and proposes first action; push/merge/deploy separate authorization
+next_stage: early visual prototype
+next_stage_workflow: awaiting user review; git push/merge and deployment require separate authorization
 publication_workflow: local after S0; Vercel deferred to final stages and a separate explicit request; push and merge only as a separate requested action after acceptance of that action's changes
 handoff_notes:
   - S0 explicitly accepted through user confirmation of all checklist items on 2026-11-06.
   - S1 accepted; user separately authorized S1 push and S2 prompt; S2 implementation remains for a new chat.
 ---
+
+## Первая поставка — Merge, 09.11.2026
+
+- implemented: явный выбор второй дружественной группы, сброс обоих приказов и сближение центров. Порог 80 world units [P], один Group ID первой группы, короткая подсветка 45 ticks [P]. Новый приказ участнику или пустой клик выбранного участника отменяет сближение.
+- tests_verified: 86 unit/integration; Chrome smoke 17/17 во временной копии `/private/tmp/splat-merge-qa.ELLhwx` до добавления обработки пустого клика, позднее проверенной unit-тестом. Typecheck, lint, format:check и build прошли.
+- manual_acceptance: Merge принят пользователем 09.11.2026. Cut принят и сохранён коммитом `ff8e95100331a44f2bb9a357ed28b1a106447f96`, общая поставка остаётся открытой.
+- Проверены 15+25, repeated click, split→merge→split после нового построения, недопустимая фракция, пустая группа и тестовая фикстура удаления агента. Боевой механизм остаётся будущим этапом.
+- Демо: `http://127.0.0.1:4175/`. После Cut дождаться расхождения, выбрать первую группу, «Объединить», выбрать вторую.
+- D-06 Open, D-07—D-10 Proposed. Ранний визуальный прототип и ручная приёмка всей поставки впереди.
 
 ## Первая поставка — Cut, 09.11.2026
 
@@ -97,7 +106,7 @@ handoff_notes:
 | S0 | accepted | true; Preview deployed by user | local pass: 23 unit/integration + 1 smoke; remote metadata verified; remote e2e not_run (SSO) | accepted (2026-11-06) | Пользователь подтвердил весь чеклист; Preview READY, SHA 29946cd; остановка перед S1 |
 | S1 | accepted (2026-11-06) | true (actions 1-6) | local pass: 80 unit/integration + 15 Chrome smoke | S1 accepted by user, current prototype scope | Приёмка S1_ACCEPTANCE; подготовка нового чата S2 |
 | S2 | in_progress | Cut prototype | local tests pass | Cut accepted 2026-11-09 | Две группы и независимые приказы; ожидается оценка правил |
-| S3 | not_started | false | not_run | not_requested | Однократный merge без дублей/сирот |
+| S3 | in_progress | Merge prototype | local tests pass | Merge accepted 2026-11-09 | Сближение и однократное объединение ожидают оценки |
 | S4 | not_started | false | not_run | not_requested | Окраска, однократный win, чистый Restart |
 | S5 | not_started | false | not_run | not_requested | Детерминированный враг, бой, победа/поражение |
 | S6 | not_started | false | not_run | not_requested | B-static, минимальный HUD, понятный UX |

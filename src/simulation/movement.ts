@@ -1,4 +1,4 @@
-import type { LevelConfig, MatchState } from '../core/types';
+import type { AgentId, LevelConfig, MatchState, Point } from '../core/types';
 
 export function validateMovement(config: LevelConfig): void {
   const m = config.movement;
@@ -14,7 +14,11 @@ export function validateMovement(config: LevelConfig): void {
     throw new Error('Invalid movement configuration');
 }
 
-export function moveAgents(state: MatchState, config: LevelConfig): void {
+export function moveAgents(
+  state: MatchState,
+  config: LevelConfig,
+  mergeTargets: ReadonlyMap<AgentId, Point> = new Map(),
+): void {
   const m = config.movement;
   const dt = config.fixedStepMs / 1000;
   // Read old positions for every pair. Apply all changes together, in stable ID order.
@@ -27,7 +31,7 @@ export function moveAgents(state: MatchState, config: LevelConfig): void {
     ),
   );
   const updates = ordered.map((agent) => {
-    const target = targets.get(agent.id);
+    const target = mergeTargets.get(agent.id) ?? targets.get(agent.id);
     if (!target) return { agent, x: agent.x, y: agent.y, vx: 0, vy: 0 };
     const dx = target.x - agent.x,
       dy = target.y - agent.y;

@@ -25,6 +25,7 @@ export interface Group {
   agentIds: AgentId[];
   formation?: Formation;
   tensionUntilTick?: number;
+  mergeHighlightUntilTick?: number;
 }
 
 export interface FormationSlot extends Point {
@@ -52,9 +53,12 @@ export interface MatchState {
   agents: Agent[];
   groups: Group[];
   selectedGroupId: GroupId | null;
+  merge: { first: GroupId; second: GroupId } | null;
 }
 
 export interface LevelConfig {
+  readonly mergeDistance: number;
+  readonly mergeHighlightTicks: number;
   readonly tension: TensionConfig;
   readonly movement: MovementConfig;
   readonly seed: number;
@@ -98,6 +102,7 @@ export interface ClockConfig {
 
 export type CommandIntent =
   | { readonly type: 'restart' }
+  | { readonly type: 'merge'; readonly groupId: GroupId; readonly targetGroupId: GroupId }
   | { readonly type: 'cut'; readonly groupId: GroupId; readonly points: readonly Point[] }
   | { readonly type: 'select-group'; readonly point: Point }
   | { readonly type: 'select-group-id'; readonly groupId: GroupId | null }

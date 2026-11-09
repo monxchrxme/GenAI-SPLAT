@@ -15,6 +15,7 @@ function requiredElement<T extends HTMLElement>(id: string): T {
 async function start(): Promise<void> {
   const arena = requiredElement('arena');
   const hint = requiredElement('hint');
+  const merge = requiredElement<HTMLButtonElement>('merge');
   const cut = requiredElement<HTMLButtonElement>('cut');
   const restart = requiredElement<HTMLButtonElement>('restart');
   const session = new Session(S0_LEVEL, S0_CLOCK);
@@ -42,6 +43,8 @@ async function start(): Promise<void> {
   );
   const toggleCut = () => drawing.toggleCut();
   cut.addEventListener('click', toggleCut);
+  const toggleMerge = () => drawing.toggleMerge();
+  merge.addEventListener('click', toggleMerge);
   let arenaWidth = arena.clientWidth;
   let arenaHeight = arena.clientHeight;
   const observer = new ResizeObserver(() => {
@@ -64,6 +67,10 @@ async function start(): Promise<void> {
     renderer.draw(snapshot, session.restartCount, preview);
     hud.draw(snapshot, preview);
     cut.setAttribute('aria-pressed', String(drawing.cutMode));
+    merge.setAttribute('aria-pressed', String(drawing.mergeMode));
+    if (drawing.mergeMode) hint.textContent = 'Режим Merge: выберите вторую группу. Esc — отмена.';
+    else if (snapshot.merge)
+      hint.textContent = `Группы ${snapshot.merge.first} и ${snapshot.merge.second} сближаются.`;
     if (drawing.cutMode)
       hint.textContent = 'Режим Cut: проведите линию через построение. Esc — отмена.';
     frameId = requestAnimationFrame(frame);
@@ -87,6 +94,7 @@ async function start(): Promise<void> {
     unbindInput();
     drawing.dispose();
     cut.removeEventListener('click', toggleCut);
+    merge.removeEventListener('click', toggleMerge);
     document.removeEventListener('visibilitychange', discardHiddenTime);
     window.removeEventListener('pagehide', dispose);
     renderer.destroy();

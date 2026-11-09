@@ -11,6 +11,7 @@ export function createSnapshot(state: MatchState): Snapshot {
   return freezeTree({
     ...state,
     world: { ...state.world },
+    merge: state.merge ? { ...state.merge } : null,
     agents: state.agents.map((agent) => ({ ...agent })),
     groups: state.groups.map((group) => ({
       ...group,

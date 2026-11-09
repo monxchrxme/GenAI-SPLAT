@@ -107,6 +107,28 @@ export class PixiRenderer {
       .join(',');
     this.canvas.dataset.drawing = String(preview?.active ?? false);
     this.canvas.dataset.drawingLimited = String(preview?.limited ?? false);
+    if (snapshot.merge) {
+      const center = (id: string) => {
+        const agents = snapshot.agents.filter((agent) => agent.alive && agent.groupId === id);
+        return agents.length
+          ? {
+              x: agents.reduce((sum, agent) => sum + agent.x, 0) / agents.length,
+              y: agents.reduce((sum, agent) => sum + agent.y, 0) / agents.length,
+            }
+          : null;
+      };
+      const first = center(snapshot.merge.first),
+        second = center(snapshot.merge.second);
+      if (first && second)
+        this.line
+          .moveTo(first.x, first.y)
+          .lineTo(second.x, second.y)
+          .stroke({
+            color: view.colors.selection,
+            width: view.previewStrokeWidth / this.cameraScale,
+          });
+    }
+    this.canvas.dataset.merging = String(snapshot.merge !== null);
     this.selection.clear();
     let selectionRingCount = 0;
     if (this.generation !== restartCount) {
@@ -131,7 +153,13 @@ export class PixiRenderer {
       }
       // B-static: only position is written; shape, rotation and scale stay fixed.
       marker.position.set(agent.x, agent.y);
-      if (snapshot.selectedGroupId === agent.groupId) {
+      if (
+        snapshot.selectedGroupId === agent.groupId ||
+        snapshot.groups.some(
+          (group) =>
+            group.id === agent.groupId && (group.mergeHighlightUntilTick ?? 0) > snapshot.tick,
+        )
+      ) {
         this.selection.circle(agent.x, agent.y, view.markerRadius + view.selectionPadding);
         selectionRingCount++;
       }
