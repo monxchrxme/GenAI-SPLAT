@@ -57,8 +57,8 @@ export interface PaintConfig {
 }
 
 export interface MatchState {
-  phase: 'running';
-  result: null;
+  phase: 'running' | 'finished';
+  result: 'victory' | null;
   tick: number;
   seed: number;
   rngState: number;
@@ -73,6 +73,7 @@ export interface MatchState {
 
 export interface LevelConfig {
   readonly paint: PaintConfig;
+  readonly victoryFraction: number;
   readonly mergeDistance: number;
   readonly mergeHighlightTicks: number;
   readonly tension: TensionConfig;

@@ -15,6 +15,9 @@ function requiredElement<T extends HTMLElement>(id: string): T {
 async function start(): Promise<void> {
   const arena = requiredElement('arena');
   const hint = requiredElement('hint');
+  const outcome = requiredElement('outcome');
+  requiredElement('paint-goal').textContent =
+    `Территория / цель ${Math.round(S0_LEVEL.victoryFraction * 100)}%`;
   const tilt = requiredElement<HTMLButtonElement>('tilt');
   const samples = requiredElement('visual-samples');
   const merge = requiredElement<HTMLButtonElement>('merge');
@@ -82,6 +85,7 @@ async function start(): Promise<void> {
     const preview = drawing.preview();
     renderer.draw(snapshot, session.restartCount, preview);
     hud.draw(snapshot, preview);
+    outcome.hidden = snapshot.result !== 'victory';
     cut.setAttribute('aria-pressed', String(drawing.cutMode));
     merge.setAttribute('aria-pressed', String(drawing.mergeMode));
     if (drawing.mergeMode)

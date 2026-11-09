@@ -17,6 +17,12 @@ export class Simulation {
   constructor(private readonly config: LevelConfig) {
     validateMovement(config);
     validatePaint(config.paint);
+    if (
+      !Number.isFinite(config.victoryFraction) ||
+      config.victoryFraction <= 0 ||
+      config.victoryFraction > 1
+    )
+      throw new Error('Invalid victory fraction');
     if (!Number.isFinite(config.mergeDistance) || config.mergeDistance <= 0)
       throw new Error('Invalid merge distance');
     validateTension(config.tension);
@@ -35,6 +41,7 @@ export class Simulation {
   }
 
   step(commands: readonly GameCommand[] = []): void {
+    if (this.state.phase === 'finished') return;
     for (const command of commands) {
       if (command.tick !== this.state.tick) continue;
       if (command.type === 'select-group-id') {
@@ -132,6 +139,11 @@ export class Simulation {
     moveAgents(this.state, this.config, targets);
     updatePaint(this.state, this.config);
     this.state.tick++;
+    const owned = this.state.paintCells.filter((cell) => cell.owner === 'blue').length;
+    if (owned / this.state.paintCells.length >= this.config.victoryFraction) {
+      this.state.phase = 'finished';
+      this.state.result = 'victory';
+    }
   }
 
   private select(selected: GroupId | null): void {

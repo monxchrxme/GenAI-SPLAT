@@ -13,6 +13,7 @@ export const DRAWING: DrawingConfig = Object.freeze({
 // [P] D-10: reversible S0 test dimensions, spawn and technical timing.
 export const S0_LEVEL: LevelConfig = Object.freeze({
   // [P] S1 action 5: a visual cue for stretched target spacing, never a split threshold.
+  victoryFraction: 0.6, // [P] objective threshold, pending balancing
   paint: Object.freeze({
     columns: 20,
     rows: 10,

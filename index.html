@@ -20,7 +20,7 @@
             <dd id="agent-count">—</dd>
           </div>
           <div class="counter">
-            <dt>Территория</dt>
+            <dt id="paint-goal">Территория</dt>
             <dd id="paint-progress">—</dd>
           </div>
           <div class="counter">
@@ -36,6 +36,9 @@
         </button>
       </header>
       <section id="arena" aria-label="Игровое поле" aria-describedby="hint">
+        <div id="outcome" hidden role="status" aria-live="polite">
+          Победа! Территория захвачена. Нажмите «Заново», чтобы повторить.
+        </div>
         <aside id="visual-samples" hidden aria-label="Пробные формы Сплатов">
           <span>Пробные формы</span>
           <svg

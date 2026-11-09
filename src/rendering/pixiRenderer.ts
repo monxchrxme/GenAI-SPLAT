@@ -68,21 +68,20 @@ export class PixiRenderer {
       grid.moveTo(0, y).lineTo(this.world.width, y);
     }
     grid.stroke({ color: view.colors.grid, width: 1 });
-    // A small visual study of the arena surface, with no gameplay geometry.
-    const patch = new Graphics()
-      .ellipse(1240, 690, 185, 95)
-      .fill({ color: 0xd7d3c5, alpha: 0.55 })
-      .ellipse(1280, 670, 32, 18)
-      .fill(0xa6a99c)
-      .ellipse(1300, 665, 15, 8)
-      .fill(0xc4c5b5)
-      .ellipse(1160, 745, 24, 13)
-      .fill(0x96a28d)
-      .ellipse(1180, 735, 20, 16)
-      .fill(0xa7b39b);
-    this.decor.addChild(patch);
-    this.decor.visible = false;
-    this.scene.addChild(field, this.paint, grid, this.decor, this.line, this.selection, this.units);
+    // [P] Two open flanks and three landmarks: they never obstruct movement or paint.
+    const lanes = new Graphics();
+    for (const y of view.laneY) {
+      lanes.roundRect(500, y - 85, 860, 170, 85).fill({ color: 0xd8ddcf, alpha: 0.22 });
+    }
+    for (const landmark of view.landmarks) {
+      lanes
+        .circle(landmark.x, landmark.y, landmark.radius)
+        .fill({ color: 0xd8d0bc, alpha: 0.33 })
+        .stroke({ color: 0xaaa38f, width: 2, alpha: 0.55 });
+      lanes.circle(landmark.x, landmark.y, 8).fill({ color: 0x9a9f8d, alpha: 0.65 });
+    }
+    this.decor.addChild(lanes);
+    this.scene.addChild(field, this.decor, this.paint, grid, this.line, this.selection, this.units);
     this.app.stage.addChild(this.scene);
     this.app.canvas.setAttribute('aria-label', 'Поле с 40 синими маркерами');
     this.app.canvas.setAttribute('role', 'img');
@@ -93,7 +92,6 @@ export class PixiRenderer {
 
   setTilt(tilted: boolean): void {
     this.tilted = tilted;
-    this.decor.visible = tilted;
     this.generation = -1;
     this.resize(this.viewport.width, this.viewport.height);
   }

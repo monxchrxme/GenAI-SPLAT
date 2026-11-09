@@ -1,11 +1,11 @@
 ---
 updated_at: 2026-11-09
-current_stage: delivery_2_step_1
-stage_state: step_1_accepted
+current_stage: delivery_2_step_2
+stage_state: step_2_accepted
 implemented: true
-implementation_scope: S4 step 1 territory prototype; delivery 1 remains accepted
+implementation_scope: S4 step 2 map and territory victory prototype; step 1 accepted
 preparation_implemented: true
-tests_verified: local_pass; 94 unit/integration and 20 Chrome smoke in temporary copy
+tests_verified: local_pass; see step 2 entry for checks and scope
 document_checks_verified: closure pass; 159 local links, 53 original tasks/gates/artifacts, unchanged D-register/protected files, 10 handoff lines, accepted runtime/tests unchanged, deploy guard false, source SHA verified
 awaiting_manual_acceptance: false
 preview_gate: verified_for_S0_only
@@ -32,8 +32,8 @@ last_verified_checks:
   - python3 /private/tmp/splat-input-doccheck.py: exit 0; 154 local file links, 53 original tasks and gates/artifacts, unchanged D-register/protected files/HEAD, 10 handoff lines; nothing staged
   - historical remote verification before action 1: git ls-remote exit 0; f64af0a / 8519f19 / 29946cd; not rerun in action 5
   - historical Vercel verification before action 1: CLI list exit 0; only two S0 deployments; not rerun in action 5
-manual_acceptance: delivery_2_step_1_accepted_by_user_on_2026-11-09
-last_accepted_intermediate_action: delivery_2_step_1_territory
+manual_acceptance: delivery_2_step_2_accepted_by_user_on_2026-11-09
+last_accepted_intermediate_action: delivery_2_step_2_map_and_objective
 last_accepted_intermediate_commit: pending_current_commit
 last_accepted_at: 2026-11-09
 known_issues:
@@ -43,7 +43,7 @@ known_issues:
   - Main remains at S−1 (8519f19); no merge. Accepted S1 source 8330ed3 committed; user authorized push on feature/s1-formations with deploy disabled; verify actual Git.
   - Node/npm absent from system PATH; temporary Node 24.22.2 is available in /private/tmp, see README.
   - Firefox, WebGPU and performance measurements not_run; full S4–S7 remain unimplemented.
-next_stage: delivery_2_step_2_map_and_objective
+next_stage: delivery_2_enemy_and_combat_after_step_2_review
 next_stage_workflow: accepted delivery 1 pushed with user authorization for possible Preview; next chat begins with audit and plan; git merge and future deployment remain separate authorization
 publication_workflow: local after S0; Vercel deferred to final stages and a separate explicit request; push and merge only as a separate requested action after acceptance of that action's changes
 handoff_notes:
@@ -106,6 +106,16 @@ handoff_notes:
 - Разрез требует ровно одно пересечение между слотами существующего построения. До первого построения, на слоте, на краю или при нескольких пересечениях команда отклоняется.
 - Начальная группа заменяется двумя ID; выделена сторона начала линии, оба набора слотов сохраняются. Сравнение Cut и натяжения ждёт человека.
 - Первый browser run использовал стандартные `test-results` и пути `reports` существующих тестов: Playwright очищает стандартный каталог результатов, некоторые игнорируемые снимки могли быть перезаписаны. Повтор проведён во временной копии `/private/tmp/splat-cut-qa.jePqFG`.
+
+## Вторая поставка — шаг 2: карта и цель, 09.11.2026
+
+Пользователь подтвердил приёмку черновой схемы и поручил коммит и следующий шаг. Контраст полос и кругов отмечен для дальнейшей визуальной проработки по референсам.
+
+- implemented: пробные два открытых фланга и три визуальных ориентира (без препятствий и бонусов), цель 60% клеток [P]; единственный переход в victory, заморозка состояния, уведомление и чистый Restart. Карта — схема, не финальные ассеты; игровое назначение зон ещё требует согласования.
+- tests_verified: typecheck, lint, format:check, build; 98 unit/integration и 20 Chrome smoke во временной копии `/private/tmp/splat-s4-step2.xDb9CI`. Юнит-тест проверяет ускорение покрытия split в контролируемом сценарии, replay seed+commands, порог и Restart; browser smoke не доводил партию до победы.
+- awaiting_manual_acceptance: false для шага 2 после подтверждения пользователя; S4 и вся поставка не приняты. Полные QA-05/08/10/11/12 и проверка с врагом впереди; переход в победу и Restart проверены автоматически в модели; отображение победного сообщения в браузере не проверено, ручная QA-06 открыта.
+- Принятый шаг 1 сохранён коммитом `aa8db42`; идея нескольких посещений сохранена как будущая гипотеза. D-06 Open; D-07—D-10 Proposed.
+- Handoff: 1) оценить схему флангов и ориентиров; 2) проверить охват после Cut; 3) проверить победу на 60% и Restart; 4) согласовать назначение зон и баланс позже; 5) после решения переходить к врагу и бою; 6) полный QA и приёмка объединённой поставки остаются впереди.
 
 ## Вторая поставка — шаг 1: окраска, 09.11.2026
 

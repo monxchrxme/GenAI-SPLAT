@@ -3,6 +3,13 @@ export const PRESENTATION = Object.freeze({
   padding: 24,
   tiltY: 0.72, // [P] orthographic inclined view for visual review
   maxResolution: 2,
+  // [P] Open lanes and landmarks are decorative, with no collision or bonuses.
+  landmarks: [
+    { x: 800, y: 500, radius: 80 },
+    { x: 1120, y: 245, radius: 58 },
+    { x: 1120, y: 755, radius: 58 },
+  ],
+  laneY: [250, 750],
   markerRadius: 11,
   shadowOffset: 3,
   shadowScaleY: 0.65,
