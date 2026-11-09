@@ -1,5 +1,8 @@
 # SPLAT! — проверки и ручная приёмка
 
+**09.11.2026.** Первая поставка принята пользователем. Последний локальный набор: 90 unit/integration и 19 Chrome smoke, typecheck/lint/format:check/build прошли. Полные QA боя, карты, исходов и публикации остаются будущими. [Отчёт](DELIVERY1_REPORT.md).
+
+
 **S1 принят пользователем 06.11.2026 на текущей стадии.** Приняты локальные построения/управление и результаты действия 6: 80 unit/integration, 15 Chrome smoke, typecheck/lint/format:check/build pass. Пользователь отдельно поручил сохранить и отправить весь S1 в feature/s1-formations, подготовить передачу новому чату S2. Merge/deploy и реализация S2 здесь не разрешены; запрет автодеплоя S1 сохраняется. [Приёмка](S1_ACCEPTANCE.md), [отчёт](S1_REPORT.md).
 
 
@@ -12,16 +15,16 @@
 | ID | Ожидаемый результат | Вид тестирования | Первый этап применения | Статус |
 |---|---|---|---|---|
 | QA-01 | 40 агентов принимают многоизломную форму, остаются одной группой. | unit (геометрия/слоты), integration (движение/членство), manual (устойчивость формы) | S1 | local_tests_verified; manual S1 accepted 2026-11-06: three-corner path, 40 identities/membership, bounded movement, exact slots and stable rest |
-| QA-02 | split 40 → две корректные непустые группы, сумма 40. | unit, integration; manual (независимые приказы) | S2 | not_implemented |
-| QA-03 | merge групп 15 и 25 → группа 40 без дублей. | unit, integration; manual (сближение/выделение) | S3 | not_implemented |
-| QA-04 | split группы из одного агента безопасно отклоняется. | unit, integration | S2 | not_implemented |
-| QA-05 | смерть агента во время независимых приказов, split или merge правильно очищает ссылки и счётчики. | unit, integration; manual (HUD/выделение) | S5 полностью; S3 — фикстура смерти при merge | not_implemented |
+| QA-02 | split 40 → две корректные непустые группы, сумма 40. | unit, integration; manual (независимые приказы) | S2 | local_tests_verified; delivery 1 accepted |
+| QA-03 | merge групп 15 и 25 → группа 40 без дублей. | unit, integration; manual (сближение/выделение) | S3 | local_tests_verified; delivery 1 accepted |
+| QA-04 | split группы из одного агента безопасно отклоняется. | unit, integration | S2 | local_tests_verified; delivery 1 accepted |
+| QA-05 | смерть агента во время независимых приказов, split или merge правильно очищает ссылки и счётчики. | unit, integration; manual (HUD/выделение) | S5 полностью; S3 — фикстура смерти при merge | partial_verified: domain fixture only; combat pending |
 | QA-06 | достижение порога окраски показывает один win-screen, Restart работает. | unit (порог), integration (outcome/reset), e2e, manual | S4 | not_implemented |
-| QA-07 | серия быстрых или пустых жестов не ломает состояние или UI. | unit (фильтрация), integration (команды), e2e, manual | S1; расширение S2/S3 | local_tests_verified; manual S1 accepted 2026-11-06: mixed rapid/empty commands, coalesced turns, frame continuity, cancellation/recovery, resize and Restart; future split/merge coverage pending |
+| QA-07 | серия быстрых или пустых жестов не ломает состояние или UI. | unit (фильтрация), integration (команды), e2e, manual | S1; расширение S2/S3 | local_tests_verified; manual S1 accepted 2026-11-06: mixed rapid/empty commands, coalesced turns, frame continuity, cancellation/recovery, resize and Restart; split/merge repeated commands locally verified |
 | QA-08 | одинаковые seed + журнал команд → одинаковый логический результат независимо от рендера/FPS. | unit, integration; e2e smoke по доступности | S0 — fixed-step/seed основа; полный replay S5 | partial_verified: seed/restart, selection and formation command log at 120 ticks при 30/60/144 FPS; full gameplay replay not_implemented |
 | QA-09 | статичный B-static спрайт при перемещении не морфится, не вращается «перекатыванием», не эмитирует непрерывных частиц. | manual; e2e (движение), review rendering | S0 — статичные маркеры; движение S1; финальные спрайты S6 | partial_verified: B-static position-only movement reviewed, stable canvas after arrival; final sprites/S6 pending |
-| QA-10 | отдельные отряды достигают разных флангов; карта позволяет минимум два осмысленных параллельных маршрута. | integration (независимые цели), manual, e2e по доступности | S2 — группы; полная планировка S4 | not_implemented |
-| QA-11 | HUD и выделение правильны после split/merge/смерти; результат матча не пересчитывается после окончания. | integration, e2e, manual | S2 — split; S3 merge; S4 outcome; S5 смерть | not_implemented |
+| QA-10 | отдельные отряды достигают разных флангов; карта позволяет минимум два осмысленных параллельных маршрута. | integration (независимые цели), manual, e2e по доступности | S2 — группы; полная планировка S4 | partial_verified: independent orders; full map pending |
+| QA-11 | HUD и выделение правильны после split/merge/смерти; результат матча не пересчитывается после окончания. | integration, e2e, manual | S2 — split; S3 merge; S4 outcome; S5 смерть | partial_verified: split/merge HUD and selection; outcome and combat death pending |
 | QA-12 | Vercel preview и production работают с корректными ассетами, координатами мыши и resize. | e2e (Playwright), manual | S0 — preview; pointer S1; production S7, с разрешением | partial_verified: local S1 pointer/resize/CSS offset at DPR 1/2; S0 Vercel manual checklist accepted; external S1 e2e not_run; full production S7 not_implemented |
 
 Раннее частичное применение не означает закрытия всего QA. Новые проверки сохранять и повторять при изменении смежных механизмов. В частности, fixed steps S0 не заменяют replay S5, локальный preview не заменяет Vercel, а Vercel preview не заменяет production. Restart S0 также не закрывает QA-06 без окраски/win S4.

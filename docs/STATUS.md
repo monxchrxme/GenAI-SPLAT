@@ -1,18 +1,18 @@
 ---
 updated_at: 2026-11-09
-current_stage: delivery_1_visual_prototype
-stage_state: visual_prototype_accepted
+current_stage: delivery_1
+stage_state: accepted
 implemented: true
-implementation_scope: early visual prototype; Cut and Merge intermediate steps accepted 2026-11-09
+implementation_scope: S2 + S3 and early visual prototype accepted by user on 2026-11-09
 preparation_implemented: true
-tests_verified: local_pass; 89 unit/integration and 19 Chrome smoke, including S0/S1/Cut/Merge regression
+tests_verified: local_pass; 90 unit/integration and 19 Chrome smoke, including S0/S1/Cut/Merge regression
 document_checks_verified: closure pass; 159 local links, 53 original tasks/gates/artifacts, unchanged D-register/protected files, 10 handoff lines, accepted runtime/tests unchanged, deploy guard false, source SHA verified
 awaiting_manual_acceptance: false
 preview_gate: verified_for_S0_only
 preview_gate_evidence: user browser checklist and agent READY/commit inspection
 external_automated_smoke: not_run_due_to_sso
-last_accepted_commit: 8330ed31ba94b8899889aea58b7c5cdbe420e290
-last_accepted_stage: S1
+last_accepted_commit: 9ab767787df7c06b17250a41cc64b915e2796765
+last_accepted_stage: delivery_1
 working_branch: codex/s2-s3-squads
 upstream: none
 last_pushed_preparation_commit: f64af0adf12f87f295122066ecc283c363c219b7
@@ -32,24 +32,50 @@ last_verified_checks:
   - python3 /private/tmp/splat-input-doccheck.py: exit 0; 154 local file links, 53 original tasks and gates/artifacts, unchanged D-register/protected files/HEAD, 10 handoff lines; nothing staged
   - historical remote verification before action 1: git ls-remote exit 0; f64af0a / 8519f19 / 29946cd; not rerun in action 5
   - historical Vercel verification before action 1: CLI list exit 0; only two S0 deployments; not rerun in action 5
-manual_acceptance: visual_prototype_accepted_2026-11-09; delivery_1_acceptance_pending
-last_accepted_intermediate_action: S1-5
-last_accepted_intermediate_commit: not_available_for_action_5; approved uncommitted working tree
-last_accepted_at: 2026-11-06
+manual_acceptance: delivery_1_accepted_by_user_on_2026-11-09
+last_accepted_intermediate_action: delivery_1_hotkeys
+last_accepted_intermediate_commit: 9ab767787df7c06b17250a41cc64b915e2796765
+last_accepted_at: 2026-11-09
 known_issues:
   - Historical MASTER_SPEC §8 uses old PRD.md and SPLAT_FINAL_TZ_v2.md names; see BOOTSTRAP_REPORT.
   - Preview requires Vercel SSO for anonymous access; external automated smoke not_run, manual user smoke accepted.
   - User created a technical Production bootstrap and a Preview via CLI; this is not the final S7 release.
   - Main remains at S−1 (8519f19); no merge. Accepted S1 source 8330ed3 committed; user authorized push on feature/s1-formations with deploy disabled; verify actual Git.
   - Node/npm absent from system PATH; temporary Node 24.22.2 is available in /private/tmp, see README.
-  - Firefox, WebGPU and performance measurements not_run; S1 accepted on current prototype stage; S2-S7 not_implemented.
-next_stage: delivery 1 integrated QA and overall manual acceptance
-next_stage_workflow: awaiting user review; git push/merge and deployment require separate authorization
+  - Firefox, WebGPU and performance measurements not_run; full S4–S7 remain unimplemented.
+next_stage: S4+S5 in a new main chat
+next_stage_workflow: user requested push of accepted delivery 1; next chat begins with audit and plan; git merge and deployment separate authorization
 publication_workflow: local after S0; Vercel deferred to final stages and a separate explicit request; push and merge only as a separate requested action after acceptance of that action's changes
 handoff_notes:
   - S0 explicitly accepted through user confirmation of all checklist items on 2026-11-06.
-  - S1 accepted; user separately authorized S1 push and S2 prompt; S2 implementation remains for a new chat.
+  - Delivery 1 accepted; next chat S4+S5, see S4_S5_HANDOFF_PROMPT.md.
 ---
+
+## Приёмка первой объединённой поставки — 09.11.2026
+
+Пользователь сообщил «я все принимаю», поручил commit, push и подготовку следующего чата. Первая поставка S2+S3 и ранний визуальный прототип принята целиком. Принятый source `9ab767787df7c06b17250a41cc64b915e2796765`; 90 unit/integration и 19 Chrome smoke, typecheck/lint/format:check/build — последние локальные результаты перед приёмкой, не новый запуск. Точный итог публикации проверять отдельно. [Отчёт](DELIVERY1_REPORT.md), [промпт S4+S5](S4_S5_HANDOFF_PROMPT.md).
+
+Пользователь одобрил ракурс как пример и пробный дизайн Сплатов. Финальный вид карты и ракурс развивать по референсам окружения, переключатель ракурсов временный и должен отсутствовать в финальной версии. D-06 Open, D-07—D-10 Proposed. Следующая поставка — S4+S5 в новом основном чате.
+
+## Горячая клавиша Cut, 09.11.2026
+
+- implemented: Cut использует физическую KeyX при любой раскладке. Как и для Merge, игнорируются удержание, набор текста и сочетания с Ctrl/Cmd/Alt.
+- tests_verified: typecheck/lint/test/format:check/build exit 0, 90 unit/integration и 19 Chrome smoke в `/private/tmp/splat-cut-key-qa.N6Mwfy`. Русская раскладка проверена синтетическим событием KeyX с символом «ч».
+- awaiting_manual_acceptance: true для изменения и общей приёмки поставки. Прежние незакоммиченные изменения сохранены.
+
+## Горячая клавиша Merge, 09.11.2026
+
+- implemented: физическая клавиша M (KeyM) переключает режим Merge, повторное M или Esc отменяет. Подсказка на кнопке и в режиме обновлена. Сочетания с Ctrl/Cmd/Alt, повтор удержания и ввод в текстовых полях не переключают режим.
+- tests_verified: `npm run test` 90/90; `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm run build` exit 0; Chrome smoke 19/19 в `/private/tmp/splat-merge-key-qa.y4j7sL`, включая русскую раскладку через синтетическое событие KeyM, повтор M, Esc и Ctrl+M.
+- awaiting_manual_acceptance: true для корректировки и общей приёмки первой поставки. Прежний интеграционный тест и документы сохранены в рабочем дереве.
+
+## Первая поставка — общая проверка, 09.11.2026
+
+- implemented: Cut, Merge и ранний визуальный прототип; промежуточные шаги одобрены человеком.
+- tests_verified: 90 unit/integration и 19 Chrome smoke, typecheck/lint/format:check/build exit 0 во временной копии. [Отчёт и ручной сценарий](DELIVERY1_REPORT.md).
+- awaiting_manual_acceptance: true для объединённой поставки. Пользователь одобрил силуэты и наклонный ракурс как пример, финальный ракурс/карту следует развивать по референсам, переключатель временный.
+- Cut `ff8e951`, Merge `b2378b0`, визуальный прототип `c22d1bc`. Интеграционный тест и отчёт находятся в рабочем дереве.
+- D-06 Open, D-07—D-10 Proposed. Полные QA боя, карты, исходов и публикации остаются будущим этапам.
 
 ## Первая поставка — визуальный прототип, 09.11.2026
 
@@ -83,7 +109,7 @@ handoff_notes:
 
 # Состояние SPLAT!
 
-**09.11.2026.** Пользователь согласовал три объединённые поставки. Первая включает S2+S3 и ранний визуальный прототип, вторая S4+S5, третья S6+S7. Исходные задачи и QA сохранены в PLAN. Подготовлены локальные документы и обновлённый промпт нового чата, реализация первой поставки не начата. [Новый порядок](PLAN.md), [промпт](S2_HANDOFF_PROMPT.md).
+**Историческая запись перепланирования.** Пользователь согласовал три объединённые поставки. Первая включает S2+S3 и ранний визуальный прототип, вторая S4+S5, третья S6+S7. Исходные задачи и QA сохранены в PLAN. Подготовлены локальные документы и обновлённый промпт нового чата, реализация первой поставки не начата. [Новый порядок](PLAN.md), [промпт](S2_HANDOFF_PROMPT.md).
 
 
 **S1 принят пользователем 06.11.2026 на текущей стадии.** Приняты локальные построения/управление и результаты действия 6: 80 unit/integration, 15 Chrome smoke, typecheck/lint/format:check/build pass. Пользователь отдельно поручил сохранить и отправить весь S1 в feature/s1-formations, подготовить передачу новому чату S2. Merge/deploy и реализация S2 здесь не разрешены; запрет автодеплоя S1 сохраняется. [Приёмка](S1_ACCEPTANCE.md), [отчёт](S1_REPORT.md).
@@ -115,8 +141,8 @@ handoff_notes:
 | S−1 | accepted | true (documentation only) | not_applicable (documentation checks separate) | accepted (2026-11-05) | Документация принята пользователем; следующий этап — только по отдельному поручению в новом чате |
 | S0 | accepted | true; Preview deployed by user | local pass: 23 unit/integration + 1 smoke; remote metadata verified; remote e2e not_run (SSO) | accepted (2026-11-06) | Пользователь подтвердил весь чеклист; Preview READY, SHA 29946cd; остановка перед S1 |
 | S1 | accepted (2026-11-06) | true (actions 1-6) | local pass: 80 unit/integration + 15 Chrome smoke | S1 accepted by user, current prototype scope | Приёмка S1_ACCEPTANCE; подготовка нового чата S2 |
-| S2 | in_progress | Cut prototype | local tests pass | Cut accepted 2026-11-09 | Две группы и независимые приказы; ожидается оценка правил |
-| S3 | in_progress | Merge prototype | local tests pass | Merge accepted 2026-11-09 | Сближение и однократное объединение ожидают оценки |
+| S2 | accepted | Cut and independent orders | local tests pass | accepted 2026-11-09 | QA-02/04 and applicable QA-07/10/11 |
+| S3 | accepted | Merge | local tests pass | accepted 2026-11-09 | QA-03 and applicable QA-11 |
 | S4 | not_started | false | not_run | not_requested | Окраска, однократный win, чистый Restart |
 | S5 | not_started | false | not_run | not_requested | Детерминированный враг, бой, победа/поражение |
 | S6 | not_started | false | not_run | not_requested | B-static, минимальный HUD, понятный UX |
