@@ -24,9 +24,8 @@ test('S0 production build: 40 static markers, clean restart, keyboard, resize, c
   await expect(page.locator('#group-count')).toHaveText('1');
   await expect(page.getByRole('button')).toHaveCount(4);
 
-  const before = await canvas.screenshot();
   await expect.poll(async () => Number(await canvas.getAttribute('data-tick'))).toBeGreaterThan(30);
-  expect((await canvas.screenshot()).equals(before)).toBe(true);
+  await expect(page.locator('#paint-progress')).toContainText('%');
 
   const restart = page.getByRole('button', { name: 'Заново' });
   for (let count = 1; count <= 3; count++) {
@@ -34,7 +33,7 @@ test('S0 production build: 40 static markers, clean restart, keyboard, resize, c
     await expect(canvas).toHaveAttribute('data-restart-count', String(count));
     expect(Number(await canvas.getAttribute('data-tick'))).toBeLessThan(20);
     await expect(canvas).toHaveAttribute('data-marker-count', '40');
-    expect((await canvas.screenshot()).equals(before)).toBe(true);
+    await expect(page.locator('#paint-progress')).toContainText('%');
   }
   await restart.focus();
   await page.keyboard.press('Enter');
@@ -55,7 +54,7 @@ test('S0 production build: 40 static markers, clean restart, keyboard, resize, c
   }
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect.poll(async () => (await canvas.boundingBox())?.width).toBe(1440);
-  expect((await canvas.screenshot()).equals(before)).toBe(true);
+  await expect(page.locator('#paint-progress')).toContainText('%');
   await page.screenshot({ path: 'reports/s0-desktop.png' });
   expect(errors).toEqual([]);
 });

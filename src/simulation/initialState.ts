@@ -40,6 +40,11 @@ export function createInitialState(config: LevelConfig): MatchState {
     seed: config.seed,
     rngState: rng.state,
     world: { ...config.world },
+    paintGrid: { columns: config.paint.columns, rows: config.paint.rows },
+    paintCells: Array.from({ length: config.paint.columns * config.paint.rows }, () => ({
+      control: 0,
+      owner: null,
+    })),
     agents,
     groups: [{ id: groupId, factionId: 'blue', agentIds: agents.map((agent) => agent.id) }],
     selectedGroupId: null,

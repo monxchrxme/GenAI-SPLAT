@@ -10,6 +10,7 @@ export class PixiRenderer {
   private readonly scene = new Container();
   private readonly units = new Container();
   private readonly decor = new Container();
+  private readonly paint = new Graphics();
   private tilted = false;
   private readonly selection = new Graphics();
   private readonly line = new Graphics();
@@ -52,14 +53,21 @@ export class PixiRenderer {
       .fill(view.colors.arena)
       .stroke({ color: view.colors.border, width: 2 });
     const grid = new Graphics();
-    for (let x = view.gridSpacing; x < this.world.width; x += view.gridSpacing) {
+    for (
+      let x = this.world.width / snapshot.paintGrid.columns;
+      x < this.world.width;
+      x += this.world.width / snapshot.paintGrid.columns
+    ) {
       grid.moveTo(x, 0).lineTo(x, this.world.height);
     }
-    for (let y = view.gridSpacing; y < this.world.height; y += view.gridSpacing) {
+    for (
+      let y = this.world.height / snapshot.paintGrid.rows;
+      y < this.world.height;
+      y += this.world.height / snapshot.paintGrid.rows
+    ) {
       grid.moveTo(0, y).lineTo(this.world.width, y);
     }
     grid.stroke({ color: view.colors.grid, width: 1 });
-    // This grid is visual only; there is no territory or paint model in S0.
     // A small visual study of the arena surface, with no gameplay geometry.
     const patch = new Graphics()
       .ellipse(1240, 690, 185, 95)
@@ -74,7 +82,7 @@ export class PixiRenderer {
       .fill(0xa7b39b);
     this.decor.addChild(patch);
     this.decor.visible = false;
-    this.scene.addChild(field, grid, this.decor, this.line, this.selection, this.units);
+    this.scene.addChild(field, this.paint, grid, this.decor, this.line, this.selection, this.units);
     this.app.stage.addChild(this.scene);
     this.app.canvas.setAttribute('aria-label', 'Поле с 40 синими маркерами');
     this.app.canvas.setAttribute('role', 'img');
@@ -104,6 +112,20 @@ export class PixiRenderer {
   }
 
   draw(snapshot: Snapshot, restartCount: number, preview?: DrawingPreview): void {
+    this.paint.clear();
+    const columns = snapshot.paintGrid.columns;
+    const rows = snapshot.paintGrid.rows;
+    const width = snapshot.world.width / columns;
+    const height = snapshot.world.height / rows;
+    for (const [index, cell] of snapshot.paintCells.entries()) {
+      if (cell.control === 0) continue;
+      this.paint
+        .rect((index % columns) * width, Math.floor(index / columns) * height, width, height)
+        .fill({
+          color: cell.control > 0 ? view.colors.paintBlue : view.colors.paintRed,
+          alpha: 0.12 + Math.abs(cell.control) * 0.25,
+        });
+    }
     const selected = snapshot.groups.find((group) => group.id === snapshot.selectedGroupId);
     const tension =
       preview?.active || preview?.pending

@@ -12,6 +12,8 @@ export function createSnapshot(state: MatchState): Snapshot {
     ...state,
     world: { ...state.world },
     merge: state.merge ? { ...state.merge } : null,
+    paintGrid: { ...state.paintGrid },
+    paintCells: state.paintCells.map((cell) => ({ ...cell })),
     agents: state.agents.map((agent) => ({ ...agent })),
     groups: state.groups.map((group) => ({
       ...group,

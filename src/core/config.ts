@@ -13,6 +13,13 @@ export const DRAWING: DrawingConfig = Object.freeze({
 // [P] D-10: reversible S0 test dimensions, spawn and technical timing.
 export const S0_LEVEL: LevelConfig = Object.freeze({
   // [P] S1 action 5: a visual cue for stretched target spacing, never a split threshold.
+  paint: Object.freeze({
+    columns: 20,
+    rows: 10,
+    radius: 90,
+    ratePerSecond: 0.5,
+    ownerThreshold: 0.6,
+  }), // [P] S4 territory prototype
   mergeHighlightTicks: 45, // [P] short feedback after merging
   mergeDistance: 80, // [P] centre-to-centre distance in world units
   tension: Object.freeze({ neighborGap: 48, durationTicks: 90 }),

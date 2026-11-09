@@ -43,6 +43,19 @@ export interface World {
   height: number;
 }
 
+export interface PaintCell {
+  control: number;
+  owner: FactionId | null;
+}
+
+export interface PaintConfig {
+  readonly columns: number;
+  readonly rows: number;
+  readonly radius: number;
+  readonly ratePerSecond: number;
+  readonly ownerThreshold: number;
+}
+
 export interface MatchState {
   phase: 'running';
   result: null;
@@ -50,6 +63,8 @@ export interface MatchState {
   seed: number;
   rngState: number;
   world: World;
+  paintGrid: { columns: number; rows: number };
+  paintCells: PaintCell[];
   agents: Agent[];
   groups: Group[];
   selectedGroupId: GroupId | null;
@@ -57,6 +72,7 @@ export interface MatchState {
 }
 
 export interface LevelConfig {
+  readonly paint: PaintConfig;
   readonly mergeDistance: number;
   readonly mergeHighlightTicks: number;
   readonly tension: TensionConfig;

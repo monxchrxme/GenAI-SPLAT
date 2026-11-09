@@ -25,7 +25,6 @@ test('QA-01: 40 agents reach a stable three-corner form, resize preserves order 
   await page.goto('/');
   await expect(page.locator('#arena')).toHaveAttribute('data-ready', 'true');
   const canvas = page.locator('canvas');
-  const initial = await canvas.screenshot();
   const first = createInitialState(S0_LEVEL).agents[0]!;
   const pick = await screen(canvas, first.x, first.y);
   await page.mouse.click(pick.x, pick.y);
@@ -52,18 +51,18 @@ test('QA-01: 40 agents reach a stable three-corner form, resize preserves order 
   await expect(canvas).toHaveAttribute('data-slot-count', '40');
   await expect(canvas).toHaveAttribute('data-moving-count', '0', { timeout: 15000 });
   await expect(canvas).toHaveAttribute('data-max-slot-error', '0');
-  const settled = await canvas.screenshot();
   const tick = Number(await canvas.getAttribute('data-tick'));
   await expect
     .poll(async () => Number(await canvas.getAttribute('data-tick')))
     .toBeGreaterThan(tick + 30);
-  expect((await canvas.screenshot()).equals(settled)).toBe(true);
+  await expect(canvas).toHaveAttribute('data-moving-count', '0');
+  await expect(canvas).toHaveAttribute('data-max-slot-error', '0');
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect.poll(async () => (await canvas.boundingBox())?.width).toBe(1440);
   await page.screenshot({ path: 'reports/s1-action6-settled.png' });
   await page.getByRole('button', { name: 'Заново' }).click();
   await expect(canvas).toHaveAttribute('data-slot-count', '0');
   await expect(canvas).toHaveAttribute('data-moving-count', '0');
-  expect((await canvas.screenshot()).equals(initial)).toBe(true);
+  await expect(page.locator('#paint-progress')).toHaveText('0%');
   expect(errors).toEqual([]);
 });

@@ -1,4 +1,5 @@
 import type { GameCommand, GroupId, LevelConfig, MatchState, Snapshot } from '../core/types';
+import { updatePaint, validatePaint } from './paint';
 import { advanceMerge, startMerge } from './merge';
 import { splitFormation } from './split';
 import { createInitialState } from './initialState';
@@ -15,6 +16,7 @@ export class Simulation {
 
   constructor(private readonly config: LevelConfig) {
     validateMovement(config);
+    validatePaint(config.paint);
     if (!Number.isFinite(config.mergeDistance) || config.mergeDistance <= 0)
       throw new Error('Invalid merge distance');
     validateTension(config.tension);
@@ -128,6 +130,7 @@ export class Simulation {
       this.config.mergeHighlightTicks,
     );
     moveAgents(this.state, this.config, targets);
+    updatePaint(this.state, this.config);
     this.state.tick++;
   }
 

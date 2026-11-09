@@ -3,7 +3,6 @@ export const PRESENTATION = Object.freeze({
   padding: 24,
   tiltY: 0.72, // [P] orthographic inclined view for visual review
   maxResolution: 2,
-  gridSpacing: 100,
   markerRadius: 11,
   shadowOffset: 3,
   shadowScaleY: 0.65,
@@ -21,6 +20,8 @@ export const PRESENTATION = Object.freeze({
     arena: 0xf3f0e7,
     grid: 0xe3dfd4,
     border: 0xc9c4b7,
+    paintBlue: 0x3977d4,
+    paintRed: 0xd66459,
     blue: 0x2866dc,
     blueEdge: 0x1e4eb1,
     highlight: 0x8bb7ff,

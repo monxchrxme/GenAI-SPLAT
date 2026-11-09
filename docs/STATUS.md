@@ -1,11 +1,11 @@
 ---
 updated_at: 2026-11-09
-current_stage: delivery_1
-stage_state: accepted
+current_stage: delivery_2_step_1
+stage_state: step_1_accepted
 implemented: true
-implementation_scope: S2 + S3 and early visual prototype accepted by user on 2026-11-09
+implementation_scope: S4 step 1 territory prototype; delivery 1 remains accepted
 preparation_implemented: true
-tests_verified: local_pass; 90 unit/integration and 19 Chrome smoke, including S0/S1/Cut/Merge regression
+tests_verified: local_pass; 94 unit/integration and 20 Chrome smoke in temporary copy
 document_checks_verified: closure pass; 159 local links, 53 original tasks/gates/artifacts, unchanged D-register/protected files, 10 handoff lines, accepted runtime/tests unchanged, deploy guard false, source SHA verified
 awaiting_manual_acceptance: false
 preview_gate: verified_for_S0_only
@@ -13,8 +13,8 @@ preview_gate_evidence: user browser checklist and agent READY/commit inspection
 external_automated_smoke: not_run_due_to_sso
 last_accepted_commit: 9ab767787df7c06b17250a41cc64b915e2796765
 last_accepted_stage: delivery_1
-working_branch: codex/s2-s3-squads
-upstream: origin/codex/s2-s3-squads
+working_branch: codex/s4-s5-territory-combat
+upstream: none
 last_pushed_preparation_commit: f64af0adf12f87f295122066ecc283c363c219b7
 local_s0_acceptance_commit: 8452ba00fa30f8571f20625dbb0fd9bdb7d41084
 local_gitignore_commit: 8fe235ee7a630cb51751c0a450ede0dfda164efc
@@ -32,9 +32,9 @@ last_verified_checks:
   - python3 /private/tmp/splat-input-doccheck.py: exit 0; 154 local file links, 53 original tasks and gates/artifacts, unchanged D-register/protected files/HEAD, 10 handoff lines; nothing staged
   - historical remote verification before action 1: git ls-remote exit 0; f64af0a / 8519f19 / 29946cd; not rerun in action 5
   - historical Vercel verification before action 1: CLI list exit 0; only two S0 deployments; not rerun in action 5
-manual_acceptance: delivery_1_accepted_by_user_on_2026-11-09
-last_accepted_intermediate_action: delivery_1_hotkeys
-last_accepted_intermediate_commit: 9ab767787df7c06b17250a41cc64b915e2796765
+manual_acceptance: delivery_2_step_1_accepted_by_user_on_2026-11-09
+last_accepted_intermediate_action: delivery_2_step_1_territory
+last_accepted_intermediate_commit: pending_current_commit
 last_accepted_at: 2026-11-09
 known_issues:
   - Historical MASTER_SPEC §8 uses old PRD.md and SPLAT_FINAL_TZ_v2.md names; see BOOTSTRAP_REPORT.
@@ -43,7 +43,7 @@ known_issues:
   - Main remains at S−1 (8519f19); no merge. Accepted S1 source 8330ed3 committed; user authorized push on feature/s1-formations with deploy disabled; verify actual Git.
   - Node/npm absent from system PATH; temporary Node 24.22.2 is available in /private/tmp, see README.
   - Firefox, WebGPU and performance measurements not_run; full S4–S7 remain unimplemented.
-next_stage: S4+S5 in a new main chat
+next_stage: delivery_2_step_2_map_and_objective
 next_stage_workflow: accepted delivery 1 pushed with user authorization for possible Preview; next chat begins with audit and plan; git merge and future deployment remain separate authorization
 publication_workflow: local after S0; Vercel deferred to final stages and a separate explicit request; push and merge only as a separate requested action after acceptance of that action's changes
 handoff_notes:
@@ -106,6 +106,16 @@ handoff_notes:
 - Разрез требует ровно одно пересечение между слотами существующего построения. До первого построения, на слоте, на краю или при нескольких пересечениях команда отклоняется.
 - Начальная группа заменяется двумя ID; выделена сторона начала линии, оба набора слотов сохраняются. Сравнение Cut и натяжения ждёт человека.
 - Первый browser run использовал стандартные `test-results` и пути `reports` существующих тестов: Playwright очищает стандартный каталог результатов, некоторые игнорируемые снимки могли быть перезаписаны. Повтор проведён во временной копии `/private/tmp/splat-cut-qa.jePqFG`.
+
+## Вторая поставка — шаг 1: окраска, 09.11.2026
+
+Пользователь принял шаг и поручил коммит и следующий шаг. Баланс предлагается оценивать после карты и врагов; идея нескольких посещений для захвата отложена для будущего обсуждения.
+
+- implemented: сетка 20×10, control от −1 до 1, owner по порогу 0.6, радиус 90, скорость 0.5/с [P]; присутствие каждой фракции бинарно, противоположное присутствие взаимно отменяется, без присутствия контроль сохраняется. HUD показывает долю принадлежащих синим клеток; интенсивность заливки отражает control ещё до владения.
+- tests_verified: во временной копии `/private/tmp/splat-s4-step1.7dntCM` прошли typecheck, lint, 94 unit/integration, build и 20 Chrome smoke. Первый smoke 17/20 выявил старые побайтовые сравнения меняющегося поля; тесты адаптированы и повторный набор прошёл. Проверки статичности всего изображения заменены проверками движения/выделения; полноценная визуальная QA остаётся ручной.
+- awaiting_manual_acceptance: false для шага 1 после сообщения пользователя. Это промежуточный шаг, S4/S5 и вся поставка не приняты. Победа, новая карта, враг и бой не реализованы; полные QA-05/06/08/10/11/12 впереди. D-06 Open, D-07—D-10 Proposed.
+- Ветка `codex/s4-s5-territory-combat` создана от `d74f064160c9a79a8de8cd13be76a1dcea91e313`, upstream отсутствует. Push/merge/deploy не выполнялись.
+- Handoff: 1) проверить читаемость клеток и HUD; 2) оценить скорость/радиус и бинарное присутствие; 3) проверить движение и Cut/Merge; 4) проверить Restart; 5) после согласования перейти к карте и цели S4; 6) QA охвата/концентрации и S5 остаются впереди.
 
 # Состояние SPLAT!
 

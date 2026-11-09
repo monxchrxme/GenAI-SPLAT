@@ -6,12 +6,14 @@ export class Hud {
   constructor(
     private readonly agentCount: HTMLElement,
     private readonly groupCount: HTMLElement,
+    private readonly paintProgress: HTMLElement,
     private readonly hint: HTMLElement,
   ) {}
 
   draw(snapshot: Snapshot, preview?: DrawingPreview): void {
     this.agentCount.textContent = String(snapshot.agents.filter((agent) => agent.alive).length);
     this.groupCount.textContent = String(snapshot.groups.length);
+    this.paintProgress.textContent = `${Math.round((100 * snapshot.paintCells.filter((cell) => cell.owner === 'blue').length) / snapshot.paintCells.length)}%`;
     const selected = snapshot.groups.find((group) => group.id === snapshot.selectedGroupId);
     const moving = snapshot.agents.some(
       (a) => a.groupId === selected?.id && (a.vx !== 0 || a.vy !== 0),

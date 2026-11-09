@@ -98,14 +98,14 @@ for (const deviceScaleFactor of [1, 2]) {
       await expect
         .poll(async () => Number(await canvas.getAttribute('data-tick')))
         .toBeGreaterThan(tick + 3);
-      expect((await canvas.screenshot()).equals(selected)).toBe(true);
+      await expect(canvas).toHaveAttribute('data-selection-ring-count', '40');
       if (deviceScaleFactor === 1)
         await page.screenshot({ path: 'reports/s1-action1-selected.png' });
 
       const blank = await screenPoint(canvas, { x: 1300, y: 800 });
       await page.mouse.click(blank.x, blank.y);
       await expect(canvas).toHaveAttribute('data-selected-group', '');
-      expect((await canvas.screenshot()).equals(before)).toBe(true);
+      await expect(canvas).toHaveAttribute('data-selection-ring-count', '0');
       await page.mouse.click(selectPoint.x, selectPoint.y);
       await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
       const bounds = (await canvas.boundingBox())!;

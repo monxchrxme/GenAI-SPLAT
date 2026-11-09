@@ -22,7 +22,12 @@ async function start(): Promise<void> {
   const restart = requiredElement<HTMLButtonElement>('restart');
   const session = new Session(S0_LEVEL, S0_CLOCK);
   const renderer = new PixiRenderer();
-  const hud = new Hud(requiredElement('agent-count'), requiredElement('group-count'), hint);
+  const hud = new Hud(
+    requiredElement('agent-count'),
+    requiredElement('group-count'),
+    requiredElement('paint-progress'),
+    hint,
+  );
 
   try {
     await renderer.init(arena, session.getSnapshot());
