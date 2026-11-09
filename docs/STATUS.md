@@ -14,7 +14,7 @@ external_automated_smoke: not_run_due_to_sso
 last_accepted_commit: 9ab767787df7c06b17250a41cc64b915e2796765
 last_accepted_stage: delivery_1
 working_branch: codex/s2-s3-squads
-upstream: none
+upstream: origin/codex/s2-s3-squads
 last_pushed_preparation_commit: f64af0adf12f87f295122066ecc283c363c219b7
 local_s0_acceptance_commit: 8452ba00fa30f8571f20625dbb0fd9bdb7d41084
 local_gitignore_commit: 8fe235ee7a630cb51751c0a450ede0dfda164efc
@@ -44,7 +44,7 @@ known_issues:
   - Node/npm absent from system PATH; temporary Node 24.22.2 is available in /private/tmp, see README.
   - Firefox, WebGPU and performance measurements not_run; full S4–S7 remain unimplemented.
 next_stage: S4+S5 in a new main chat
-next_stage_workflow: user requested push of accepted delivery 1; next chat begins with audit and plan; git merge and deployment separate authorization
+next_stage_workflow: accepted delivery 1 pushed with user authorization for possible Preview; next chat begins with audit and plan; git merge and future deployment remain separate authorization
 publication_workflow: local after S0; Vercel deferred to final stages and a separate explicit request; push and merge only as a separate requested action after acceptance of that action's changes
 handoff_notes:
   - S0 explicitly accepted through user confirmation of all checklist items on 2026-11-06.
@@ -53,7 +53,7 @@ handoff_notes:
 
 ## Приёмка первой объединённой поставки — 09.11.2026
 
-Пользователь сообщил «я все принимаю», поручил commit, push и подготовку следующего чата. Первая поставка S2+S3 и ранний визуальный прототип принята целиком. Принятый source `9ab767787df7c06b17250a41cc64b915e2796765`; 90 unit/integration и 19 Chrome smoke, typecheck/lint/format:check/build — последние локальные результаты перед приёмкой, не новый запуск. Точный итог публикации проверять отдельно. [Отчёт](DELIVERY1_REPORT.md), [промпт S4+S5](S4_S5_HANDOFF_PROMPT.md).
+Пользователь сообщил «я все принимаю», поручил commit, push и подготовку следующего чата. Отдельно разрешил push с возможным Preview. Команда `git push --set-upstream origin codex/s2-s3-squads` завершилась exit 0, `git ls-remote` подтвердил `dcade8b8eb620dbe0796554d7bdcfe94c55a55bb`; main `8519f198f501e9fba3bfd32693f0306f0043ccd5`. Статус нового deployment не проверялся. Первая поставка S2+S3 и ранний визуальный прототип принята целиком. Принятый source `9ab767787df7c06b17250a41cc64b915e2796765`; 90 unit/integration и 19 Chrome smoke, typecheck/lint/format:check/build — последние локальные результаты перед приёмкой, не новый запуск. Точный итог публикации проверять отдельно. [Отчёт](DELIVERY1_REPORT.md), [промпт S4+S5](S4_S5_HANDOFF_PROMPT.md).
 
 Пользователь одобрил ракурс как пример и пробный дизайн Сплатов. Финальный вид карты и ракурс развивать по референсам окружения, переключатель ракурсов временный и должен отсутствовать в финальной версии. D-06 Open, D-07—D-10 Proposed. Следующая поставка — S4+S5 в новом основном чате.
 
