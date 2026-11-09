@@ -26,6 +26,7 @@ body {
 }
 .hud {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
@@ -155,4 +156,23 @@ button[aria-pressed='true'] {
   color: #fff;
   background: #2866dc;
   border-color: #2866dc;
+}
+#arena {
+  position: relative;
+}
+#visual-samples:not([hidden]) {
+  position: absolute;
+  z-index: 1;
+  right: 20px;
+  bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border: 1px solid #c9c4b7;
+  border-radius: 10px;
+  background: #f7f5efed;
+  color: #686d72;
+  font-size: 12px;
+  pointer-events: none;
 }

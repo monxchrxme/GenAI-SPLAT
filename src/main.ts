@@ -15,6 +15,8 @@ function requiredElement<T extends HTMLElement>(id: string): T {
 async function start(): Promise<void> {
   const arena = requiredElement('arena');
   const hint = requiredElement('hint');
+  const tilt = requiredElement<HTMLButtonElement>('tilt');
+  const samples = requiredElement('visual-samples');
   const merge = requiredElement<HTMLButtonElement>('merge');
   const cut = requiredElement<HTMLButtonElement>('cut');
   const restart = requiredElement<HTMLButtonElement>('restart');
@@ -43,6 +45,15 @@ async function start(): Promise<void> {
   );
   const toggleCut = () => drawing.toggleCut();
   cut.addEventListener('click', toggleCut);
+  let tilted = false;
+  const toggleTilt = () => {
+    drawing.cancel();
+    tilted = !tilted;
+    renderer.setTilt(tilted);
+    tilt.setAttribute('aria-pressed', String(tilted));
+    samples.hidden = !tilted;
+  };
+  tilt.addEventListener('click', toggleTilt);
   const toggleMerge = () => drawing.toggleMerge();
   merge.addEventListener('click', toggleMerge);
   let arenaWidth = arena.clientWidth;
@@ -95,6 +106,7 @@ async function start(): Promise<void> {
     drawing.dispose();
     cut.removeEventListener('click', toggleCut);
     merge.removeEventListener('click', toggleMerge);
+    tilt.removeEventListener('click', toggleTilt);
     document.removeEventListener('visibilitychange', discardHiddenTime);
     window.removeEventListener('pagehide', dispose);
     renderer.destroy();

@@ -21,13 +21,42 @@
             <dd id="group-count">—</dd>
           </div>
         </dl>
+        <button id="tilt" type="button" aria-pressed="false">Наклонный ракурс</button>
         <button id="cut" type="button" aria-pressed="false">Разрезать (X)</button>
         <button id="merge" type="button" aria-pressed="false">Объединить</button>
         <button id="restart" type="button" disabled>
           <span aria-hidden="true">↺</span> Заново
         </button>
       </header>
-      <section id="arena" aria-label="Игровое поле" aria-describedby="hint"></section>
+      <section id="arena" aria-label="Игровое поле" aria-describedby="hint">
+        <aside id="visual-samples" hidden aria-label="Пробные формы Сплатов">
+          <span>Пробные формы</span>
+          <svg
+            viewBox="0 0 106 48"
+            width="106"
+            height="48"
+            role="img"
+            aria-label="Синий и красный статичные сгустки"
+          >
+            <ellipse cx="25" cy="40" rx="20" ry="4" fill="#313c52" opacity=".14" />
+            <path
+              d="M7 28 C5 17 15 9 25 10 C36 8 44 16 43 28 C42 37 34 39 25 39 C16 39 8 36 7 28Z"
+              fill="#2866dc"
+              stroke="#1e4eb1"
+              stroke-width="2"
+            />
+            <ellipse cx="19" cy="18" rx="5" ry="3" fill="#8bb7ff" opacity=".8" />
+            <ellipse cx="78" cy="40" rx="20" ry="4" fill="#313c52" opacity=".14" />
+            <path
+              d="M59 29 C58 20 64 12 71 10 C77 8 81 12 86 11 C93 13 98 20 96 30 C94 37 87 39 78 39 C69 39 61 37 59 29Z"
+              fill="#d8554d"
+              stroke="#9d3f3b"
+              stroke-width="2"
+            />
+            <ellipse cx="70" cy="19" rx="5" ry="3" fill="#ffb0a5" opacity=".8" />
+          </svg>
+        </aside>
+      </section>
       <footer class="footer">
         <p id="hint" role="status">Подготовка поля…</p>
         <span class="stage-label">S1 · Прототип</span>

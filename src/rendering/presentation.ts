@@ -1,6 +1,7 @@
 // [P] S0 presentation values, pending D-10 scale/contrast acceptance.
 export const PRESENTATION = Object.freeze({
   padding: 24,
+  tiltY: 0.72, // [P] orthographic inclined view for visual review
   maxResolution: 2,
   gridSpacing: 100,
   markerRadius: 11,

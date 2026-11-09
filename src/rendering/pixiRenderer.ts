@@ -9,6 +9,8 @@ export class PixiRenderer {
   private readonly app = new Application();
   private readonly scene = new Container();
   private readonly units = new Container();
+  private readonly decor = new Container();
+  private tilted = false;
   private readonly selection = new Graphics();
   private readonly line = new Graphics();
   private readonly markers = new Map<AgentId, Graphics>();
@@ -28,6 +30,7 @@ export class PixiRenderer {
       this.viewport,
       this.world,
       view.padding,
+      this.tilted ? view.tiltY : 1,
     );
   }
 
@@ -57,7 +60,21 @@ export class PixiRenderer {
     }
     grid.stroke({ color: view.colors.grid, width: 1 });
     // This grid is visual only; there is no territory or paint model in S0.
-    this.scene.addChild(field, grid, this.line, this.selection, this.units);
+    // A small visual study of the arena surface, with no gameplay geometry.
+    const patch = new Graphics()
+      .ellipse(1240, 690, 185, 95)
+      .fill({ color: 0xd7d3c5, alpha: 0.55 })
+      .ellipse(1280, 670, 32, 18)
+      .fill(0xa6a99c)
+      .ellipse(1300, 665, 15, 8)
+      .fill(0xc4c5b5)
+      .ellipse(1160, 745, 24, 13)
+      .fill(0x96a28d)
+      .ellipse(1180, 735, 20, 16)
+      .fill(0xa7b39b);
+    this.decor.addChild(patch);
+    this.decor.visible = false;
+    this.scene.addChild(field, grid, this.decor, this.line, this.selection, this.units);
     this.app.stage.addChild(this.scene);
     this.app.canvas.setAttribute('aria-label', 'Поле с 40 синими маркерами');
     this.app.canvas.setAttribute('role', 'img');
@@ -66,13 +83,24 @@ export class PixiRenderer {
     this.resize(host.clientWidth, host.clientHeight);
   }
 
+  setTilt(tilted: boolean): void {
+    this.tilted = tilted;
+    this.decor.visible = tilted;
+    this.generation = -1;
+    this.resize(this.viewport.width, this.viewport.height);
+  }
+
   resize(width: number, height: number): void {
     this.viewport = { width: Math.max(1, width), height: Math.max(1, height) };
     this.app.renderer.resize(this.viewport.width, this.viewport.height);
     const camera = fitWorld(this.viewport.width, this.viewport.height, this.world, view.padding);
     this.cameraScale = camera.scale;
-    this.scene.scale.set(camera.scale);
-    this.scene.position.set(camera.x, camera.y);
+    const tiltY = this.tilted ? view.tiltY : 1;
+    this.scene.scale.set(camera.scale, camera.scale * tiltY);
+    this.scene.position.set(
+      camera.x,
+      (this.viewport.height - this.world.height * camera.scale * tiltY) / 2,
+    );
   }
 
   draw(snapshot: Snapshot, restartCount: number, preview?: DrawingPreview): void {
@@ -142,12 +170,27 @@ export class PixiRenderer {
       if (!marker) {
         marker = new Graphics()
           .ellipse(0, view.shadowOffset, view.markerRadius, view.markerRadius * view.shadowScaleY)
-          .fill({ color: view.colors.shadow, alpha: 0.12 })
-          .circle(0, 0, view.markerRadius)
-          .fill(view.colors.blue)
-          .stroke({ color: view.colors.blueEdge, width: 1 })
+          .fill({ color: view.colors.shadow, alpha: 0.12 });
+        if (this.tilted) {
+          marker
+            .moveTo(-11, 2)
+            .bezierCurveTo(-12, -7, -6, -11, 0, -10)
+            .bezierCurveTo(7, -12, 12, -6, 11, 2)
+            .bezierCurveTo(10, 10, 6, 11, 0, 10)
+            .bezierCurveTo(-6, 11, -10, 8, -11, 2)
+            .closePath()
+            .fill(view.colors.blue)
+            .stroke({ color: view.colors.blueEdge, width: 1 });
+        } else {
+          marker
+            .circle(0, 0, view.markerRadius)
+            .fill(view.colors.blue)
+            .stroke({ color: view.colors.blueEdge, width: 1 });
+        }
+        marker
           .circle(view.highlightOffset, view.highlightOffset, view.highlightRadius)
           .fill({ color: view.colors.highlight, alpha: 0.7 });
+        marker.scale.y = this.tilted ? 1 / view.tiltY : 1;
         this.units.addChild(marker);
         this.markers.set(agent.id, marker);
       }

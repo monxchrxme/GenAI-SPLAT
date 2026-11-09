@@ -1,11 +1,11 @@
 ---
 updated_at: 2026-11-09
-current_stage: delivery_1_merge
-stage_state: merge_accepted
+current_stage: delivery_1_visual_prototype
+stage_state: visual_prototype_accepted
 implemented: true
-implementation_scope: S3 Merge prototype; Cut accepted 2026-11-09 and S1 accepted 2026-11-06
+implementation_scope: early visual prototype; Cut and Merge intermediate steps accepted 2026-11-09
 preparation_implemented: true
-tests_verified: local_pass; 86 unit/integration and 17 Chrome smoke, including S0/S1/Cut regression
+tests_verified: local_pass; 89 unit/integration and 19 Chrome smoke, including S0/S1/Cut/Merge regression
 document_checks_verified: closure pass; 159 local links, 53 original tasks/gates/artifacts, unchanged D-register/protected files, 10 handoff lines, accepted runtime/tests unchanged, deploy guard false, source SHA verified
 awaiting_manual_acceptance: false
 preview_gate: verified_for_S0_only
@@ -32,7 +32,7 @@ last_verified_checks:
   - python3 /private/tmp/splat-input-doccheck.py: exit 0; 154 local file links, 53 original tasks and gates/artifacts, unchanged D-register/protected files/HEAD, 10 handoff lines; nothing staged
   - historical remote verification before action 1: git ls-remote exit 0; f64af0a / 8519f19 / 29946cd; not rerun in action 5
   - historical Vercel verification before action 1: CLI list exit 0; only two S0 deployments; not rerun in action 5
-manual_acceptance: Merge_and_Cut_accepted_by_user_on_2026-11-09
+manual_acceptance: visual_prototype_accepted_2026-11-09; delivery_1_acceptance_pending
 last_accepted_intermediate_action: S1-5
 last_accepted_intermediate_commit: not_available_for_action_5; approved uncommitted working tree
 last_accepted_at: 2026-11-06
@@ -43,13 +43,23 @@ known_issues:
   - Main remains at S−1 (8519f19); no merge. Accepted S1 source 8330ed3 committed; user authorized push on feature/s1-formations with deploy disabled; verify actual Git.
   - Node/npm absent from system PATH; temporary Node 24.22.2 is available in /private/tmp, see README.
   - Firefox, WebGPU and performance measurements not_run; S1 accepted on current prototype stage; S2-S7 not_implemented.
-next_stage: early visual prototype
+next_stage: delivery 1 integrated QA and overall manual acceptance
 next_stage_workflow: awaiting user review; git push/merge and deployment require separate authorization
 publication_workflow: local after S0; Vercel deferred to final stages and a separate explicit request; push and merge only as a separate requested action after acceptance of that action's changes
 handoff_notes:
   - S0 explicitly accepted through user confirmation of all checklist items on 2026-11-06.
   - S1 accepted; user separately authorized S1 push and S2 prompt; S2 implementation remains for a new chat.
 ---
+
+## Первая поставка — визуальный прототип, 09.11.2026
+
+- implemented: переключаемый наклонный ортографический вид [P] с вертикальным масштабом 0.72, обратное преобразование pointer, маленький декоративный фрагмент и пробные безликие статичные силуэты. В обычном режиме сохранён прежний вид.
+- tests_verified: 89 unit/integration; typecheck/lint/format:check/build; Chrome smoke 19/19 из временной копии `/private/tmp/splat-view-final.SBAsLl`. Первый прогон 18/19 выявил гонку проверки между Restart и resize, тест дополнен ожиданием.
+- manual_acceptance: пользователь одобрил пробные силуэты и ракурс как пример 09.11.2026. В дальнейшем ракурс и карту развивать по референсам карт, без финального переключателя. Это ортографическое сжатие без перспективного схода, гипотеза D-10.
+- Принятый Merge сохранён в `b2378b0ecbe5115054a2a926624af858a382ce6c`, Cut — `ff8e95100331a44f2bb9a357ed28b1a106447f96`.
+- Демо `http://127.0.0.1:4175/`: кнопка «Наклонный ракурс» переключает виды, образцы показаны отдельно от управляемых агентов.
+- Проверены выбор плотной группы, рисование/слоты, Cut и resize на DPR 1/2, восстановление обычного вида, отсутствие горизонтальной прокрутки на 390 px.
+- Финальная карта, ассеты и оценка UX остаются последующими задачами. D-06 Open, D-07—D-10 Proposed.
 
 ## Первая поставка — Merge, 09.11.2026
 

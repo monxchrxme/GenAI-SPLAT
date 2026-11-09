@@ -86,3 +86,46 @@ it('maps exact world edges and rejects invalid rectangles, points and dimensions
     ).toBeNull();
   }
 });
+
+it.each([
+  [1440, 760, 1],
+  [900, 520, 2],
+  [390, 600, 0.75],
+])('maps inclined view with offset and CSS scaling %dx%d', (width, height, cssScale) => {
+  const bounds = { left: 45, top: 80, width: width * cssScale, height: height * cssScale };
+  const viewport = { width, height };
+  const camera = fitWorld(width, height, S0_LEVEL.world, PRESENTATION.padding);
+  const tilt = PRESENTATION.tiltY;
+  for (const expected of [
+    { x: 0, y: 0 },
+    { x: 430, y: 500 },
+    { x: 1599, y: 999 },
+  ]) {
+    const client = {
+      x: bounds.left + (camera.x + expected.x * camera.scale) * cssScale,
+      y:
+        bounds.top +
+        ((height - 1000 * camera.scale * tilt) / 2 + expected.y * camera.scale * tilt) * cssScale,
+    };
+    const actual = clientToWorld(
+      client,
+      bounds,
+      viewport,
+      S0_LEVEL.world,
+      PRESENTATION.padding,
+      tilt,
+    );
+    expect(actual?.x).toBeCloseTo(expected.x, 8);
+    expect(actual?.y).toBeCloseTo(expected.y, 8);
+  }
+  expect(
+    clientToWorld(
+      { x: bounds.left, y: bounds.top },
+      bounds,
+      viewport,
+      S0_LEVEL.world,
+      PRESENTATION.padding,
+      tilt,
+    ),
+  ).toBeNull();
+});
