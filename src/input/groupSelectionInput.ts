@@ -28,6 +28,8 @@ export function bindGroupSelectionInput(
   snapshot: () => Snapshot,
 ) {
   let draft: PolylineDraft | null = null;
+  let cutMode = false;
+  let gestureCut = false;
   let pointerId: number | null = null;
   let origin: Point = { x: 0, y: 0 };
   let dragged = false;
@@ -54,6 +56,7 @@ export function bindGroupSelectionInput(
   const reset = () => {
     cancel();
     completedLimited = false;
+    cutMode = false;
     pendingSelection = null;
     pendingFormation = null;
   };
@@ -63,6 +66,18 @@ export function bindGroupSelectionInput(
     if (point === null) return;
     event.preventDefault();
     const state = snapshot();
+    gestureCut = cutMode;
+    if (gestureCut) {
+      gestureGroup = effectiveSelection(state);
+      if (!gestureGroup) return;
+      pressedGroup = null;
+      origin = { x: event.clientX, y: event.clientY };
+      dragged = false;
+      draft = new PolylineDraft(point, DRAWING);
+      pointerId = event.pointerId;
+      canvas.setPointerCapture(event.pointerId);
+      return;
+    }
     pressedGroup = pickGroupAtPoint(state, point, S0_LEVEL.selection);
     gestureGroup = pressedGroup ?? effectiveSelection(state);
     if (pressedGroup) select(pressedGroup, state.tick);
@@ -93,6 +108,14 @@ export function bindGroupSelectionInput(
     if (event.pointerId !== pointerId || !draft) return;
     move(event);
     if (!draft) return;
+    if (gestureCut) {
+      if (dragged && draft.valid && gestureGroup)
+        submit({ type: 'cut', groupId: gestureGroup, points: draft.points });
+      cutMode = false;
+      pendingFormation = null;
+      cancel();
+      return;
+    }
     if (!dragged) {
       // The intent is latched at pointerdown; moving agents cannot turn a blank click into a hit.
       if (!pressedGroup) select(null, snapshot().tick);
@@ -109,7 +132,18 @@ export function bindGroupSelectionInput(
     cancel();
   };
   const key = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') cancel();
+    if (event.key === 'Escape') {
+      cancel();
+      cutMode = false;
+    }
+    if (
+      event.key.toLowerCase() === 'x' &&
+      !event.repeat &&
+      !(event.target instanceof HTMLInputElement)
+    ) {
+      cancel();
+      cutMode = !cutMode;
+    }
   };
   const hide = () => {
     if (document.hidden) cancel();
@@ -131,6 +165,13 @@ export function bindGroupSelectionInput(
   return {
     cancel,
     reset,
+    toggleCut() {
+      cancel();
+      cutMode = !cutMode;
+    },
+    get cutMode() {
+      return cutMode;
+    },
     preview(): DrawingPreview {
       const state = snapshot();
       const selected = effectiveSelection(state);
@@ -145,7 +186,8 @@ export function bindGroupSelectionInput(
       const formation = pending?.formation ?? group?.formation;
       const points =
         draft && dragged && draft.points.length >= 2 ? draft.points : (formation?.points ?? []);
-      const provisional = draft && dragged ? createFormation(points, group?.agentIds ?? []) : null;
+      const provisional =
+        draft && dragged && !gestureCut ? createFormation(points, group?.agentIds ?? []) : null;
       return {
         points,
         slots: draft && dragged ? (provisional?.slots ?? []) : (formation?.slots ?? []),

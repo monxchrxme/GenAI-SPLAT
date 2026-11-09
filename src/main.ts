@@ -15,6 +15,7 @@ function requiredElement<T extends HTMLElement>(id: string): T {
 async function start(): Promise<void> {
   const arena = requiredElement('arena');
   const hint = requiredElement('hint');
+  const cut = requiredElement<HTMLButtonElement>('cut');
   const restart = requiredElement<HTMLButtonElement>('restart');
   const session = new Session(S0_LEVEL, S0_CLOCK);
   const renderer = new PixiRenderer();
@@ -39,6 +40,8 @@ async function start(): Promise<void> {
     (intent) => session.submit(intent),
     () => session.getSnapshot(),
   );
+  const toggleCut = () => drawing.toggleCut();
+  cut.addEventListener('click', toggleCut);
   let arenaWidth = arena.clientWidth;
   let arenaHeight = arena.clientHeight;
   const observer = new ResizeObserver(() => {
@@ -60,6 +63,9 @@ async function start(): Promise<void> {
     const preview = drawing.preview();
     renderer.draw(snapshot, session.restartCount, preview);
     hud.draw(snapshot, preview);
+    cut.setAttribute('aria-pressed', String(drawing.cutMode));
+    if (drawing.cutMode)
+      hint.textContent = 'Режим Cut: проведите линию через построение. Esc — отмена.';
     frameId = requestAnimationFrame(frame);
   };
   const discardHiddenTime = () => {
@@ -80,6 +86,7 @@ async function start(): Promise<void> {
     observer.disconnect();
     unbindInput();
     drawing.dispose();
+    cut.removeEventListener('click', toggleCut);
     document.removeEventListener('visibilitychange', discardHiddenTime);
     window.removeEventListener('pagehide', dispose);
     renderer.destroy();

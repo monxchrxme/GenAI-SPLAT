@@ -22,7 +22,7 @@ test('S0 production build: 40 static markers, clean restart, keyboard, resize, c
   await expect(canvas).toHaveAttribute('data-world-size', '1600×1000');
   await expect(page.locator('#agent-count')).toHaveText('40');
   await expect(page.locator('#group-count')).toHaveText('1');
-  await expect(page.getByRole('button')).toHaveCount(1);
+  await expect(page.getByRole('button')).toHaveCount(2);
 
   const before = await canvas.screenshot();
   await expect.poll(async () => Number(await canvas.getAttribute('data-tick'))).toBeGreaterThan(30);

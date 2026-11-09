@@ -21,12 +21,12 @@ export class Hud {
         ? preview.stretched
         : tensionActive(selected, snapshot.tick);
     if (selected && tension) {
-      const text = `Выбрана группа · ${selected.agentIds.length} Сплатов. Натяжение: построение растянуто. ${preview?.active ? (preview.limited ? 'Лимит линии — отпустите кнопку. Группа остаётся целой.' : 'Отпустите для перестроения. Группа остаётся целой.') : 'Группа остаётся целой.'}`;
+      const text = `Выбрана группа · ${selected.agentIds.length} Сплатов (${selected.id}). Натяжение: построение растянуто. ${preview?.active ? (preview.limited ? 'Лимит линии — отпустите кнопку. Группа остаётся целой.' : 'Отпустите для перестроения. Группа остаётся целой.') : 'Группа остаётся целой.'}`;
       if (this.hint.textContent !== text) this.hint.textContent = text;
       return;
     }
     const text = selected
-      ? `Выбрана группа · ${selected.agentIds.length} Сплатов. ${preview?.active ? (preview.limited ? 'Достигнут предел линии — отпустите кнопку.' : 'Рисуйте линию; отпустите для перестроения. Esc — отмена текущего жеста.') : preview && preview.points.length >= 2 ? `${moving ? 'Занимаем форму' : 'Форма занята'} · ${preview.slots.length} мест. Пустой клик — остановить и очистить; Esc отменяет только текущий жест.` : 'Зажмите ЛКМ на свободном поле и нарисуйте линию.'}`
+      ? `Выбрана группа · ${selected.agentIds.length} Сплатов (${selected.id}). ${preview?.active ? (preview.limited ? 'Достигнут предел линии — отпустите кнопку.' : 'Рисуйте линию; отпустите для перестроения. Esc — отмена текущего жеста.') : preview && preview.points.length >= 2 ? `${moving ? 'Занимаем форму' : 'Форма занята'} · ${preview.slots.length} мест. Пустой клик — остановить и очистить; Esc отменяет только текущий жест.` : 'Зажмите ЛКМ на свободном поле и нарисуйте линию.'}`
       : 'Выберите группу: нажмите на синий маркер или между близкими маркерами.';
     if (this.hint.textContent !== text) this.hint.textContent = text;
   }

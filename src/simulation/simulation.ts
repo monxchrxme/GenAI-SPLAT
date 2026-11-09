@@ -1,4 +1,5 @@
 import type { GameCommand, GroupId, LevelConfig, MatchState, Snapshot } from '../core/types';
+import { splitFormation } from './split';
 import { createInitialState } from './initialState';
 import { assertInvariants } from './invariants';
 import { createSnapshot } from './snapshot';
@@ -9,6 +10,7 @@ import { isStretched, validateTension } from '../core/tension';
 
 export class Simulation {
   private readonly state: MatchState;
+  private nextGroupId = 2;
 
   constructor(private readonly config: LevelConfig) {
     validateMovement(config);
@@ -36,6 +38,34 @@ export class Simulation {
           )
         )
           this.select(command.groupId);
+        continue;
+      }
+      if (command.type === 'cut') {
+        const group = this.state.groups.find((g) => g.id === command.groupId);
+        if (
+          !group ||
+          group.id !== this.state.selectedGroupId ||
+          !group.formation ||
+          command.points.some(
+            (p) =>
+              p.x < 0 || p.y < 0 || p.x > this.state.world.width || p.y > this.state.world.height,
+          )
+        )
+          continue;
+        const parts = splitFormation(group.formation, command.points);
+        if (!parts) continue;
+        const groups = parts.map((formation) => ({
+          id: `group-${this.nextGroupId++}` as GroupId,
+          factionId: group.factionId,
+          agentIds: formation.slots.map((slot) => slot.agentId),
+          formation,
+        }));
+        this.state.groups.splice(this.state.groups.indexOf(group), 1, ...groups);
+        for (const agent of this.state.agents) {
+          const owner = groups.find((g) => g.agentIds.includes(agent.id));
+          if (owner) agent.groupId = owner.id;
+        }
+        this.state.selectedGroupId = groups[0]!.id;
         continue;
       }
       if (command.type === 'set-formation') {

@@ -151,3 +151,8 @@ canvas {
     display: none;
   }
 }
+button[aria-pressed='true'] {
+  color: #fff;
+  background: #2866dc;
+  border-color: #2866dc;
+}

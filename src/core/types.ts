@@ -98,6 +98,7 @@ export interface ClockConfig {
 
 export type CommandIntent =
   | { readonly type: 'restart' }
+  | { readonly type: 'cut'; readonly groupId: GroupId; readonly points: readonly Point[] }
   | { readonly type: 'select-group'; readonly point: Point }
   | { readonly type: 'select-group-id'; readonly groupId: GroupId | null }
   | {
