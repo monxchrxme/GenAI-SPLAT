@@ -44,11 +44,21 @@ test('Merge combines two separated groups once', async ({ page }) => {
   await expect
     .poll(async () => Number(await canvas.getAttribute('data-max-slot-error')), { timeout: 15000 })
     .toBeLessThan(1);
-  await page.getByRole('button', { name: 'Объединить' }).click();
-  await expect(page.getByRole('button', { name: 'Объединить' })).toHaveAttribute(
-    'aria-pressed',
-    'true',
+  const mergeButton = page.getByRole('button', { name: 'Объединить (M)' });
+  await mergeButton.click();
+  await expect(mergeButton).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('Escape');
+  await expect(mergeButton).toHaveAttribute('aria-pressed', 'false');
+  await page.keyboard.press('Control+m');
+  await expect(mergeButton).toHaveAttribute('aria-pressed', 'false');
+  await page.evaluate(() =>
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ь', code: 'KeyM' })),
   );
+  await expect(mergeButton).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('m');
+  await expect(mergeButton).toHaveAttribute('aria-pressed', 'false');
+  await page.keyboard.press('m');
+  await expect(mergeButton).toHaveAttribute('aria-pressed', 'true');
   const other = await point(800, 300);
   await page.mouse.click(other.x, other.y);
   await expect(canvas).toHaveAttribute('data-merging', 'true');

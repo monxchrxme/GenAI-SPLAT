@@ -79,7 +79,8 @@ async function start(): Promise<void> {
     hud.draw(snapshot, preview);
     cut.setAttribute('aria-pressed', String(drawing.cutMode));
     merge.setAttribute('aria-pressed', String(drawing.mergeMode));
-    if (drawing.mergeMode) hint.textContent = 'Режим Merge: выберите вторую группу. Esc — отмена.';
+    if (drawing.mergeMode)
+      hint.textContent = 'Режим Merge: выберите вторую группу. M или Esc — отмена.';
     else if (snapshot.merge)
       hint.textContent = `Группы ${snapshot.merge.first} и ${snapshot.merge.second} сближаются.`;
     if (drawing.cutMode)

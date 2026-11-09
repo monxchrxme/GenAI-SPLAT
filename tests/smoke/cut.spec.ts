@@ -48,11 +48,17 @@ test('Cut splits a drawn group and each group accepts an independent order', asy
     'aria-pressed',
     'false',
   );
-  await page.keyboard.press('x');
-  await expect(page.getByRole('button', { name: 'Разрезать (X)' })).toHaveAttribute(
-    'aria-pressed',
-    'true',
+  const cutButton = page.getByRole('button', { name: 'Разрезать (X)' });
+  await page.keyboard.press('Control+x');
+  await expect(cutButton).toHaveAttribute('aria-pressed', 'false');
+  await page.evaluate(() =>
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ч', code: 'KeyX' })),
   );
+  await expect(cutButton).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('x');
+  await expect(cutButton).toHaveAttribute('aria-pressed', 'false');
+  await page.keyboard.press('x');
+  await expect(cutButton).toHaveAttribute('aria-pressed', 'true');
   await drag(await point(590, 200), await point(590, 400));
   await expect(page.locator('#group-count')).toHaveText('2');
   await expect(canvas).toHaveAttribute('data-selected-group', 'group-2');

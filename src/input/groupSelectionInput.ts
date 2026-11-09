@@ -150,11 +150,21 @@ export function bindGroupSelectionInput(
       mergeMode = false;
     }
     if (
-      event.key.toLowerCase() === 'x' &&
-      !event.repeat &&
-      !(event.target instanceof HTMLInputElement)
-    ) {
-      cancel();
+      (event.code !== 'KeyM' && event.code !== 'KeyX') ||
+      event.repeat ||
+      event.isComposing ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey ||
+      (event.target instanceof HTMLElement &&
+        (event.target.isContentEditable || event.target.closest('input, textarea, select')))
+    )
+      return;
+    cancel();
+    if (event.code === 'KeyM') {
+      mergeMode = !mergeMode;
+      cutMode = false;
+    } else {
       cutMode = !cutMode;
       mergeMode = false;
     }
