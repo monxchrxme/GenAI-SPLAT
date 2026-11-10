@@ -1,3 +1,4 @@
+import { restartMatch } from '../fixtures/restartMatch';
 import { expect, test } from '@playwright/test';
 
 test('hazards and final objective appear, turrets fire without player input, Restart resets the field', async ({
@@ -22,10 +23,10 @@ test('hazards and final objective appear, turrets fire without player input, Res
     await expect.poll(async () => Number(await canvas.getAttribute('data-camera-left'))).toBe(left);
   }
   await expect(right).toBeDisabled();
-  await expect(page.locator('#checkpoint-hint')).toContainText('Займите рубеж 1');
+  await expect(page.locator('#checkpoint-hint')).toHaveCount(0);
   await expect(canvas).toHaveAttribute('data-camera-left', '2400');
   await expect(canvas).toHaveAttribute('data-visible-red-count', /[1-9]/);
-  await page.getByRole('button', { name: 'Заново' }).click();
+  await restartMatch(page);
   await expect(canvas).toHaveAttribute('data-restart-count', '1');
   await expect(canvas).toHaveAttribute('data-mine-count', '3');
   await expect(page.locator('#checkpoint-status')).toHaveText('не пройден');

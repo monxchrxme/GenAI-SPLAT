@@ -97,17 +97,22 @@ export class Simulation {
       )
         throw new Error('Invalid hazards');
     }
-    if (config.checkpoint && !config.objective)
-      throw new Error('Checkpoint needs a final objective');
-    if (
-      config.checkpointViewEnd !== undefined &&
-      (!config.checkpoint ||
-        !Number.isFinite(config.checkpointViewEnd) ||
-        config.checkpointViewEnd < config.checkpoint.x + config.checkpoint.width ||
-        config.checkpointViewEnd > config.world.width)
-    )
-      throw new Error('Invalid checkpoint view boundary');
-    for (const area of [config.checkpoint, config.objective]) {
+    const checkpoints = config.checkpoints ?? [];
+    if (checkpoints.length && !config.objective)
+      throw new Error('Checkpoints need a final objective');
+    let previousBoundary = 0;
+    for (const { area, viewEnd } of checkpoints) {
+      if (
+        area.x < previousBoundary ||
+        (viewEnd !== undefined &&
+          (!Number.isFinite(viewEnd) ||
+            viewEnd < area.x + area.width ||
+            viewEnd > config.world.width))
+      )
+        throw new Error('Invalid checkpoint view boundary');
+      previousBoundary = viewEnd ?? area.x + area.width;
+    }
+    for (const area of [...checkpoints.map((point) => point.area), config.objective]) {
       if (
         area &&
         (![area.x, area.y, area.width, area.height].every(Number.isFinite) ||
@@ -217,20 +222,16 @@ export class Simulation {
     )
       throw new Error('Invalid reinforcement configuration');
     this.state = createInitialState(config);
-    for (const objective of [this.state.checkpoint, this.state.objective]) {
+    const assignedCells = new Set();
+    for (const objective of [...this.state.checkpoints, this.state.objective]) {
       if (!objective) continue;
       const cells = objectiveCells(this.state, objective.area);
       if (!cells.length || cells.some((cell) => cell.blocked))
         throw new Error('Invalid objective cells');
-    }
-    if (this.state.checkpoint && this.state.objective) {
-      const checkpointCells = new Set(objectiveCells(this.state, this.state.checkpoint.area));
-      if (
-        objectiveCells(this.state, this.state.objective.area).some((cell) =>
-          checkpointCells.has(cell),
-        )
-      )
-        throw new Error('Objectives must occupy different cells');
+      for (const cell of cells) {
+        if (assignedCells.has(cell)) throw new Error('Objectives must occupy different cells');
+        assignedCells.add(cell);
+      }
     }
     this.nextAgentId = Math.max(...this.state.agents.map((agent) => Number(agent.id.slice(6)))) + 1;
     assertInvariants(this.state);
@@ -563,8 +564,9 @@ export class Simulation {
   }
 
   private hasWon(): boolean {
-    const { checkpoint, objective, paintCells } = this.state;
-    if (checkpoint) return checkpoint.captured && objective?.captured === true;
+    const { checkpoints, objective, paintCells } = this.state;
+    if (checkpoints.length)
+      return checkpoints.every((point) => point.captured) && objective?.captured === true;
     if (objective && !objective.captured) return false;
     const accessible = paintCells.filter((cell) => !cell.blocked);
     return (

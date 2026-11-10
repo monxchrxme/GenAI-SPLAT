@@ -86,7 +86,7 @@ it('moves a deviant on the actual final sector while ordinary post membership re
   assertInvariants(after);
 });
 
-it('survives a concentrated opening volley, but falls if the squad maintains contact', () => {
+it('survives three volleys from six units, but falls if the squad maintains contact', () => {
   const config = { ...level, combat: GAME_LEVEL.combat! };
   const state = createInitialState(config);
   const defender = state.agents.find((agent) => agent.variant === 'deviant')!;
@@ -99,6 +99,12 @@ it('survives a concentrated opening volley, but falls if the squad maintains con
   expect(defender.hp).toBe(config.deviant.hp - 6);
   expect(blues.some((agent) => agent.hp < config.initialHp)).toBe(true);
   state.tick = config.combat.cooldownTicks;
+  resolveCombat(state, config);
+  expect(defender.alive).toBe(true);
+  state.tick += config.combat.cooldownTicks;
+  resolveCombat(state, config);
+  expect(defender.alive).toBe(true);
+  state.tick += config.combat.cooldownTicks;
   resolveCombat(state, config);
   expect(defender.alive).toBe(false);
 });

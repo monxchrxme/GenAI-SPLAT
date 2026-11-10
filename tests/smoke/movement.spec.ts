@@ -1,3 +1,4 @@
+import { restartMatch } from '../fixtures/restartMatch';
 import { test, expect, type Locator } from '@playwright/test';
 import { S0_LEVEL } from '../../src/core/config';
 import { createInitialState } from '../../src/simulation/initialState';
@@ -60,7 +61,7 @@ test('QA-01: 40 agents reach a stable three-corner form, resize preserves order 
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect.poll(async () => (await canvas.boundingBox())?.width).toBe(1440);
   await page.screenshot({ path: 'reports/s1-action6-settled.png' });
-  await page.getByRole('button', { name: 'Заново' }).click();
+  await restartMatch(page);
   await expect(canvas).toHaveAttribute('data-slot-count', '0');
   await expect(canvas).toHaveAttribute('data-moving-count', '0');
   await expect(page.locator('#paint-progress')).toHaveText('0%');

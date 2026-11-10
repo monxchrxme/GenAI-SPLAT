@@ -1,3 +1,4 @@
+import { restartMatch } from '../fixtures/restartMatch';
 import { expect, test } from '@playwright/test';
 
 test('Merge combines two separated groups once', async ({ page }) => {
@@ -65,7 +66,7 @@ test('Merge combines two separated groups once', async ({ page }) => {
   await expect(page.locator('#agent-count')).toHaveText('40');
   await expect(canvas).toHaveAttribute('data-selected-group', 'group-2');
   await expect(canvas).toHaveAttribute('data-merging', 'false');
-  await page.getByRole('button', { name: 'Заново' }).click();
+  await restartMatch(page);
   await expect(page.locator('#group-count')).toHaveText('1');
   await expect(page.locator('#agent-count')).toHaveText('40');
 });

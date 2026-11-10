@@ -62,7 +62,7 @@ export function bindTutorial(ui: TutorialControls, onOpen: () => void): () => vo
     ui.split.disabled = ui.merge.disabled = ui.restart.disabled = true;
     ui.merge.setAttribute('aria-pressed', 'false');
     const session = new Session(practiceLevel, S0_CLOCK);
-    const renderer = new PixiRenderer();
+    const renderer = new PixiRenderer(practiceLevel, [250, 750]);
     try {
       await renderer.init(ui.field, session.getSnapshot());
     } catch (error) {
@@ -101,7 +101,7 @@ export function bindTutorial(ui: TutorialControls, onOpen: () => void): () => vo
         ? 'Синие потеряны. Нажмите «Начать урок заново», чтобы попробовать ещё раз.'
         : hint
           ? `Шаг ${lesson + 1} из ${lessons.length}. ${hint}`
-          : 'Урок пройден! В партии закрасьте рубеж и финальную точку. За побеждённых красных можно пополнить выбранный отряд кнопкой R.';
+          : 'Урок пройден! За побеждённых красных можно пополнить выбранный отряд кнопкой R.';
     };
     const checkStep = (snapshot: Snapshot) => {
       const selected = snapshot.groups.find((group) => group.id === snapshot.selectedGroupId);

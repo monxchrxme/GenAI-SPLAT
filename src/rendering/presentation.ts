@@ -7,8 +7,6 @@ export const PRESENTATION = Object.freeze({
   cameraManualHoldMs: 4000,
   cameraTransitionMs: 320, // [P] quick, smooth transition between adjacent blocks
   cameraEdgeFraction: 0.15, // [P] the group center must approach the edge before auto-paging
-  // [P] Lane markings indicate the two paths without changing movement.
-  laneY: [250, 750],
   markerRadius: 11,
   shadowOffset: 3,
   shadowScaleY: 0.65,

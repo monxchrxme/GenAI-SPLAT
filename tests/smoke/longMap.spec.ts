@@ -1,3 +1,4 @@
+import { restartMatch } from '../fixtures/restartMatch';
 import { expect, test } from '@playwright/test';
 import { S0_LEVEL } from '../../src/core/config';
 import { createInitialState } from '../../src/simulation/initialState';
@@ -53,7 +54,7 @@ test('camera pans, maps pointer coordinates and Restart restores the start', asy
     .toBeGreaterThan(1);
   const path = JSON.parse((await canvas.getAttribute('data-formation-path'))!);
   expect(path[0].x).toBeCloseTo(1600, 0);
-  await page.getByRole('button', { name: 'Заново' }).click();
+  await restartMatch(page);
   await expect(canvas).toHaveAttribute('data-camera-left', '0');
 });
 

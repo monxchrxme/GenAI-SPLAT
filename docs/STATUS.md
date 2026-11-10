@@ -1,11 +1,11 @@
 ---
 updated_at: 2026-11-11
-current_stage: s6_s7_checkpoint_guidance
-stage_state: checkpoint_guidance_awaiting_manual_acceptance
+current_stage: s6_s7_izluchina
+stage_state: current_gameplay_accepted_for_preview
 implemented: true
-implementation_scope: checkpoint guidance and camera boundary
+implementation_scope: checkpoint support squads and shared deviant tuning
 preparation_implemented: true
-tests_verified: see CHECKPOINT_GUIDANCE_REPORT for local scope
+tests_verified: see IZLUCHINA_REPORT for local scope
 document_checks_verified: closure pass; 159 local links, 53 original tasks/gates/artifacts, unchanged D-register/protected files, 10 handoff lines, accepted runtime/tests unchanged, deploy guard false, source SHA verified
 awaiting_manual_acceptance: true
 preview_gate: verified_for_S0_only
@@ -50,6 +50,35 @@ handoff_notes:
   - S0 explicitly accepted through user confirmation of all checklist items on 2026-11-06.
   - Delivery 1 accepted; next chat S4+S5, see S4_S5_HANDOFF_PROMPT.md.
 ---
+
+## Текущий игровой срез принят для Preview — 11.11.2026
+
+Заказчик подтвердил текущую версию после усиления гарнизонов и девиантов и отдельно поручил сохранить её коммитом и развернуть Vercel Preview. Подтверждение относится к текущему игровому срезу. Итоговая приёмка S6/S7 и общие QA-гейты остаются открыты.
+
+## Поддержка за рубежами — 11.11.2026
+
+- implemented — по две малые группы за каждым рубежом «Излучины», усилены три основных гарнизона. Девианты обеих карт быстрее и выносливее. [Отчёт](IZLUCHINA_REPORT.md).
+- tests_verified — 159 unit/integration, оба маршрута «Излучины» в модели и полная победа на обеих картах в Chrome. Для первой карты проверен раздельный бой с девиантами.
+- awaiting_manual_acceptance — удобство отвлечения малых групп, сложность рубежей и девиантов.
+
+## Баланс «Излучины» и девиантов — 11.11.2026
+
+- implemented — по замечанию заказчика усилены гарнизоны «Излучины» и девианты обеих карт. Первая карта получила название «Два прохода». [Отчёт](IZLUCHINA_REPORT.md).
+- tests_verified — оба маршрута «Излучины» пройдены в модели, обе карты пройдены в Chrome. 158 unit/integration, типизация, линтер, форматирование и сборка прошли.
+- awaiting_manual_acceptance — оценка новой сложности рубежей, финала и боя с девиантами. Заказчик положительно оценил планировку и расположение декораций второй карты.
+
+## «Излучина» и меню уровней — 11.11.2026
+
+- implemented — карта с двумя последовательными рубежами и финальной точкой, меню выбора, повтор и переход после победы. Рубежи визуально обозначены на обеих картах. [Отчёт и чеклист](IZLUCHINA_REPORT.md).
+- tests_verified — 158 unit/integration, 34 уникальных Chrome smoke с учётом повтора, типизация, линтер, форматирование и сборка. Победа и переход между картами проверены через интерфейс.
+- awaiting_manual_acceptance — проходимость для нового игрока, тактические маршруты, баланс и меню. Остальные QA и гейты открыты.
+
+## Вторая карта — уточнение схемы, 11.11.2026
+
+- Сохранённая игровая версия с одобренным оформлением целей — `f9d285b9c50b8bc856a59d7a1aa9fc1e694783e8`, локальный коммит.
+- implemented — обновлён проект карты «Излучина» с двумя рубежами и разными задачами на трёх участках. [Схема](MAP_CONCEPTS.md).
+- tests_verified — документальные проверки текущего изменения. Последние игровые проверки относятся к сохранённой версии и перечислены ниже.
+- awaiting_manual_acceptance — схема второй карты, число рубежей, размещение и гипотеза разовой награды. Следующий шаг — согласование перед игровой реализацией.
 
 ## Оформление целей одобрено — 11.11.2026
 

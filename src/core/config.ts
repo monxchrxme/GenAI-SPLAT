@@ -65,8 +65,9 @@ export const GAME_LEVEL: LevelConfig = Object.freeze({
     columns: 75,
     firstCaptureRatePerSecond: 0.8, // [P] allow a moving formation to claim fresh ground
   }),
-  checkpoint: Object.freeze({ x: 3520, y: 400, width: 160, height: 200 }), // [P] second-sector checkpoint
-  checkpointViewEnd: 4000, // [P] reveal the third sector after securing the checkpoint
+  checkpoints: Object.freeze([
+    { area: { x: 3520, y: 400, width: 160, height: 200 }, viewEnd: 4000 },
+  ]), // [P] second-sector checkpoint
   objective: Object.freeze({ x: 5600, y: 400, width: 320, height: 200 }), // [P] final capture area
   obstacles: Object.freeze([
     Object.freeze({ x: 1440, y: 0, width: 80, height: 200 }),
@@ -92,10 +93,10 @@ export const GAME_LEVEL: LevelConfig = Object.freeze({
     { count: 1, columns: 1, centerX: 5580, centerY: 700, deviant: true },
   ]),
   deviant: Object.freeze({
-    hp: 8,
-    speedFactor: 1.35,
-    attackRange: 40,
-    attackCooldown: 45,
+    hp: 20,
+    speedFactor: 1.5,
+    attackRange: 50,
+    attackCooldown: 30,
     threatRadius: 320,
     defenseDepth: 240,
   }), // [P]

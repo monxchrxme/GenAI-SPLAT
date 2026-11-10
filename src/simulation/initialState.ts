@@ -109,6 +109,12 @@ export function createInitialState(config: LevelConfig): MatchState {
       });
     }
   }
+  const checkpoints = (config.checkpoints ?? []).map((point) => ({
+    ...point,
+    area: { ...point.area },
+    captured: false,
+  }));
+  const objectiveAreas = [...checkpoints.map((point) => point.area), config.objective];
   return {
     phase: 'running',
     result: null,
@@ -122,7 +128,7 @@ export function createInitialState(config: LevelConfig): MatchState {
     projectiles: [],
     paintGrid: { columns: config.paint.columns, rows: config.paint.rows },
     objective: config.objective ? { area: { ...config.objective }, captured: false } : null,
-    checkpoint: config.checkpoint ? { area: { ...config.checkpoint }, captured: false } : null,
+    checkpoints,
     paintCells: Array.from({ length: config.paint.columns * config.paint.rows }, (_, index) => {
       const width = config.world.width / config.paint.columns;
       const height = config.world.height / config.paint.rows;
@@ -135,7 +141,7 @@ export function createInitialState(config: LevelConfig): MatchState {
           y < obstacle.y + obstacle.height &&
           y + height > obstacle.y,
       );
-      const inObjective = [config.checkpoint, config.objective].some(
+      const inObjective = objectiveAreas.some(
         (area) => area && objectiveContains(area, x + width / 2, y + height / 2),
       );
       return {

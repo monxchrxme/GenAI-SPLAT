@@ -28,11 +28,11 @@
             <dd id="paint-progress">—</dd>
           </div>
           <div class="counter">
-            <dt>1. Рубеж</dt>
+            <dt id="checkpoint-label">Рубеж</dt>
             <dd id="checkpoint-status">—</dd>
           </div>
           <div class="counter">
-            <dt>2. Финальная точка</dt>
+            <dt>Финальная точка</dt>
             <dd id="objective-status">—</dd>
           </div>
           <div class="counter">
@@ -57,20 +57,27 @@
           </p>
         </details>
         <button id="tutorial-open" type="button" disabled>Как играть</button>
-        <button id="restart" type="button" disabled>
-          <span aria-hidden="true">↺</span> Заново
-        </button>
+        <button id="level-menu-open" type="button" disabled>Меню</button>
       </header>
       <section id="arena" aria-label="Игровое поле" aria-describedby="hint">
-        <div id="checkpoint-hint" hidden role="status" aria-live="polite"></div>
-        <div id="outcome" hidden role="status" aria-live="polite">
-          Победа! Рубеж и финальная точка взяты. Нажмите «Заново», чтобы повторить.
-        </div>
+        <div id="outcome" hidden role="status" aria-live="polite"></div>
       </section>
       <footer class="footer">
         <p id="hint" role="status">Подготовка поля…</p>
       </footer>
     </main>
+    <dialog id="level-menu" aria-labelledby="level-menu-title">
+      <header class="menu-header">
+        <h2 id="level-menu-title">Уровни</h2>
+        <button id="level-menu-close" type="button" autofocus>Закрыть</button>
+      </header>
+      <p id="level-menu-current"></p>
+      <div class="menu-actions">
+        <a id="next-level" class="menu-link primary" hidden>Следующий уровень</a>
+        <button id="restart" type="button">Заново</button>
+      </div>
+      <nav id="level-list" aria-label="Выбор уровня"></nav>
+    </dialog>
     <dialog id="tutorial" aria-labelledby="tutorial-title" aria-describedby="tutorial-step">
       <header class="tutorial-bar">
         <h2 id="tutorial-title">Как играть</h2>

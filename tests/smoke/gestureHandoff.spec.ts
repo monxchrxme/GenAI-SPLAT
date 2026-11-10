@@ -53,9 +53,10 @@ for (const divisor of [1, 8]) {
     const hit = await screen(page, first.x, first.y);
     await page.mouse.click(hit.x, hit.y);
     await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
+    // Use the open flanks between the current shoreline and the first wall.
     for (let i = 0; i < 12; i++) {
-      const a = await screen(page, i % 2 ? 1400 : 700, i % 2 ? 850 : 150);
-      const b = await screen(page, i % 2 ? 700 : 1400, i % 2 ? 850 : 150);
+      const a = await screen(page, i % 2 ? 1400 : 700, i % 2 ? 700 : 300);
+      const b = await screen(page, i % 2 ? 700 : 1400, i % 2 ? 700 : 300);
       await page.evaluate(() => {
         (window as unknown as AuditedWindow).gestureAudit.expected = '';
       });

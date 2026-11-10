@@ -1,3 +1,4 @@
+import { restartMatch } from '../fixtures/restartMatch';
 import { expect, test, type Locator } from '@playwright/test';
 
 async function screen(canvas: Locator, x: number, y: number) {
@@ -38,7 +39,7 @@ test('empty click moves the selected group, obstructed slots are adjusted, anoth
   await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
   await expect(canvas).toHaveAttribute('data-slot-count', '40');
   await expect(page.locator('#hint')).not.toContainText('препятствие');
-  await page.getByRole('button', { name: 'Заново' }).click();
+  await restartMatch(page);
   await expect(canvas).toHaveAttribute('data-restart-count', '1');
   await page.mouse.click(first.x, first.y);
   await page.keyboard.press('x');

@@ -1,3 +1,4 @@
+import { restartMatch } from '../fixtures/restartMatch';
 import { expect, test, type Locator } from '@playwright/test';
 
 async function screen(canvas: Locator, x: number, y: number) {
@@ -45,7 +46,7 @@ for (const deviceScaleFactor of [1, 2]) {
       expect(path[0].y).toBeCloseTo(300, 1);
       await page.getByRole('button', { name: 'Разделить (X)' }).click();
       await expect(page.locator('#group-count')).toHaveText('2');
-      await page.getByRole('button', { name: 'Заново' }).click();
+      await restartMatch(page);
       await expect(canvas).toHaveAttribute('data-restart-count', '1');
       await page.setViewportSize({ width: 900, height: 650 });
       await expect.poll(async () => (await canvas.boundingBox())?.width).toBe(900);

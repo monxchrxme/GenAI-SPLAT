@@ -1,3 +1,4 @@
+import { restartMatch } from '../fixtures/restartMatch';
 import { expect, test } from '@playwright/test';
 
 test('territory becomes owned and Restart clears it', async ({ page }) => {
@@ -7,7 +8,7 @@ test('territory becomes owned and Restart clears it', async ({ page }) => {
   await expect
     .poll(async () => Number((await progress.textContent())?.replace('%', '')))
     .toBeGreaterThan(0);
-  await page.getByRole('button', { name: 'Заново' }).click();
+  await restartMatch(page);
   await expect(progress).toHaveText('0%');
   await expect
     .poll(async () => Number((await progress.textContent())?.replace('%', '')))

@@ -20,7 +20,7 @@ function isCaptured(state: MatchState, area: Obstacle): boolean {
 
 export function updateObjective(state: MatchState): void {
   // The checkpoint marks progress for the rest of this match; the final point can be lost.
-  if (state.checkpoint && !state.checkpoint.captured)
-    state.checkpoint.captured = isCaptured(state, state.checkpoint.area);
+  const next = state.checkpoints.find((point) => !point.captured);
+  if (next) next.captured = isCaptured(state, next.area);
   if (state.objective) state.objective.captured = isCaptured(state, state.objective.area);
 }

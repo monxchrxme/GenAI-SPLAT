@@ -1,3 +1,4 @@
+import { restartMatch } from '../fixtures/restartMatch';
 import { test, expect, type Locator } from '@playwright/test';
 import { createInitialState } from '../../src/simulation/initialState';
 import { S0_LEVEL } from '../../src/core/config';
@@ -33,13 +34,15 @@ for (const deviceScaleFactor of [1, 2])
       await page.mouse.click(pick.x, pick.y);
       await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
       const draw = async () => {
-        const a = await screen(canvas, 200, 100),
-          b = await screen(canvas, 1400, 100),
-          c = await screen(canvas, 1400, 900);
+        const a = await screen(canvas, 200, 250),
+          b = await screen(canvas, 1350, 250),
+          c = await screen(canvas, 1350, 750),
+          d = await screen(canvas, 900, 750);
         await page.mouse.move(a.x, a.y);
         await page.mouse.down();
         await page.mouse.move(b.x, b.y, { steps: 20 });
         await page.mouse.move(c.x, c.y, { steps: 20 });
+        await page.mouse.move(d.x, d.y, { steps: 20 });
         await page.mouse.up();
       };
       await draw();
@@ -54,7 +57,7 @@ for (const deviceScaleFactor of [1, 2])
       await expect(canvas).toHaveAttribute('data-slot-count', '40');
       await draw();
       await expect(canvas).toHaveAttribute('data-tension-active', 'true');
-      await page.getByRole('button', { name: 'Заново' }).click();
+      await restartMatch(page);
       await expect(canvas).toHaveAttribute('data-tension-active', 'false');
       await expect(canvas).toHaveAttribute('data-slot-count', '0');
       await expect(canvas).toHaveAttribute('data-moving-count', '0');

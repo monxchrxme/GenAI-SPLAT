@@ -90,6 +90,11 @@ export interface CaptureObjective {
   captured: boolean;
 }
 
+export interface CheckpointConfig {
+  readonly area: Obstacle;
+  readonly viewEnd?: number;
+}
+
 export interface MatchState {
   phase: 'running' | 'finished';
   result: 'victory' | 'defeat' | null;
@@ -101,7 +106,7 @@ export interface MatchState {
   paintGrid: { columns: number; rows: number };
   paintCells: PaintCell[];
   objective: CaptureObjective | null;
-  checkpoint: CaptureObjective | null;
+  checkpoints: (CaptureObjective & CheckpointConfig)[];
   hazards: Hazard[];
   ponds: Obstacle[];
   projectiles: Projectile[];
@@ -116,9 +121,8 @@ export interface LevelConfig {
   readonly paint: PaintConfig;
   readonly obstacles?: readonly Obstacle[];
   readonly objective?: Obstacle;
-  /** When present, victory requires this checkpoint and the final objective. */
-  readonly checkpoint?: Obstacle;
-  readonly checkpointViewEnd?: number;
+  /** When present, victory requires all checkpoints in order and the final objective. */
+  readonly checkpoints?: readonly CheckpointConfig[];
   readonly enemyPosts?: readonly {
     readonly count: number;
     readonly columns: number;

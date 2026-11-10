@@ -1,8 +1,7 @@
+import { restartMatch } from '../fixtures/restartMatch';
 import { expect, test } from '@playwright/test';
 
-test('the checkpoint stops camera paging, explains capture and Restart restores the first view', async ({
-  page,
-}) => {
+test('the checkpoint stops camera paging and Restart restores the first view', async ({ page }) => {
   await page.goto('/');
   const canvas = page.locator('canvas');
   await expect(page.locator('#arena')).toHaveAttribute('data-ready', 'true');
@@ -15,12 +14,12 @@ test('the checkpoint stops camera paging, explains capture and Restart restores 
     await expect.poll(async () => Number(await canvas.getAttribute('data-camera-left'))).toBe(left);
   }
   await expect(right).toBeDisabled();
-  await expect(page.locator('#checkpoint-hint')).toContainText('Займите рубеж 1');
+  await expect(page.locator('#checkpoint-hint')).toHaveCount(0);
   await expect(canvas).toHaveAttribute('data-camera-left', '2400');
   await expect
     .poll(async () => Number(await canvas.getAttribute('data-visible-red-count')))
     .toBeGreaterThan(0);
-  await page.getByRole('button', { name: 'Заново' }).click();
+  await restartMatch(page);
   await expect(canvas).toHaveAttribute('data-camera-left', '0');
   await expect(page.locator('#red-count')).toHaveText('102');
   await expect(canvas).toHaveAttribute('data-red-group-count', '9');

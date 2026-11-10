@@ -1,3 +1,4 @@
+import { restartMatch } from '../fixtures/restartMatch';
 import { expect, test } from '@playwright/test';
 
 test('Split immediately halves the selected group with physical X and button', async ({ page }) => {
@@ -50,7 +51,7 @@ test('Split immediately halves the selected group with physical X and button', a
   await page.getByRole('button', { name: 'Разделить (X)' }).click();
   await expect(page.locator('#group-count')).toHaveText('3');
   await expect(canvas).toHaveAttribute('data-selection-ring-count', '10');
-  await page.getByRole('button', { name: 'Заново' }).click();
+  await restartMatch(page);
   await expect(page.locator('#group-count')).toHaveText('1');
   await expect(page.locator('#agent-count')).toHaveText('40');
   await page.mouse.click(center.x, center.y);

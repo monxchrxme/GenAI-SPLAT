@@ -28,11 +28,13 @@ export class Hud {
     this.credits.textContent = String(snapshot.reinforcementCredits);
     const accessibleCells = snapshot.paintCells.filter((cell) => !cell.blocked);
     this.paintProgress.textContent = `${territoryPercent(accessibleCells.filter((cell) => cell.owner === 'blue').length, accessibleCells.length)}%`;
-    this.checkpointStatus.textContent = snapshot.checkpoint
-      ? snapshot.checkpoint.captured
-        ? 'пройден'
-        : 'не пройден'
-      : '—';
+    const captured = snapshot.checkpoints.filter((point) => point.captured).length;
+    this.checkpointStatus.textContent =
+      snapshot.checkpoints.length === 1
+        ? captured
+          ? 'пройден'
+          : 'не пройден'
+        : `${captured}/${snapshot.checkpoints.length}`;
     this.objectiveStatus.textContent = snapshot.objective
       ? snapshot.objective.captured
         ? 'захвачена'

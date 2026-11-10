@@ -1,3 +1,4 @@
+import { restartMatch } from '../fixtures/restartMatch';
 import { expect, test, type Locator } from '@playwright/test';
 import { S0_LEVEL } from '../../src/core/config';
 import { createInitialState } from '../../src/simulation/initialState';
@@ -63,7 +64,7 @@ for (const deviceScaleFactor of [1, 2]) {
       await page.mouse.click(blank.x, blank.y);
       await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
       await expect(canvas).toHaveAttribute('data-slot-count', '40');
-      await page.getByRole('button', { name: 'Заново' }).click();
+      await restartMatch(page);
       await page.setViewportSize({ width: 900, height: 650 });
       await expect.poll(async () => (await canvas.boundingBox())?.width).toBe(900);
       const resized = await screenPoint(canvas, gap);
@@ -106,7 +107,7 @@ for (const deviceScaleFactor of [1, 2]) {
       await page.mouse.click(blank.x, blank.y);
       await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
       await expect(canvas).toHaveAttribute('data-selection-ring-count', '40');
-      await page.getByRole('button', { name: 'Заново' }).click();
+      await restartMatch(page);
       await expect(canvas).toHaveAttribute('data-selected-group', '');
       await page.mouse.click(selectPoint.x, selectPoint.y);
       await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
@@ -136,7 +137,7 @@ for (const deviceScaleFactor of [1, 2]) {
         const empty = await screenPoint(canvas, { x: 900, y: 700 });
         await page.mouse.click(empty.x, empty.y);
         await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
-        await page.getByRole('button', { name: 'Заново' }).click();
+        await restartMatch(page);
         await expect(canvas).toHaveAttribute('data-selected-group', '');
         const marker = await screenPoint(canvas, first);
         await page.mouse.click(marker.x, marker.y);
@@ -150,12 +151,12 @@ for (const deviceScaleFactor of [1, 2]) {
       const empty = await screenPoint(canvas, { x: 900, y: 700 });
       await page.mouse.click(empty.x, empty.y);
       await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
-      await page.getByRole('button', { name: 'Заново' }).click();
+      await restartMatch(page);
       await expect(canvas).toHaveAttribute('data-selected-group', '');
       const marker = await screenPoint(canvas, first);
       await page.mouse.click(marker.x, marker.y);
       await expect(canvas).toHaveAttribute('data-selection-ring-count', '40');
-      await page.getByRole('button', { name: 'Заново' }).click();
+      await restartMatch(page);
       await expect(canvas).toHaveAttribute('data-selected-group', '');
       await expect(canvas).toHaveAttribute('data-selection-ring-count', '0');
       await expect(page.locator('#agent-count')).toHaveText('40');

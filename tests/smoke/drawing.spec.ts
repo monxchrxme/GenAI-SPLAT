@@ -1,3 +1,4 @@
+import { restartMatch } from '../fixtures/restartMatch';
 import { test, expect, type Locator } from '@playwright/test';
 import { createInitialState } from '../../src/simulation/initialState';
 import { S0_LEVEL } from '../../src/core/config';
@@ -86,7 +87,7 @@ for (const deviceScaleFactor of [1, 2])
       await page.setViewportSize({ width: 900, height: 650 });
       await expect(canvas).toHaveAttribute('data-drawing', 'false');
       await page.mouse.up();
-      await page.getByRole('button', { name: 'Заново' }).click();
+      await restartMatch(page);
       await expect(canvas).toHaveAttribute('data-preview-points', '0');
       await expect(canvas).toHaveAttribute('data-slot-count', '0');
       await expect(canvas).toHaveAttribute('data-selected-group', '');

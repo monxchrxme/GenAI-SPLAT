@@ -1,5 +1,5 @@
 import { Application, Container, Graphics, Text } from 'pixi.js';
-import type { AgentId, Point, Snapshot, World } from '../core/types';
+import type { AgentId, LevelConfig, Point, Snapshot, World } from '../core/types';
 import { PRESENTATION as view } from './presentation';
 import {
   clientToWorld,
@@ -10,7 +10,6 @@ import {
 } from './viewport';
 import type { DrawingPreview } from '../input/groupSelectionInput';
 import { tensionActive } from '../core/tension';
-import { GAME_LEVEL } from '../core/config';
 import { cannonAngle } from '../simulation/hazards';
 
 export class PixiRenderer {
@@ -19,7 +18,7 @@ export class PixiRenderer {
   private readonly units = new Container();
   private readonly decor = new Container();
   private readonly paint = new Graphics();
-  private readonly checkpointOutline = new Graphics();
+  private readonly checkpointMarkers: { outline: Graphics; label: Text }[] = [];
   private readonly finalOutline = new Graphics();
   private readonly hazardGraphics = new Graphics();
   private readonly selection = new Graphics();
@@ -36,20 +35,10 @@ export class PixiRenderer {
   private cameraFrameTime: number | null = null;
   private manualCameraUntil = 0;
   private cameraEndX = 1;
-  private readonly checkpointLabel = new Text({
-    text: '1 · ЗАНЯТЬ РУБЕЖ',
-    style: { fontFamily: 'sans-serif', fontSize: 30, fontWeight: '700', fill: 0x694717 },
-  });
-
-  constructor(private readonly checkpointViewEnd?: number) {}
-
-  get checkpointInView(): boolean {
-    return (
-      this.checkpointOutline.width > 0 &&
-      this.checkpointLabel.x >= this.cameraLeft &&
-      this.cameraLeft + view.cameraViewWidth >= this.checkpointLabel.x
-    );
-  }
+  constructor(
+    private readonly level: LevelConfig,
+    private readonly lanes: readonly number[] = [],
+  ) {}
 
   get atCheckpointLimit(): boolean {
     return (
@@ -88,10 +77,7 @@ export class PixiRenderer {
       height: 1,
     });
     this.world = snapshot.world;
-    this.cameraEndX =
-      snapshot.checkpoint && !snapshot.checkpoint.captured
-        ? (this.checkpointViewEnd ?? this.world.width)
-        : this.world.width;
+    this.updateCameraBoundary(snapshot);
     const field = new Graphics()
       .rect(0, 0, this.world.width, this.world.height)
       .fill(view.colors.arena)
@@ -114,40 +100,43 @@ export class PixiRenderer {
     grid.stroke({ color: view.colors.grid, width: 1 });
     // [P] Two open flanks and three landmarks: they never obstruct movement or paint.
     const lanes = new Graphics();
-    for (const y of view.laneY) {
+    for (const y of this.lanes) {
       lanes.roundRect(500, y - 85, 860, 170, 85).fill({ color: 0xd8ddcf, alpha: 0.22 });
     }
     this.decor.addChild(lanes);
     const obstacles = new Graphics();
     const objectives = new Container();
-    for (const [target, outline, label] of [
-      [snapshot.checkpoint, this.checkpointOutline, '1 · Рубеж'],
-      [snapshot.objective, this.finalOutline, '2 · Финальная точка'],
-    ] as const) {
-      if (!target) continue;
-      const { area } = target;
-      outline
+    for (const [index, { area }] of snapshot.checkpoints.entries()) {
+      const center = area.x + area.width / 2;
+      const outline = new Graphics()
         .rect(area.x, area.y, area.width, area.height)
-        .fill({ color: 0xffffff, alpha: target === snapshot.checkpoint ? 0.16 : 0 })
-        .stroke({ color: 0xffffff, width: target === snapshot.checkpoint ? 9 : 5, alpha: 0.95 });
+        .fill({ color: 0xffffff, alpha: 0.16 })
+        .stroke({ color: 0xffffff, width: 9, alpha: 0.95 })
+        .moveTo(center - 18, area.y - 18)
+        .lineTo(center, area.y - 2)
+        .lineTo(center + 18, area.y - 18)
+        .stroke({ color: 0xffffff, width: 7 });
+      const label = new Text({
+        text: `${index + 1} · Рубеж`,
+        style: { fontFamily: 'sans-serif', fontSize: 30, fontWeight: '700', fill: 0x694717 },
+      });
+      label.anchor.set(0.5, 0);
+      label.position.set(center, Math.max(0, area.y - 64));
+      this.checkpointMarkers.push({ outline, label });
+      objectives.addChild(outline, label);
+    }
+    if (snapshot.objective) {
+      const { area } = snapshot.objective;
+      this.finalOutline
+        .rect(area.x, area.y, area.width, area.height)
+        .stroke({ color: 0xffffff, width: 5, alpha: 0.95 });
       const name = new Text({
-        text: label,
+        text: `${snapshot.checkpoints.length + 1} · Финальная точка`,
         style: { fontFamily: 'sans-serif', fontSize: 26, fontWeight: '600', fill: 0x373d46 },
       });
       name.anchor.set(0.5, 0);
       name.position.set(area.x + area.width / 2, Math.max(0, area.y - 42));
-      objectives.addChild(outline, name);
-      if (target === snapshot.checkpoint) {
-        name.visible = false;
-        this.checkpointLabel.anchor.set(0.5, 0);
-        this.checkpointLabel.position.set(area.x + area.width / 2, area.y - 64);
-        objectives.addChild(this.checkpointLabel);
-        outline
-          .moveTo(area.x + area.width / 2 - 18, area.y - 18)
-          .lineTo(area.x + area.width / 2, area.y - 2)
-          .lineTo(area.x + area.width / 2 + 18, area.y - 18)
-          .stroke({ color: 0xffffff, width: 7 });
-      }
+      objectives.addChild(this.finalOutline, name);
     }
     for (const block of snapshot.obstacles) {
       obstacles
@@ -187,6 +176,11 @@ export class PixiRenderer {
     this.updateCamera();
   }
 
+  private updateCameraBoundary(snapshot: Snapshot): void {
+    this.cameraEndX =
+      snapshot.checkpoints.find((point) => !point.captured)?.viewEnd ?? this.world.width;
+  }
+
   private updateCamera(): void {
     const camera = fitCamera(
       this.viewport.width,
@@ -223,10 +217,7 @@ export class PixiRenderer {
   }
 
   draw(snapshot: Snapshot, restartCount: number, preview?: DrawingPreview): void {
-    this.cameraEndX =
-      snapshot.checkpoint && !snapshot.checkpoint.captured
-        ? (this.checkpointViewEnd ?? this.world.width)
-        : this.world.width;
+    this.updateCameraBoundary(snapshot);
     if (this.generation !== restartCount) {
       this.cameraLeft = 0;
       this.cameraStart = 0;
@@ -275,13 +266,11 @@ export class PixiRenderer {
     this.canvas.dataset.cameraTarget = String(this.cameraTarget);
     this.canvas.dataset.cameraLeft = String(this.cameraLeft);
     this.paint.clear();
-    this.checkpointOutline.tint = snapshot.checkpoint?.captured ? view.colors.blueEdge : 0xb27819;
-    this.checkpointLabel.text = snapshot.checkpoint?.captured
-      ? '1 · РУБЕЖ ВЗЯТ ✓'
-      : '1 · ЗАНЯТЬ РУБЕЖ';
-    this.checkpointLabel.style.fill = snapshot.checkpoint?.captured
-      ? view.colors.blueEdge
-      : 0x694717;
+    for (const [index, marker] of this.checkpointMarkers.entries()) {
+      const captured = snapshot.checkpoints[index]!.captured;
+      marker.outline.tint = captured ? view.colors.blueEdge : 0xb27819;
+      marker.label.style.fill = captured ? view.colors.blueEdge : 0x694717;
+    }
     this.finalOutline.tint = snapshot.objective?.captured
       ? view.colors.blueEdge
       : view.colors.redEdge;
@@ -303,7 +292,7 @@ export class PixiRenderer {
     for (const hazard of snapshot.hazards) {
       if (!hazard.active) continue;
       if (hazard.kind === 'slow') {
-        const halfWidth = hazard.radius ?? GAME_LEVEL.hazards!.slowRadius;
+        const halfWidth = hazard.radius ?? this.level.hazards!.slowRadius;
         this.hazardGraphics
           .rect(hazard.x - halfWidth, hazard.y - halfWidth, halfWidth * 2, halfWidth * 2)
           .fill({ color: 0xc39038, alpha: 0.15 })
@@ -323,7 +312,7 @@ export class PixiRenderer {
           .fill(0x9d3f3b)
           .stroke({ color: 0x542b2b, width: 2 });
       } else {
-        const angle = cannonAngle(hazard, snapshot.tick, GAME_LEVEL);
+        const angle = cannonAngle(hazard, snapshot.tick, this.level);
         this.hazardGraphics
           .circle(hazard.x, hazard.y, 17)
           .fill(0x7c443c)

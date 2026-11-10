@@ -1,3 +1,4 @@
+import { restartMatch } from '../fixtures/restartMatch';
 import { expect, test } from '@playwright/test';
 
 test('S0 production build: 40 static markers, clean restart, keyboard, resize, console and assets', async ({
@@ -18,23 +19,24 @@ test('S0 production build: 40 static markers, clean restart, keyboard, resize, c
   await expect(page.locator('#arena')).toHaveAttribute('data-ready', 'true');
   const canvas = page.getByRole('img', { name: 'Поле с синими и красными Сплатами' });
   await expect(canvas).toBeVisible();
-  await expect(canvas).toHaveAttribute('data-marker-count', '76');
-  await expect(canvas).toHaveAttribute('data-world-size', '3200×1000');
+  await expect(canvas).toHaveAttribute('data-marker-count', '142');
+  await expect(canvas).toHaveAttribute('data-world-size', '6000×1000');
   await expect(page.locator('#agent-count')).toHaveText('40');
   await expect(page.locator('#group-count')).toHaveText('1');
-  await expect(page.getByRole('button')).toHaveCount(7);
+  await expect(page.getByRole('button', { name: 'Меню', exact: true })).toBeEnabled();
 
   await expect.poll(async () => Number(await canvas.getAttribute('data-tick'))).toBeGreaterThan(30);
   await expect(page.locator('#paint-progress')).toContainText('%');
 
   const restart = page.getByRole('button', { name: 'Заново' });
   for (let count = 1; count <= 3; count++) {
-    await restart.click();
+    await restartMatch(page);
     await expect(canvas).toHaveAttribute('data-restart-count', String(count));
     expect(Number(await canvas.getAttribute('data-tick'))).toBeLessThan(20);
-    await expect(canvas).toHaveAttribute('data-marker-count', '76');
+    await expect(canvas).toHaveAttribute('data-marker-count', '142');
     await expect(page.locator('#paint-progress')).toContainText('%');
   }
+  await page.getByRole('button', { name: 'Меню', exact: true }).click();
   await restart.focus();
   await page.keyboard.press('Enter');
   await expect(canvas).toHaveAttribute('data-restart-count', '4');
@@ -45,8 +47,8 @@ test('S0 production build: 40 static markers, clean restart, keyboard, resize, c
   ]) {
     await page.setViewportSize(viewport);
     await expect.poll(async () => (await canvas.boundingBox())?.width).toBe(viewport.width);
-    await expect(canvas).toHaveAttribute('data-world-size', '3200×1000');
-    await expect(canvas).toHaveAttribute('data-marker-count', '76');
+    await expect(canvas).toHaveAttribute('data-world-size', '6000×1000');
+    await expect(canvas).toHaveAttribute('data-marker-count', '142');
     await expect(page.locator('#agent-count')).toHaveText('40');
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),

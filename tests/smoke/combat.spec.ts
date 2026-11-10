@@ -1,3 +1,4 @@
+import { restartMatch } from '../fixtures/restartMatch';
 import { expect, test, type Locator } from '@playwright/test';
 import { S0_LEVEL } from '../../src/core/config';
 import { createInitialState } from '../../src/simulation/initialState';
@@ -78,7 +79,7 @@ test('red agents engage, losses update the HUD, and Restart restores both armies
       return killed - credits;
     })
     .toBe(5);
-  await page.getByRole('button', { name: 'Заново' }).click();
+  await restartMatch(page);
   await expect(page.locator('#red-count')).toHaveText('102');
   await expect(page.locator('#agent-count')).toHaveText('40');
   await expect(canvas).toHaveAttribute('data-marker-count', '142');
