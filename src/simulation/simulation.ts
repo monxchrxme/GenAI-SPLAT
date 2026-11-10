@@ -12,7 +12,7 @@ import { createFormation } from '../core/formation';
 import { moveAgents, validateMovement, type RouteCache } from './movement';
 import { pointBlocked, UNIT_CLEARANCE } from './obstacles';
 import { groupMoveFormation } from './groupMove';
-import { updateObjective } from './objective';
+import { objectiveCells, updateObjective } from './objective';
 import { updateHazards } from './hazards';
 import { isStretched, validateTension } from '../core/tension';
 
@@ -97,22 +97,29 @@ export class Simulation {
       )
         throw new Error('Invalid hazards');
     }
+    if (config.checkpoint && !config.objective)
+      throw new Error('Checkpoint needs a final objective');
     if (
-      config.objective &&
-      (![
-        config.objective.x,
-        config.objective.y,
-        config.objective.width,
-        config.objective.height,
-      ].every(Number.isFinite) ||
-        config.objective.x < 0 ||
-        config.objective.y < 0 ||
-        config.objective.width <= 0 ||
-        config.objective.height <= 0 ||
-        config.objective.x + config.objective.width > config.world.width ||
-        config.objective.y + config.objective.height > config.world.height)
+      config.checkpointViewEnd !== undefined &&
+      (!config.checkpoint ||
+        !Number.isFinite(config.checkpointViewEnd) ||
+        config.checkpointViewEnd < config.checkpoint.x + config.checkpoint.width ||
+        config.checkpointViewEnd > config.world.width)
     )
-      throw new Error('Invalid objective');
+      throw new Error('Invalid checkpoint view boundary');
+    for (const area of [config.checkpoint, config.objective]) {
+      if (
+        area &&
+        (![area.x, area.y, area.width, area.height].every(Number.isFinite) ||
+          area.x < 0 ||
+          area.y < 0 ||
+          area.width <= 0 ||
+          area.height <= 0 ||
+          area.x + area.width > config.world.width ||
+          area.y + area.height > config.world.height)
+      )
+        throw new Error('Invalid objective');
+    }
     if (
       config.enemyPosts &&
       (!enemy ||
@@ -210,16 +217,20 @@ export class Simulation {
     )
       throw new Error('Invalid reinforcement configuration');
     this.state = createInitialState(config);
-    if (this.state.objective) {
-      const { area } = this.state.objective;
-      const { columns, rows } = this.state.paintGrid;
-      const cells = this.state.paintCells.filter((_, index) => {
-        const x = (((index % columns) + 0.5) * this.state.world.width) / columns;
-        const y = ((Math.floor(index / columns) + 0.5) * this.state.world.height) / rows;
-        return x >= area.x && x < area.x + area.width && y >= area.y && y < area.y + area.height;
-      });
+    for (const objective of [this.state.checkpoint, this.state.objective]) {
+      if (!objective) continue;
+      const cells = objectiveCells(this.state, objective.area);
       if (!cells.length || cells.some((cell) => cell.blocked))
         throw new Error('Invalid objective cells');
+    }
+    if (this.state.checkpoint && this.state.objective) {
+      const checkpointCells = new Set(objectiveCells(this.state, this.state.checkpoint.area));
+      if (
+        objectiveCells(this.state, this.state.objective.area).some((cell) =>
+          checkpointCells.has(cell),
+        )
+      )
+        throw new Error('Objectives must occupy different cells');
     }
     this.nextAgentId = Math.max(...this.state.agents.map((agent) => Number(agent.id.slice(6)))) + 1;
     assertInvariants(this.state);
@@ -539,21 +550,27 @@ export class Simulation {
     updateHazards(this.state, this.config);
     updateObjective(this.state);
     this.state.tick++;
-    const accessible = this.state.paintCells.filter((cell) => !cell.blocked);
-    const owned = accessible.filter((cell) => cell.owner === 'blue').length;
     if (
       this.config.combat &&
       !this.state.agents.some((agent) => agent.alive && agent.factionId === 'blue')
     ) {
       this.state.phase = 'finished';
       this.state.result = 'defeat';
-    } else if (
-      owned / accessible.length >= this.config.victoryFraction &&
-      (!this.state.objective || this.state.objective.captured)
-    ) {
+    } else if (this.hasWon()) {
       this.state.phase = 'finished';
       this.state.result = 'victory';
     }
+  }
+
+  private hasWon(): boolean {
+    const { checkpoint, objective, paintCells } = this.state;
+    if (checkpoint) return checkpoint.captured && objective?.captured === true;
+    if (objective && !objective.captured) return false;
+    const accessible = paintCells.filter((cell) => !cell.blocked);
+    return (
+      accessible.filter((cell) => cell.owner === 'blue').length / accessible.length >=
+      this.config.victoryFraction
+    );
   }
 
   private allocateGroupId(): GroupId {

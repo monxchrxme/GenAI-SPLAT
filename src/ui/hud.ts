@@ -9,6 +9,7 @@ export class Hud {
     private readonly groupCount: HTMLElement,
     private readonly redCount: HTMLElement,
     private readonly paintProgress: HTMLElement,
+    private readonly checkpointStatus: HTMLElement,
     private readonly objectiveStatus: HTMLElement,
     private readonly credits: HTMLElement,
     private readonly hint: HTMLElement,
@@ -27,6 +28,11 @@ export class Hud {
     this.credits.textContent = String(snapshot.reinforcementCredits);
     const accessibleCells = snapshot.paintCells.filter((cell) => !cell.blocked);
     this.paintProgress.textContent = `${territoryPercent(accessibleCells.filter((cell) => cell.owner === 'blue').length, accessibleCells.length)}%`;
+    this.checkpointStatus.textContent = snapshot.checkpoint
+      ? snapshot.checkpoint.captured
+        ? 'пройден'
+        : 'не пройден'
+      : '—';
     this.objectiveStatus.textContent = snapshot.objective
       ? snapshot.objective.captured
         ? 'захвачена'

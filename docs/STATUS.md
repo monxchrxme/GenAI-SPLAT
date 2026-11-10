@@ -1,11 +1,11 @@
 ---
 updated_at: 2026-11-11
-current_stage: s6_s7_first_capture
-stage_state: first_capture_awaiting_manual_acceptance
+current_stage: s6_s7_checkpoint_guidance
+stage_state: checkpoint_guidance_awaiting_manual_acceptance
 implemented: true
-implementation_scope: faster first territory capture
+implementation_scope: checkpoint guidance and camera boundary
 preparation_implemented: true
-tests_verified: see FIRST_CAPTURE_REPORT for local scope
+tests_verified: see CHECKPOINT_GUIDANCE_REPORT for local scope
 document_checks_verified: closure pass; 159 local links, 53 original tasks/gates/artifacts, unchanged D-register/protected files, 10 handoff lines, accepted runtime/tests unchanged, deploy guard false, source SHA verified
 awaiting_manual_acceptance: true
 preview_gate: verified_for_S0_only
@@ -50,6 +50,28 @@ handoff_notes:
   - S0 explicitly accepted through user confirmation of all checklist items on 2026-11-06.
   - Delivery 1 accepted; next chat S4+S5, see S4_S5_HANDOFF_PROMPT.md.
 ---
+
+## Оформление целей одобрено — 11.11.2026
+
+Заказчик одобрил оформление рубежа и финальной точки и запросил локальный коммит текущей сборки. Схема второй карты перерабатывается по его уточнению о длинной карте с продвижением вправо и одной или несколькими промежуточными целями. Общие ручные гейты сохраняются.
+
+## Видимость рубежа и схема второй карты — 11.11.2026
+
+- implemented — золотая зона, крупная подпись, инструкция и ограничение камеры до захвата рубежа. [Отчёт](CHECKPOINT_GUIDANCE_REPORT.md).
+- tests_verified — 156 unit/integration, 8 Chrome smoke, обе типизации, линтер, форматирование и сборка во временной копии.
+- manual_acceptance — оформление рубежа и финальной точки одобрено заказчиком 11.11.2026. Баланс полной партии и [схема второй карты](MAP_CONCEPTS.md) ожидают оценки.
+
+## Рубеж и финальная точка — 11.11.2026
+
+- implemented — обязательный рубеж во втором участке и финальная точка вместо общего порога. [Отчёт и чеклист](CHECKPOINT_REPORT.md).
+- tests_verified — 156 unit/integration, 6 Chrome smoke, типизация, линтер, форматирование, сборка и полный модельный маршрут.
+- awaiting_manual_acceptance — читаемость и расположение рубежа, удобство маршрута и баланс партии. Добавление карт рассмотрено как возможное расширение.
+
+## Обучение и оценка условия победы — 11.11.2026
+
+- implemented — отдельный интерактивный урок по кнопке «Как играть» с возвратом в основную партию. Контрольный коммит до изменений `1c6ea1e`.
+- tests_verified — 154 unit/integration, 10 Chrome smoke, обе типизации, линтер, форматирование, сборка и сравнение маршрутов в модели. [Отчёт и чеклист](TUTORIAL_BALANCE_REPORT.md).
+- awaiting_manual_acceptance — прохождение урока новым игроком и выбор итогового условия победы. Пробное условие для сравнения — финальная точка без общего порога.
 
 ## Первый захват территории — 11.11.2026
 

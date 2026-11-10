@@ -182,3 +182,66 @@ button[aria-pressed='true'] {
   text-align: center;
   pointer-events: none;
 }
+
+#tutorial {
+  width: min(880px, calc(100% - 24px));
+  max-height: calc(100dvh - 24px);
+  padding: 16px;
+  border: 1px solid #c6c4bb;
+  border-radius: 10px;
+  background: #f7f5ef;
+  color: inherit;
+}
+
+#tutorial::backdrop {
+  background: #373d4680;
+}
+
+.tutorial-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tutorial-bar h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+#tutorial-step {
+  min-height: 3em;
+  margin: 12px 0;
+  line-height: 1.5;
+}
+
+#tutorial-field {
+  height: clamp(200px, 54dvh, 480px);
+  overflow: hidden;
+  border: 1px solid #d8d4c9;
+}
+
+.tutorial-actions {
+  justify-content: flex-start;
+  margin-top: 12px;
+}
+
+#checkpoint-hint:not([hidden]) {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(620px, calc(100% - 24px));
+  padding: 10px 16px;
+  border: 2px solid #b27819;
+  border-radius: 8px;
+  background: #fff8e8f5;
+  color: #694717;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: center;
+  pointer-events: none;
+}

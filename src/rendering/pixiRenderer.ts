@@ -1,4 +1,4 @@
-import { Application, Container, Graphics } from 'pixi.js';
+import { Application, Container, Graphics, Text } from 'pixi.js';
 import type { AgentId, Point, Snapshot, World } from '../core/types';
 import { PRESENTATION as view } from './presentation';
 import {
@@ -19,6 +19,8 @@ export class PixiRenderer {
   private readonly units = new Container();
   private readonly decor = new Container();
   private readonly paint = new Graphics();
+  private readonly checkpointOutline = new Graphics();
+  private readonly finalOutline = new Graphics();
   private readonly hazardGraphics = new Graphics();
   private readonly selection = new Graphics();
   private readonly line = new Graphics();
@@ -33,13 +35,35 @@ export class PixiRenderer {
   private cameraProgress = 1;
   private cameraFrameTime: number | null = null;
   private manualCameraUntil = 0;
+  private cameraEndX = 1;
+  private readonly checkpointLabel = new Text({
+    text: '1 · ЗАНЯТЬ РУБЕЖ',
+    style: { fontFamily: 'sans-serif', fontSize: 30, fontWeight: '700', fill: 0x694717 },
+  });
+
+  constructor(private readonly checkpointViewEnd?: number) {}
+
+  get checkpointInView(): boolean {
+    return (
+      this.checkpointOutline.width > 0 &&
+      this.checkpointLabel.x >= this.cameraLeft &&
+      this.cameraLeft + view.cameraViewWidth >= this.checkpointLabel.x
+    );
+  }
+
+  get atCheckpointLimit(): boolean {
+    return (
+      this.cameraEndX < this.world.width &&
+      this.cameraTarget + view.cameraViewWidth >= this.cameraEndX
+    );
+  }
 
   get canvas(): HTMLCanvasElement {
     return this.app.canvas;
   }
 
   toWorld(point: Point): Point | null {
-    return clientToWorld(
+    const worldPoint = clientToWorld(
       point,
       this.canvas.getBoundingClientRect(),
       this.viewport,
@@ -48,6 +72,7 @@ export class PixiRenderer {
       view.cameraViewWidth,
       this.cameraLeft,
     );
+    return worldPoint && worldPoint.x <= this.cameraEndX ? worldPoint : null;
   }
 
   async init(host: HTMLElement, snapshot: Snapshot): Promise<void> {
@@ -63,6 +88,10 @@ export class PixiRenderer {
       height: 1,
     });
     this.world = snapshot.world;
+    this.cameraEndX =
+      snapshot.checkpoint && !snapshot.checkpoint.captured
+        ? (this.checkpointViewEnd ?? this.world.width)
+        : this.world.width;
     const field = new Graphics()
       .rect(0, 0, this.world.width, this.world.height)
       .fill(view.colors.arena)
@@ -90,12 +119,35 @@ export class PixiRenderer {
     }
     this.decor.addChild(lanes);
     const obstacles = new Graphics();
-    const objective = new Graphics();
-    if (snapshot.objective) {
-      const area = snapshot.objective.area;
-      objective
+    const objectives = new Container();
+    for (const [target, outline, label] of [
+      [snapshot.checkpoint, this.checkpointOutline, '1 · Рубеж'],
+      [snapshot.objective, this.finalOutline, '2 · Финальная точка'],
+    ] as const) {
+      if (!target) continue;
+      const { area } = target;
+      outline
         .rect(area.x, area.y, area.width, area.height)
-        .stroke({ color: 0x9d3f3b, width: 5, alpha: 0.9 });
+        .fill({ color: 0xffffff, alpha: target === snapshot.checkpoint ? 0.16 : 0 })
+        .stroke({ color: 0xffffff, width: target === snapshot.checkpoint ? 9 : 5, alpha: 0.95 });
+      const name = new Text({
+        text: label,
+        style: { fontFamily: 'sans-serif', fontSize: 26, fontWeight: '600', fill: 0x373d46 },
+      });
+      name.anchor.set(0.5, 0);
+      name.position.set(area.x + area.width / 2, Math.max(0, area.y - 42));
+      objectives.addChild(outline, name);
+      if (target === snapshot.checkpoint) {
+        name.visible = false;
+        this.checkpointLabel.anchor.set(0.5, 0);
+        this.checkpointLabel.position.set(area.x + area.width / 2, area.y - 64);
+        objectives.addChild(this.checkpointLabel);
+        outline
+          .moveTo(area.x + area.width / 2 - 18, area.y - 18)
+          .lineTo(area.x + area.width / 2, area.y - 2)
+          .lineTo(area.x + area.width / 2 + 18, area.y - 18)
+          .stroke({ color: 0xffffff, width: 7 });
+      }
     }
     for (const block of snapshot.obstacles) {
       obstacles
@@ -113,7 +165,7 @@ export class PixiRenderer {
       field,
       this.decor,
       this.paint,
-      objective,
+      objectives,
       grid,
       obstacles,
       this.hazardGraphics,
@@ -162,7 +214,7 @@ export class PixiRenderer {
       nextCameraPage(
         this.cameraTarget,
         direction < 0 ? -1 : 1,
-        this.world.width,
+        this.cameraEndX,
         view.cameraViewWidth,
         view.cameraPageStep,
       ),
@@ -171,6 +223,10 @@ export class PixiRenderer {
   }
 
   draw(snapshot: Snapshot, restartCount: number, preview?: DrawingPreview): void {
+    this.cameraEndX =
+      snapshot.checkpoint && !snapshot.checkpoint.captured
+        ? (this.checkpointViewEnd ?? this.world.width)
+        : this.world.width;
     if (this.generation !== restartCount) {
       this.cameraLeft = 0;
       this.cameraStart = 0;
@@ -207,7 +263,7 @@ export class PixiRenderer {
             this.cameraTarget,
             centerX,
             direction,
-            this.world.width,
+            this.cameraEndX,
             view.cameraViewWidth,
             view.cameraPageStep,
             view.cameraEdgeFraction,
@@ -219,6 +275,16 @@ export class PixiRenderer {
     this.canvas.dataset.cameraTarget = String(this.cameraTarget);
     this.canvas.dataset.cameraLeft = String(this.cameraLeft);
     this.paint.clear();
+    this.checkpointOutline.tint = snapshot.checkpoint?.captured ? view.colors.blueEdge : 0xb27819;
+    this.checkpointLabel.text = snapshot.checkpoint?.captured
+      ? '1 · РУБЕЖ ВЗЯТ ✓'
+      : '1 · ЗАНЯТЬ РУБЕЖ';
+    this.checkpointLabel.style.fill = snapshot.checkpoint?.captured
+      ? view.colors.blueEdge
+      : 0x694717;
+    this.finalOutline.tint = snapshot.objective?.captured
+      ? view.colors.blueEdge
+      : view.colors.redEdge;
     this.hazardGraphics.clear();
     this.canvas.dataset.pondCount = String(snapshot.ponds.length);
     this.canvas.dataset.mineCount = String(

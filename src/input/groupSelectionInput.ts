@@ -30,6 +30,7 @@ export function bindGroupSelectionInput(
   toWorld: (point: Point) => Point | null,
   submit: (intent: CommandIntent) => void,
   snapshot: () => Snapshot,
+  keyboardEnabled: () => boolean = () => true,
 ) {
   let draft: PolylineDraft | null = null;
   let mergeMode = false;
@@ -153,6 +154,7 @@ export function bindGroupSelectionInput(
     }
   };
   const key = (event: KeyboardEvent) => {
+    if (!keyboardEnabled()) return;
     if (event.key === 'Escape') {
       cancel();
       mergeMode = false;

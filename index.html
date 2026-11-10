@@ -24,11 +24,15 @@
             <dd id="red-count">—</dd>
           </div>
           <div class="counter">
-            <dt id="paint-goal">Территория</dt>
+            <dt>Территория</dt>
             <dd id="paint-progress">—</dd>
           </div>
           <div class="counter">
-            <dt>Финальная точка</dt>
+            <dt>1. Рубеж</dt>
+            <dd id="checkpoint-status">—</dd>
+          </div>
+          <div class="counter">
+            <dt>2. Финальная точка</dt>
             <dd id="objective-status">—</dd>
           </div>
           <div class="counter">
@@ -52,19 +56,36 @@
             непроходимы.
           </p>
         </details>
+        <button id="tutorial-open" type="button" disabled>Как играть</button>
         <button id="restart" type="button" disabled>
           <span aria-hidden="true">↺</span> Заново
         </button>
       </header>
       <section id="arena" aria-label="Игровое поле" aria-describedby="hint">
+        <div id="checkpoint-hint" hidden role="status" aria-live="polite"></div>
         <div id="outcome" hidden role="status" aria-live="polite">
-          Победа! Территория захвачена. Нажмите «Заново», чтобы повторить.
+          Победа! Рубеж и финальная точка взяты. Нажмите «Заново», чтобы повторить.
         </div>
       </section>
       <footer class="footer">
         <p id="hint" role="status">Подготовка поля…</p>
       </footer>
     </main>
+    <dialog id="tutorial" aria-labelledby="tutorial-title" aria-describedby="tutorial-step">
+      <header class="tutorial-bar">
+        <h2 id="tutorial-title">Как играть</h2>
+        <button id="tutorial-close" type="button" autofocus>Вернуться к игре</button>
+      </header>
+      <p id="tutorial-step" role="status"></p>
+      <div id="tutorial-field" aria-label="Тренировочное поле"></div>
+      <div class="tutorial-bar tutorial-actions">
+        <button id="tutorial-split" type="button" disabled>Разделить (X)</button>
+        <button id="tutorial-merge" type="button" aria-pressed="false" disabled>
+          Объединить (M)
+        </button>
+        <button id="tutorial-restart" type="button" disabled>Начать урок заново</button>
+      </div>
+    </dialog>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

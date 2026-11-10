@@ -1,5 +1,6 @@
 import { SeededRng } from '../core/rng';
 import type { Agent, Group, GroupId, LevelConfig, MatchState } from '../core/types';
+import { objectiveContains } from './objective';
 
 export function createInitialState(config: LevelConfig): MatchState {
   const rng = new SeededRng(config.seed);
@@ -121,6 +122,7 @@ export function createInitialState(config: LevelConfig): MatchState {
     projectiles: [],
     paintGrid: { columns: config.paint.columns, rows: config.paint.rows },
     objective: config.objective ? { area: { ...config.objective }, captured: false } : null,
+    checkpoint: config.checkpoint ? { area: { ...config.checkpoint }, captured: false } : null,
     paintCells: Array.from({ length: config.paint.columns * config.paint.rows }, (_, index) => {
       const width = config.world.width / config.paint.columns;
       const height = config.world.height / config.paint.rows;
@@ -133,13 +135,9 @@ export function createInitialState(config: LevelConfig): MatchState {
           y < obstacle.y + obstacle.height &&
           y + height > obstacle.y,
       );
-      const area = config.objective;
-      const inObjective =
-        !!area &&
-        x + width / 2 >= area.x &&
-        x + width / 2 < area.x + area.width &&
-        y + height / 2 >= area.y &&
-        y + height / 2 < area.y + area.height;
+      const inObjective = [config.checkpoint, config.objective].some(
+        (area) => area && objectiveContains(area, x + width / 2, y + height / 2),
+      );
       return {
         control: inObjective ? -1 : 0,
         owner: inObjective ? 'red' : null,

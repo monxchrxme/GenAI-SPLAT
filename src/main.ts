@@ -4,6 +4,7 @@ import { bindSessionInput } from './input/sessionInput';
 import { bindGroupSelectionInput } from './input/groupSelectionInput';
 import { PixiRenderer } from './rendering/pixiRenderer';
 import { Hud } from './ui/hud';
+import { bindTutorial } from './ui/tutorial';
 import './style.css';
 
 function requiredElement<T extends HTMLElement>(id: string): T {
@@ -16,21 +17,22 @@ async function start(): Promise<void> {
   const arena = requiredElement('arena');
   const hint = requiredElement('hint');
   const outcome = requiredElement('outcome');
-  requiredElement('paint-goal').textContent =
-    `Территория / цель ${Math.round(GAME_LEVEL.victoryFraction * 100)}%`;
+  const checkpointHint = requiredElement('checkpoint-hint');
   const cameraLeft = requiredElement<HTMLButtonElement>('camera-left');
   const cameraRight = requiredElement<HTMLButtonElement>('camera-right');
   const merge = requiredElement<HTMLButtonElement>('merge');
   const cut = requiredElement<HTMLButtonElement>('cut');
   const restart = requiredElement<HTMLButtonElement>('restart');
   const reinforce = requiredElement<HTMLButtonElement>('reinforce');
+  const tutorial = requiredElement<HTMLDialogElement>('tutorial');
   const session = new Session(GAME_LEVEL, S0_CLOCK);
-  const renderer = new PixiRenderer();
+  const renderer = new PixiRenderer(GAME_LEVEL.checkpointViewEnd);
   const hud = new Hud(
     requiredElement('agent-count'),
     requiredElement('group-count'),
     requiredElement('red-count'),
     requiredElement('paint-progress'),
+    requiredElement('checkpoint-status'),
     requiredElement('objective-status'),
     requiredElement('reinforcement-credits'),
     hint,
@@ -54,6 +56,20 @@ async function start(): Promise<void> {
     (point) => renderer.toWorld(point),
     (intent) => session.submit(intent),
     () => session.getSnapshot(),
+    () => !tutorial.open,
+  );
+  const unbindTutorial = bindTutorial(
+    {
+      dialog: tutorial,
+      open: requiredElement<HTMLButtonElement>('tutorial-open'),
+      close: requiredElement<HTMLButtonElement>('tutorial-close'),
+      field: requiredElement('tutorial-field'),
+      step: requiredElement('tutorial-step'),
+      split: requiredElement<HTMLButtonElement>('tutorial-split'),
+      merge: requiredElement<HTMLButtonElement>('tutorial-merge'),
+      restart: requiredElement<HTMLButtonElement>('tutorial-restart'),
+    },
+    () => drawing.cancel(),
   );
   const panLeft = () => {
     drawing.cancel();
@@ -72,6 +88,7 @@ async function start(): Promise<void> {
   };
   const reinforceKey = (event: KeyboardEvent) => {
     if (
+      tutorial.open ||
       event.code !== 'KeyR' ||
       event.repeat ||
       event.isComposing ||
@@ -110,10 +127,22 @@ async function start(): Promise<void> {
 
   const frame = (time: number) => {
     if (disposed) return;
+    if (tutorial.open) {
+      lastTime = null;
+      frameId = requestAnimationFrame(frame);
+      return;
+    }
     const snapshot = session.advance(lastTime === null ? 0 : time - lastTime);
     lastTime = time;
     const preview = drawing.preview();
     renderer.draw(snapshot, session.restartCount, preview);
+    cameraRight.disabled = renderer.atCheckpointLimit;
+    cameraRight.title = renderer.atCheckpointLimit ? 'Сначала займите рубеж' : 'Камера вправо';
+    checkpointHint.hidden =
+      !snapshot.checkpoint || !renderer.checkpointInView || snapshot.phase !== 'running';
+    checkpointHint.textContent = snapshot.checkpoint?.captured
+      ? 'Рубеж взят. Путь к финальной точке открыт →'
+      : 'Займите рубеж 1 — закрасьте все четыре клетки внутри золотой рамки. После захвата камера откроет следующий участок.';
     hud.draw(snapshot, preview);
     const blueCount = snapshot.agents.filter(
       (agent) => agent.alive && agent.factionId === 'blue',
@@ -136,7 +165,7 @@ async function start(): Promise<void> {
     outcome.hidden = snapshot.result === null;
     outcome.textContent =
       snapshot.result === 'victory'
-        ? 'Победа! Территория захвачена. Нажмите «Заново», чтобы повторить.'
+        ? 'Победа! Рубеж и финальная точка взяты. Нажмите «Заново», чтобы повторить.'
         : 'Поражение. Все синие Сплаты потеряны. Нажмите «Заново», чтобы повторить.';
     merge.setAttribute('aria-pressed', String(drawing.mergeMode));
     if (drawing.mergeMode)
@@ -162,6 +191,7 @@ async function start(): Promise<void> {
     cancelAnimationFrame(frameId);
     observer.disconnect();
     unbindInput();
+    unbindTutorial();
     drawing.dispose();
     cameraLeft.removeEventListener('click', panLeft);
     cameraRight.removeEventListener('click', panRight);

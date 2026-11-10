@@ -65,6 +65,8 @@ export const GAME_LEVEL: LevelConfig = Object.freeze({
     columns: 75,
     firstCaptureRatePerSecond: 0.8, // [P] allow a moving formation to claim fresh ground
   }),
+  checkpoint: Object.freeze({ x: 3520, y: 400, width: 160, height: 200 }), // [P] second-sector checkpoint
+  checkpointViewEnd: 4000, // [P] reveal the third sector after securing the checkpoint
   objective: Object.freeze({ x: 5600, y: 400, width: 320, height: 200 }), // [P] final capture area
   obstacles: Object.freeze([
     Object.freeze({ x: 1440, y: 0, width: 80, height: 200 }),

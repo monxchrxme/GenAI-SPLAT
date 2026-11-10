@@ -255,3 +255,49 @@ it('requires both 60%-style territory threshold and the captured final point, an
   expect(restarted.result).toBeNull();
   expect(restarted.objective?.captured).toBe(false);
 });
+
+it('requires both points, wins below the old territory threshold and clears them on Restart', () => {
+  const level = {
+    ...solo,
+    checkpoint: { x: 720, y: 400, width: 80, height: 100 },
+    objective: { x: 1200, y: 400, width: 80, height: 100 },
+  };
+  const session = new Session(level, S0_CLOCK);
+  const go = (x: number) => {
+    session.submit({ type: 'select-group-id', groupId: 'group-1' });
+    session.submit({ type: 'move-group', groupId: 'group-1', point: { x, y: 450 } });
+    let state = session.getSnapshot();
+    for (let i = 0; i < 600 && !state.result; i++) state = session.advance(S0_CLOCK.stepMs);
+    return state;
+  };
+  const finalFirst = go(1240);
+  expect(finalFirst.objective?.captured).toBe(true);
+  expect(finalFirst.checkpoint?.captured).toBe(false);
+  expect(finalFirst.result).toBeNull();
+  const won = go(760);
+  expect(won.checkpoint?.captured).toBe(true);
+  expect(won.result).toBe('victory');
+  expect(
+    won.paintCells.filter((cell) => cell.owner === 'blue').length / won.paintCells.length,
+  ).toBeLessThan(level.victoryFraction);
+  session.submit('restart');
+  const reset = session.advance(0);
+  expect(reset.checkpoint?.captured).toBe(false);
+  expect(reset.objective?.captured).toBe(false);
+  expect(reset.result).toBeNull();
+});
+
+it('remembers a secured checkpoint if its paint is later lost', () => {
+  const state = createInitialState({
+    ...solo,
+    checkpoint: { x: 720, y: 400, width: 80, height: 100 },
+  });
+  const cell = state.paintCells.find((item) => item.owner === 'red')!;
+  expect(state.checkpoint?.captured).toBe(false);
+  Object.assign(cell, { owner: 'blue', control: 1 });
+  updateObjective(state);
+  expect(state.checkpoint?.captured).toBe(true);
+  Object.assign(cell, { owner: 'red', control: -1 });
+  updateObjective(state);
+  expect(state.checkpoint?.captured).toBe(true);
+});

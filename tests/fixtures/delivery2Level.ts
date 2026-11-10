@@ -5,6 +5,8 @@ import type { LevelConfig } from '../../src/core/types';
 const {
   enemyPosts: posts,
   objective,
+  checkpoint,
+  checkpointViewEnd,
   hazards,
   ponds,
   shorePonds,
@@ -14,6 +16,8 @@ const {
 } = GAME_LEVEL;
 void posts;
 void objective;
+void checkpoint;
+void checkpointViewEnd;
 void hazards;
 void ponds;
 void shorePonds;

@@ -14,6 +14,9 @@ export function createSnapshot(state: MatchState): Snapshot {
     ponds: state.ponds.map((pond) => ({ ...pond })),
     projectiles: state.projectiles.map((projectile) => ({ ...projectile })),
     objective: state.objective ? { ...state.objective, area: { ...state.objective.area } } : null,
+    checkpoint: state.checkpoint
+      ? { ...state.checkpoint, area: { ...state.checkpoint.area } }
+      : null,
     world: { ...state.world },
     merge: state.merge ? { ...state.merge } : null,
     obstacles: state.obstacles.map((obstacle) => ({ ...obstacle })),
