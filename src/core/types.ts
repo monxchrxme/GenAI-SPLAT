@@ -17,6 +17,8 @@ export interface Agent {
   vy: number;
   hp: number;
   alive: boolean;
+  nextAttackTick?: number;
+  hitUntilTick?: number;
 }
 
 export interface Group {
@@ -43,8 +45,16 @@ export interface World {
   height: number;
 }
 
+export interface Obstacle {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
 export interface PaintCell {
   control: number;
+  blocked?: boolean;
   owner: FactionId | null;
 }
 
@@ -58,13 +68,15 @@ export interface PaintConfig {
 
 export interface MatchState {
   phase: 'running' | 'finished';
-  result: 'victory' | null;
+  result: 'victory' | 'defeat' | null;
   tick: number;
   seed: number;
   rngState: number;
   world: World;
+  obstacles: Obstacle[];
   paintGrid: { columns: number; rows: number };
   paintCells: PaintCell[];
+  reinforcementCredits: number;
   agents: Agent[];
   groups: Group[];
   selectedGroupId: GroupId | null;
@@ -73,7 +85,34 @@ export interface MatchState {
 
 export interface LevelConfig {
   readonly paint: PaintConfig;
+  readonly obstacles?: readonly Obstacle[];
   readonly victoryFraction: number;
+  readonly reinforcement?: {
+    readonly cost: number;
+    readonly count: number;
+    readonly maxBlue: number;
+  };
+  readonly enemy?: {
+    readonly count: number;
+    readonly columns: number;
+    readonly centerX: number;
+    readonly centerY: number;
+    readonly spacing: number;
+    readonly threatRadius: number;
+    readonly advanceDistance: number;
+    readonly decisionTicks: number;
+    readonly splitDistance: number;
+    readonly minSquadSize: number;
+    readonly defenseDepth: number;
+    readonly disadvantageRatio: number;
+    readonly guardLanes?: readonly [number, number];
+  };
+  readonly combat?: {
+    readonly range: number;
+    readonly damage: number;
+    readonly cooldownTicks: number;
+    readonly hitFeedbackTicks: number;
+  };
   readonly mergeDistance: number;
   readonly mergeHighlightTicks: number;
   readonly tension: TensionConfig;
@@ -119,6 +158,8 @@ export interface ClockConfig {
 
 export type CommandIntent =
   | { readonly type: 'restart' }
+  | { readonly type: 'split'; readonly groupId: GroupId }
+  | { readonly type: 'reinforce'; readonly groupId: GroupId }
   | { readonly type: 'merge'; readonly groupId: GroupId; readonly targetGroupId: GroupId }
   | { readonly type: 'cut'; readonly groupId: GroupId; readonly points: readonly Point[] }
   | { readonly type: 'select-group'; readonly point: Point }
@@ -129,7 +170,16 @@ export type CommandIntent =
       readonly points: readonly Point[];
     };
 
-export type GameCommand = CommandIntent & { readonly tick: number };
+export type GameCommand = (
+  | CommandIntent
+  | { readonly type: 'enemy-split'; readonly groupId: GroupId }
+  | { readonly type: 'enemy-merge'; readonly first: GroupId; readonly second: GroupId }
+  | {
+      readonly type: 'enemy-formation';
+      readonly groupId: GroupId;
+      readonly points: readonly Point[];
+    }
+) & { readonly tick: number };
 
 export type DeepReadonly<T> = T extends object
   ? { readonly [K in keyof T]: DeepReadonly<T[K]> }

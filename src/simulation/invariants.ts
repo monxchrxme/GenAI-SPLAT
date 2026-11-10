@@ -1,6 +1,8 @@
 import type { AgentId, Snapshot } from '../core/types';
 
 export function assertInvariants(state: Snapshot): void {
+  if (!Number.isSafeInteger(state.reinforcementCredits) || state.reinforcementCredits < 0)
+    throw new Error('Invalid reinforcement credits');
   const agents = new Map(state.agents.map((agent) => [agent.id, agent]));
   const groups = new Map(state.groups.map((group) => [group.id, group]));
   if (agents.size !== state.agents.length || groups.size !== state.groups.length) {

@@ -53,3 +53,33 @@ export const S0_CLOCK: ClockConfig = Object.freeze({
   maxFrameMs: 250,
   maxStepsPerFrame: 8,
 });
+
+// [P] S5 trial setup; these values and enemy behaviour need playtesting.
+export const GAME_LEVEL: LevelConfig = Object.freeze({
+  ...S0_LEVEL,
+  world: Object.freeze({ width: 3200, height: 1000 }),
+  paint: Object.freeze({ ...S0_LEVEL.paint, columns: 40 }),
+  obstacles: Object.freeze([
+    Object.freeze({ x: 1440, y: 0, width: 80, height: 200 }),
+    Object.freeze({ x: 1440, y: 400, width: 80, height: 200 }),
+    Object.freeze({ x: 1440, y: 800, width: 80, height: 200 }),
+  ]),
+  initialHp: 3,
+  reinforcement: Object.freeze({ cost: 5, count: 2, maxBlue: 40 }), // [P] pending balance review
+  enemy: Object.freeze({
+    count: 36,
+    columns: 6,
+    centerX: 1900,
+    centerY: 500,
+    spacing: 30,
+    threatRadius: 420,
+    advanceDistance: 80,
+    decisionTicks: 60,
+    splitDistance: 300,
+    minSquadSize: 8,
+    defenseDepth: 250,
+    disadvantageRatio: 1.3,
+    guardLanes: [300, 700] as const,
+  }),
+  combat: Object.freeze({ range: 33, damage: 1, cooldownTicks: 60, hitFeedbackTicks: 8 }),
+});

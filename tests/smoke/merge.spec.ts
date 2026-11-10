@@ -38,8 +38,7 @@ test('Merge combines two separated groups once', async ({ page }) => {
   await expect
     .poll(async () => JSON.parse((await canvas.getAttribute('data-formation-path'))!).length)
     .toBeGreaterThan(1);
-  await page.getByRole('button', { name: 'Разрезать (X)' }).click();
-  await drag(await point(590, 200), await point(590, 400));
+  await page.getByRole('button', { name: 'Разделить (X)' }).click();
   await expect(page.locator('#group-count')).toHaveText('2');
   await expect
     .poll(async () => Number(await canvas.getAttribute('data-max-slot-error')), { timeout: 15000 })

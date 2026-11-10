@@ -23,6 +23,7 @@ export function updatePaint(state: MatchState, config: LevelConfig): void {
   const { columns, rows, radius, ratePerSecond, ownerThreshold } = config.paint;
   const delta = (ratePerSecond * config.fixedStepMs) / 1000;
   for (let index = 0; index < state.paintCells.length; index++) {
+    if (state.paintCells[index]!.blocked) continue;
     const x = (((index % columns) + 0.5) * state.world.width) / columns;
     const y = ((Math.floor(index / columns) + 0.5) * state.world.height) / rows;
     let blue = false;

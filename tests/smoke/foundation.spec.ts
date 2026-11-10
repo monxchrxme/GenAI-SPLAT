@@ -16,13 +16,13 @@ test('S0 production build: 40 static markers, clean restart, keyboard, resize, c
   });
   await page.goto('/');
   await expect(page.locator('#arena')).toHaveAttribute('data-ready', 'true');
-  const canvas = page.getByRole('img', { name: 'Поле с 40 синими маркерами' });
+  const canvas = page.getByRole('img', { name: 'Поле с синими и красными Сплатами' });
   await expect(canvas).toBeVisible();
-  await expect(canvas).toHaveAttribute('data-marker-count', '40');
-  await expect(canvas).toHaveAttribute('data-world-size', '1600×1000');
+  await expect(canvas).toHaveAttribute('data-marker-count', '76');
+  await expect(canvas).toHaveAttribute('data-world-size', '3200×1000');
   await expect(page.locator('#agent-count')).toHaveText('40');
   await expect(page.locator('#group-count')).toHaveText('1');
-  await expect(page.getByRole('button')).toHaveCount(4);
+  await expect(page.getByRole('button')).toHaveCount(7);
 
   await expect.poll(async () => Number(await canvas.getAttribute('data-tick'))).toBeGreaterThan(30);
   await expect(page.locator('#paint-progress')).toContainText('%');
@@ -32,7 +32,7 @@ test('S0 production build: 40 static markers, clean restart, keyboard, resize, c
     await restart.click();
     await expect(canvas).toHaveAttribute('data-restart-count', String(count));
     expect(Number(await canvas.getAttribute('data-tick'))).toBeLessThan(20);
-    await expect(canvas).toHaveAttribute('data-marker-count', '40');
+    await expect(canvas).toHaveAttribute('data-marker-count', '76');
     await expect(page.locator('#paint-progress')).toContainText('%');
   }
   await restart.focus();
@@ -45,8 +45,8 @@ test('S0 production build: 40 static markers, clean restart, keyboard, resize, c
   ]) {
     await page.setViewportSize(viewport);
     await expect.poll(async () => (await canvas.boundingBox())?.width).toBe(viewport.width);
-    await expect(canvas).toHaveAttribute('data-world-size', '1600×1000');
-    await expect(canvas).toHaveAttribute('data-marker-count', '40');
+    await expect(canvas).toHaveAttribute('data-world-size', '3200×1000');
+    await expect(canvas).toHaveAttribute('data-marker-count', '76');
     await expect(page.locator('#agent-count')).toHaveText('40');
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),

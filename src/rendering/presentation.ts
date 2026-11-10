@@ -3,6 +3,11 @@ export const PRESENTATION = Object.freeze({
   padding: 24,
   tiltY: 0.72, // [P] orthographic inclined view for visual review
   maxResolution: 2,
+  cameraViewWidth: 1600, // [P] visible map width before viewport aspect-ratio margins
+  cameraPageStep: 800, // [P] half-screen overlap between adjacent blocks
+  cameraManualHoldMs: 4000,
+  cameraTransitionMs: 320, // [P] quick, smooth transition between adjacent blocks
+  cameraEdgeFraction: 0.2, // [P] reveal the next block before the leading agent reaches the edge
   // [P] Open lanes and landmarks are decorative, with no collision or bonuses.
   landmarks: [
     { x: 800, y: 500, radius: 80 },
@@ -31,6 +36,8 @@ export const PRESENTATION = Object.freeze({
     paintRed: 0xd66459,
     blue: 0x2866dc,
     blueEdge: 0x1e4eb1,
+    red: 0xd8554d,
+    redEdge: 0x9d3f3b,
     highlight: 0x8bb7ff,
     shadow: 0x313c52,
     selection: 0x087f7a,

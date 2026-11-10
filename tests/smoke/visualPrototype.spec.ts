@@ -20,7 +20,7 @@ async function screen(canvas: Locator, x: number, y: number) {
 for (const deviceScaleFactor of [1, 2]) {
   test.describe(`inclined prototype DPR ${deviceScaleFactor}`, () => {
     test.use({ deviceScaleFactor });
-    test('dense selection, world drawing, Cut and resize retain correct mapping', async ({
+    test('dense selection, world drawing, split and resize retain correct mapping', async ({
       page,
     }) => {
       await page.goto('/');
@@ -46,13 +46,7 @@ for (const deviceScaleFactor of [1, 2]) {
       const path = JSON.parse((await canvas.getAttribute('data-formation-path'))!);
       expect(path[0].x).toBeCloseTo(200, 1);
       expect(path[0].y).toBeCloseTo(300, 1);
-      await page.getByRole('button', { name: 'Разрезать (X)' }).click();
-      const a = await screen(canvas, 590, 200),
-        b = await screen(canvas, 590, 400);
-      await page.mouse.move(a.x, a.y);
-      await page.mouse.down();
-      await page.mouse.move(b.x, b.y, { steps: 10 });
-      await page.mouse.up();
+      await page.getByRole('button', { name: 'Разделить (X)' }).click();
       await expect(page.locator('#group-count')).toHaveText('2');
       await page.getByRole('button', { name: 'Заново' }).click();
       await expect(canvas).toHaveAttribute('data-restart-count', '1');

@@ -29,11 +29,11 @@ test('QA-01: 40 agents reach a stable three-corner form, resize preserves order 
   const pick = await screen(canvas, first.x, first.y);
   await page.mouse.click(pick.x, pick.y);
   await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
-  const start = await screen(canvas, 650, 250),
-    corner = await screen(canvas, 1100, 250),
-    secondCorner = await screen(canvas, 1100, 700),
-    thirdCorner = await screen(canvas, 650, 700),
-    end = await screen(canvas, 650, 500);
+  const start = await screen(canvas, 400, 250),
+    corner = await screen(canvas, 850, 250),
+    secondCorner = await screen(canvas, 850, 700),
+    thirdCorner = await screen(canvas, 400, 700),
+    end = await screen(canvas, 400, 500);
   await page.mouse.move(start.x, start.y);
   await page.mouse.down();
   await page.mouse.move(corner.x, corner.y, { steps: 10 });

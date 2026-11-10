@@ -11,12 +11,15 @@ import type {
 import { isStretched } from '../core/tension';
 import { createFormation } from '../core/formation';
 import { pickGroupAtPoint } from '../simulation/selection';
+import { pointBlocked, UNIT_CLEARANCE } from '../simulation/obstacles';
 
 export interface DrawingPreview {
   readonly points: readonly Point[];
   readonly active: boolean;
+  readonly interacting: boolean;
   readonly pending: boolean;
   readonly limited: boolean;
+  readonly blocked: boolean;
   readonly slots: readonly FormationSlot[];
   readonly stretched: boolean;
 }
@@ -28,13 +31,12 @@ export function bindGroupSelectionInput(
   snapshot: () => Snapshot,
 ) {
   let draft: PolylineDraft | null = null;
-  let cutMode = false;
   let mergeMode = false;
-  let gestureCut = false;
   let pointerId: number | null = null;
   let origin: Point = { x: 0, y: 0 };
   let dragged = false;
   let completedLimited = false;
+  let blockedFormation = false;
   let pendingSelection: { id: GroupId | null; tick: number } | null = null;
   let pendingFormation: { groupId: GroupId; tick: number; formation: Formation } | null = null;
   let gestureGroup: GroupId | null = null;
@@ -57,7 +59,7 @@ export function bindGroupSelectionInput(
   const reset = () => {
     cancel();
     completedLimited = false;
-    cutMode = false;
+    blockedFormation = false;
     mergeMode = false;
     pendingSelection = null;
     pendingFormation = null;
@@ -68,6 +70,7 @@ export function bindGroupSelectionInput(
     if (point === null) return;
     event.preventDefault();
     const state = snapshot();
+    blockedFormation = false;
     if (mergeMode) {
       const first = effectiveSelection(state);
       const second = pickGroupAtPoint(state, point, S0_LEVEL.selection);
@@ -78,17 +81,19 @@ export function bindGroupSelectionInput(
       }
       return;
     }
-    gestureCut = cutMode;
-    if (gestureCut) {
-      gestureGroup = effectiveSelection(state);
-      if (!gestureGroup) return;
-      pressedGroup = null;
-      origin = { x: event.clientX, y: event.clientY };
-      dragged = false;
-      draft = new PolylineDraft(point, DRAWING);
-      pointerId = event.pointerId;
-      canvas.setPointerCapture(event.pointerId);
+    const redGroup = pickGroupAtPoint(state, point, S0_LEVEL.selection, 'red');
+    if (!mergeMode && redGroup && !pickGroupAtPoint(state, point, S0_LEVEL.selection)) {
+      select(redGroup, state.tick);
+      cancel();
       return;
+    }
+    const selectedGroup = state.groups.find((group) => group.id === effectiveSelection(state));
+    if (selectedGroup?.factionId === 'red') {
+      if (!pickGroupAtPoint(state, point, S0_LEVEL.selection)) {
+        select(null, state.tick);
+        return;
+      }
+      mergeMode = false;
     }
     pressedGroup = pickGroupAtPoint(state, point, S0_LEVEL.selection);
     gestureGroup = pressedGroup ?? effectiveSelection(state);
@@ -120,14 +125,6 @@ export function bindGroupSelectionInput(
     if (event.pointerId !== pointerId || !draft) return;
     move(event);
     if (!draft) return;
-    if (gestureCut) {
-      if (dragged && draft.valid && gestureGroup)
-        submit({ type: 'cut', groupId: gestureGroup, points: draft.points });
-      cutMode = false;
-      pendingFormation = null;
-      cancel();
-      return;
-    }
     if (!dragged) {
       // The intent is latched at pointerdown; moving agents cannot turn a blank click into a hit.
       if (!pressedGroup) select(null, snapshot().tick);
@@ -135,7 +132,13 @@ export function bindGroupSelectionInput(
       const state = snapshot();
       const group = state.groups.find((g) => g.id === gestureGroup);
       const formation = createFormation(draft.points, group?.agentIds ?? []);
-      if (group && formation) {
+      if (
+        group &&
+        formation &&
+        formation.slots.some((slot) => pointBlocked(slot, state.obstacles, UNIT_CLEARANCE))
+      ) {
+        blockedFormation = true;
+      } else if (group && formation) {
         completedLimited = draft.limited;
         pendingFormation = { groupId: group.id, tick: state.tick, formation };
         submit({ type: 'set-formation', groupId: group.id, points: formation.points });
@@ -143,10 +146,20 @@ export function bindGroupSelectionInput(
     }
     cancel();
   };
+  const splitSelected = () => {
+    cancel();
+    mergeMode = false;
+    const state = snapshot();
+    const id = effectiveSelection(state);
+    const group = state.groups.find((item) => item.id === id && item.factionId === 'blue');
+    if (group && group.agentIds.length > 1) {
+      pendingFormation = null;
+      submit({ type: 'split', groupId: group.id });
+    }
+  };
   const key = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
       cancel();
-      cutMode = false;
       mergeMode = false;
     }
     if (
@@ -161,13 +174,8 @@ export function bindGroupSelectionInput(
     )
       return;
     cancel();
-    if (event.code === 'KeyM') {
-      mergeMode = !mergeMode;
-      cutMode = false;
-    } else {
-      cutMode = !cutMode;
-      mergeMode = false;
-    }
+    if (event.code === 'KeyM') mergeMode = !mergeMode;
+    else splitSelected();
   };
   const hide = () => {
     if (document.hidden) cancel();
@@ -189,21 +197,13 @@ export function bindGroupSelectionInput(
   return {
     cancel,
     reset,
-    toggleCut() {
-      cancel();
-      cutMode = !cutMode;
-      mergeMode = false;
-    },
+    splitSelected,
     toggleMerge() {
       cancel();
       mergeMode = !mergeMode;
-      cutMode = false;
     },
     get mergeMode() {
       return mergeMode;
-    },
-    get cutMode() {
-      return cutMode;
     },
     preview(): DrawingPreview {
       const state = snapshot();
@@ -219,8 +219,7 @@ export function bindGroupSelectionInput(
       const formation = pending?.formation ?? group?.formation;
       const points =
         draft && dragged && draft.points.length >= 2 ? draft.points : (formation?.points ?? []);
-      const provisional =
-        draft && dragged && !gestureCut ? createFormation(points, group?.agentIds ?? []) : null;
+      const provisional = draft && dragged ? createFormation(points, group?.agentIds ?? []) : null;
       return {
         points,
         slots: draft && dragged ? (provisional?.slots ?? []) : (formation?.slots ?? []),
@@ -230,8 +229,12 @@ export function bindGroupSelectionInput(
             ? isStretched(pending.formation, S0_LEVEL.tension)
             : false,
         active: draft !== null && dragged,
+        interacting: draft !== null,
         pending: pending !== null,
         limited: draft && dragged ? draft.limited : completedLimited,
+        blocked: provisional
+          ? provisional.slots.some((slot) => pointBlocked(slot, state.obstacles, UNIT_CLEARANCE))
+          : blockedFormation,
       };
     },
     dispose() {

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('Cut splits a drawn group and each group accepts an independent order', async ({ page }) => {
+test('Split immediately halves the selected group with physical X and button', async ({ page }) => {
   await page.goto('/');
   const canvas = page.locator('canvas');
   await expect(page.locator('#arena')).toHaveAttribute('data-ready', 'true');
@@ -38,35 +38,23 @@ test('Cut splits a drawn group and each group accepts an independent order', asy
   await expect
     .poll(async () => JSON.parse((await canvas.getAttribute('data-formation-path'))!).length)
     .toBeGreaterThan(1);
-  await page.getByRole('button', { name: 'Разрезать (X)' }).click();
-  await expect(page.getByRole('button', { name: 'Разрезать (X)' })).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
-  await page.keyboard.press('Escape');
-  await expect(page.getByRole('button', { name: 'Разрезать (X)' })).toHaveAttribute(
-    'aria-pressed',
-    'false',
-  );
-  const cutButton = page.getByRole('button', { name: 'Разрезать (X)' });
   await page.keyboard.press('Control+x');
-  await expect(cutButton).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('#group-count')).toHaveText('1');
   await page.evaluate(() =>
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ч', code: 'KeyX' })),
   );
-  await expect(cutButton).toHaveAttribute('aria-pressed', 'true');
-  await page.keyboard.press('x');
-  await expect(cutButton).toHaveAttribute('aria-pressed', 'false');
-  await page.keyboard.press('x');
-  await expect(cutButton).toHaveAttribute('aria-pressed', 'true');
-  await drag(await point(590, 200), await point(590, 400));
   await expect(page.locator('#group-count')).toHaveText('2');
   await expect(canvas).toHaveAttribute('data-selected-group', 'group-2');
   await expect(canvas).toHaveAttribute('data-selection-ring-count', '20');
   await expect(page.locator('#agent-count')).toHaveText('40');
-  await drag(await point(200, 700), await point(900, 700));
-  await expect(canvas).toHaveAttribute('data-slot-count', '20');
+  await page.getByRole('button', { name: 'Разделить (X)' }).click();
+  await expect(page.locator('#group-count')).toHaveText('3');
+  await expect(canvas).toHaveAttribute('data-selection-ring-count', '10');
   await page.getByRole('button', { name: 'Заново' }).click();
   await expect(page.locator('#group-count')).toHaveText('1');
   await expect(page.locator('#agent-count')).toHaveText('40');
+  await page.mouse.click(center.x, center.y);
+  await page.getByRole('button', { name: 'Разделить (X)' }).click();
+  await expect(page.locator('#group-count')).toHaveText('2');
+  await expect(canvas).toHaveAttribute('data-selection-ring-count', '20');
 });

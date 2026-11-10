@@ -1,16 +1,17 @@
-import type { AgentId, GroupId, Point, SelectionConfig, Snapshot } from '../core/types';
+import type { AgentId, FactionId, GroupId, Point, SelectionConfig, Snapshot } from '../core/types';
 
 export function pickGroupAtPoint(
   state: Snapshot,
   point: Point,
   config: SelectionConfig,
+  faction: FactionId = 'blue',
 ): GroupId | null {
   const selectableGroups = new Set(
-    state.groups.filter((group) => group.factionId === 'blue').map((group) => group.id),
+    state.groups.filter((group) => group.factionId === faction).map((group) => group.id),
   );
   let nearest: { distance: number; agentId: AgentId; groupId: GroupId } | null = null;
   const agents = state.agents.filter(
-    (agent) => agent.alive && agent.factionId === 'blue' && selectableGroups.has(agent.groupId),
+    (agent) => agent.alive && agent.factionId === faction && selectableGroups.has(agent.groupId),
   );
   for (const agent of agents) {
     const distance = (agent.x - point.x) ** 2 + (agent.y - point.y) ** 2;

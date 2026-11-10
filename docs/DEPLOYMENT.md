@@ -1,5 +1,8 @@
 # SPLAT! — GitHub → Vercel: фактическое состояние после S0
 
+**10.11.2026 — запрос публикации S4+S5.** Пользователь отдельно поручил commit, push текущей ветки и Preview, без merge и production. Перед push `vercel.json` отключает автоматический deployment только для `feature/s1-formations`, а не для `codex/s4-s5-territory-combat`; push может запустить Preview. Проверка Vercel Project API подтвердила GitHub `monxchrxme/GenAI-SPLAT` и production branch `main`; `gitProviderOptions.createDeployments = disabled` относится к настройке провайдера и не доказывает отсутствие автосборки Vercel. `git ls-remote --heads origin codex/s4-s5-territory-combat main` показал только `main` на `8519f198f501e9fba3bfd32693f0306f0043ccd5`: целевой удалённой ветки до push не было. Настройки интеграции не меняются. Точные результаты push и Preview фиксируются после их получения.
+
+
 **09.11.2026.** Пользователь принял первую поставку и разрешил push ветки `codex/s2-s3-squads` с возможным Preview. Push выполнен, GitHub SHA `dcade8b8eb620dbe0796554d7bdcfe94c55a55bb` подтверждён. Состояние нового deployment отдельно не проверялось. В `vercel.json` запрет автодеплоя по-прежнему только для `feature/s1-formations`. Следующие deployment, Git merge и изменения внешних настроек требуют отдельного разрешения.
 
 

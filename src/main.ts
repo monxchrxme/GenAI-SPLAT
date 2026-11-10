@@ -1,5 +1,5 @@
 import { Session } from './app/session';
-import { S0_CLOCK, S0_LEVEL } from './core/config';
+import { S0_CLOCK, GAME_LEVEL } from './core/config';
 import { bindSessionInput } from './input/sessionInput';
 import { bindGroupSelectionInput } from './input/groupSelectionInput';
 import { PixiRenderer } from './rendering/pixiRenderer';
@@ -17,18 +17,23 @@ async function start(): Promise<void> {
   const hint = requiredElement('hint');
   const outcome = requiredElement('outcome');
   requiredElement('paint-goal').textContent =
-    `Территория / цель ${Math.round(S0_LEVEL.victoryFraction * 100)}%`;
+    `Территория / цель ${Math.round(GAME_LEVEL.victoryFraction * 100)}%`;
+  const cameraLeft = requiredElement<HTMLButtonElement>('camera-left');
+  const cameraRight = requiredElement<HTMLButtonElement>('camera-right');
   const tilt = requiredElement<HTMLButtonElement>('tilt');
   const samples = requiredElement('visual-samples');
   const merge = requiredElement<HTMLButtonElement>('merge');
   const cut = requiredElement<HTMLButtonElement>('cut');
   const restart = requiredElement<HTMLButtonElement>('restart');
-  const session = new Session(S0_LEVEL, S0_CLOCK);
+  const reinforce = requiredElement<HTMLButtonElement>('reinforce');
+  const session = new Session(GAME_LEVEL, S0_CLOCK);
   const renderer = new PixiRenderer();
   const hud = new Hud(
     requiredElement('agent-count'),
     requiredElement('group-count'),
+    requiredElement('red-count'),
     requiredElement('paint-progress'),
+    requiredElement('reinforcement-credits'),
     hint,
   );
 
@@ -51,7 +56,42 @@ async function start(): Promise<void> {
     (intent) => session.submit(intent),
     () => session.getSnapshot(),
   );
-  const toggleCut = () => drawing.toggleCut();
+  const panLeft = () => {
+    drawing.cancel();
+    renderer.pan(-1);
+  };
+  const panRight = () => {
+    drawing.cancel();
+    renderer.pan(1);
+  };
+  cameraLeft.addEventListener('click', panLeft);
+  cameraRight.addEventListener('click', panRight);
+  const reinforceSelected = () => {
+    const state = session.getSnapshot();
+    if (!reinforce.disabled && state.selectedGroupId)
+      session.submit({ type: 'reinforce', groupId: state.selectedGroupId });
+  };
+  const reinforceKey = (event: KeyboardEvent) => {
+    if (
+      event.code !== 'KeyR' ||
+      event.repeat ||
+      event.isComposing ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey ||
+      (event.target instanceof HTMLElement &&
+        (event.target.isContentEditable || event.target.closest('input, textarea, select')))
+    )
+      return;
+    event.preventDefault();
+    reinforceSelected();
+  };
+  const reinforcement = GAME_LEVEL.reinforcement!;
+  requiredElement('reinforcement-label').textContent = `Ресурс / ${reinforcement.cost}`;
+  reinforce.title = `${reinforcement.cost} ед. ресурса → до ${reinforcement.count} Сплатов в выбранную группу`;
+  reinforce.addEventListener('click', reinforceSelected);
+  window.addEventListener('keydown', reinforceKey);
+  const toggleCut = () => drawing.splitSelected();
   cut.addEventListener('click', toggleCut);
   let tilted = false;
   const toggleTilt = () => {
@@ -85,15 +125,34 @@ async function start(): Promise<void> {
     const preview = drawing.preview();
     renderer.draw(snapshot, session.restartCount, preview);
     hud.draw(snapshot, preview);
-    outcome.hidden = snapshot.result !== 'victory';
-    cut.setAttribute('aria-pressed', String(drawing.cutMode));
+    const blueCount = snapshot.agents.filter(
+      (agent) => agent.alive && agent.factionId === 'blue',
+    ).length;
+    const selected = snapshot.groups.find((group) => group.id === snapshot.selectedGroupId);
+    cut.disabled =
+      snapshot.phase !== 'running' ||
+      selected?.factionId !== 'blue' ||
+      selected.agentIds.length < 2 ||
+      Boolean(
+        snapshot.merge &&
+        selected &&
+        [snapshot.merge.first, snapshot.merge.second].includes(selected.id),
+      );
+    reinforce.disabled =
+      snapshot.phase !== 'running' ||
+      selected?.factionId !== 'blue' ||
+      snapshot.reinforcementCredits < reinforcement.cost ||
+      blueCount >= reinforcement.maxBlue;
+    outcome.hidden = snapshot.result === null;
+    outcome.textContent =
+      snapshot.result === 'victory'
+        ? 'Победа! Территория захвачена. Нажмите «Заново», чтобы повторить.'
+        : 'Поражение. Все синие Сплаты потеряны. Нажмите «Заново», чтобы повторить.';
     merge.setAttribute('aria-pressed', String(drawing.mergeMode));
     if (drawing.mergeMode)
       hint.textContent = 'Режим Merge: выберите вторую группу. M или Esc — отмена.';
     else if (snapshot.merge)
       hint.textContent = `Группы ${snapshot.merge.first} и ${snapshot.merge.second} сближаются.`;
-    if (drawing.cutMode)
-      hint.textContent = 'Режим Cut: проведите линию через построение. Esc — отмена.';
     frameId = requestAnimationFrame(frame);
   };
   const discardHiddenTime = () => {
@@ -114,6 +173,10 @@ async function start(): Promise<void> {
     observer.disconnect();
     unbindInput();
     drawing.dispose();
+    cameraLeft.removeEventListener('click', panLeft);
+    cameraRight.removeEventListener('click', panRight);
+    reinforce.removeEventListener('click', reinforceSelected);
+    window.removeEventListener('keydown', reinforceKey);
     cut.removeEventListener('click', toggleCut);
     merge.removeEventListener('click', toggleMerge);
     tilt.removeEventListener('click', toggleTilt);

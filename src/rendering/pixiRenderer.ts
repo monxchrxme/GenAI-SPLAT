@@ -1,7 +1,13 @@
 import { Application, Container, Graphics } from 'pixi.js';
 import type { AgentId, Point, Snapshot, World } from '../core/types';
 import { PRESENTATION as view } from './presentation';
-import { clientToWorld, fitWorld } from './viewport';
+import {
+  clientToWorld,
+  fitCamera,
+  nextCameraPage,
+  pageCameraLeft,
+  cameraTransition,
+} from './viewport';
 import type { DrawingPreview } from '../input/groupSelectionInput';
 import { tensionActive } from '../core/tension';
 
@@ -16,9 +22,16 @@ export class PixiRenderer {
   private readonly line = new Graphics();
   private readonly markers = new Map<AgentId, Graphics>();
   private generation = -1;
+  private markerDirty = false;
   private world: Readonly<World> = { width: 1, height: 1 };
   private viewport = { width: 1, height: 1 };
   private cameraScale = 1;
+  private cameraLeft = 0;
+  private cameraTarget = 0;
+  private cameraStart = 0;
+  private cameraProgress = 1;
+  private cameraFrameTime: number | null = null;
+  private manualCameraUntil = 0;
 
   get canvas(): HTMLCanvasElement {
     return this.app.canvas;
@@ -32,6 +45,8 @@ export class PixiRenderer {
       this.world,
       view.padding,
       this.tilted ? view.tiltY : 1,
+      view.cameraViewWidth,
+      this.cameraLeft,
     );
   }
 
@@ -81,9 +96,25 @@ export class PixiRenderer {
       lanes.circle(landmark.x, landmark.y, 8).fill({ color: 0x9a9f8d, alpha: 0.65 });
     }
     this.decor.addChild(lanes);
-    this.scene.addChild(field, this.decor, this.paint, grid, this.line, this.selection, this.units);
+    const obstacles = new Graphics();
+    for (const block of snapshot.obstacles) {
+      obstacles
+        .rect(block.x, block.y, block.width, block.height)
+        .fill({ color: 0x6e8891, alpha: 0.9 })
+        .stroke({ color: 0x465e68, width: 3 });
+    }
+    this.scene.addChild(
+      field,
+      this.decor,
+      this.paint,
+      grid,
+      obstacles,
+      this.line,
+      this.selection,
+      this.units,
+    );
     this.app.stage.addChild(this.scene);
-    this.app.canvas.setAttribute('aria-label', 'Поле с 40 синими маркерами');
+    this.app.canvas.setAttribute('aria-label', 'Поле с синими и красными Сплатами');
     this.app.canvas.setAttribute('role', 'img');
     this.app.canvas.dataset.worldSize = `${this.world.width}×${this.world.height}`;
     host.append(this.app.canvas);
@@ -92,14 +123,26 @@ export class PixiRenderer {
 
   setTilt(tilted: boolean): void {
     this.tilted = tilted;
-    this.generation = -1;
-    this.resize(this.viewport.width, this.viewport.height);
+    this.markerDirty = true;
+    this.updateCamera();
   }
 
   resize(width: number, height: number): void {
     this.viewport = { width: Math.max(1, width), height: Math.max(1, height) };
     this.app.renderer.resize(this.viewport.width, this.viewport.height);
-    const camera = fitWorld(this.viewport.width, this.viewport.height, this.world, view.padding);
+    this.updateCamera();
+  }
+
+  private updateCamera(): void {
+    const camera = fitCamera(
+      this.viewport.width,
+      this.viewport.height,
+      this.world,
+      view.padding,
+      view.cameraViewWidth,
+      this.cameraLeft,
+    );
+    this.cameraLeft = camera.left;
     this.cameraScale = camera.scale;
     const tiltY = this.tilted ? view.tiltY : 1;
     this.scene.scale.set(camera.scale, camera.scale * tiltY);
@@ -109,7 +152,78 @@ export class PixiRenderer {
     );
   }
 
+  private moveToPage(target: number): void {
+    if (target === this.cameraTarget) return;
+    this.cameraStart = this.cameraLeft;
+    this.cameraTarget = target;
+    this.cameraProgress = 0;
+  }
+
+  pan(direction: number): void {
+    this.moveToPage(
+      nextCameraPage(
+        this.cameraTarget,
+        direction < 0 ? -1 : 1,
+        this.world.width,
+        view.cameraViewWidth,
+        view.cameraPageStep,
+      ),
+    );
+    this.manualCameraUntil = performance.now() + view.cameraManualHoldMs;
+  }
+
   draw(snapshot: Snapshot, restartCount: number, preview?: DrawingPreview): void {
+    if (this.generation !== restartCount) {
+      this.cameraLeft = 0;
+      this.cameraStart = 0;
+      this.cameraTarget = 0;
+      this.cameraProgress = 1;
+      this.cameraFrameTime = null;
+      this.manualCameraUntil = 0;
+      this.updateCamera();
+    }
+    const now = performance.now();
+    const elapsed =
+      this.cameraFrameTime === null ? 0 : Math.min(50, Math.max(0, now - this.cameraFrameTime));
+    this.cameraFrameTime = now;
+    const following = snapshot.agents.filter(
+      (agent) =>
+        agent.alive && agent.groupId === snapshot.selectedGroupId && agent.factionId === 'blue',
+    );
+    // Pausing during a gesture keeps its world-space path attached to the pointer.
+    if (!preview?.interacting) {
+      if (this.cameraProgress < 1) {
+        this.cameraProgress = Math.min(1, this.cameraProgress + elapsed / view.cameraTransitionMs);
+        this.cameraLeft = cameraTransition(
+          this.cameraStart,
+          this.cameraTarget,
+          this.cameraProgress,
+        );
+        this.updateCamera();
+      } else if (following.length && now >= this.manualCameraUntil) {
+        const meanVelocity = following.reduce((sum, agent) => sum + agent.vx, 0) / following.length;
+        const direction = meanVelocity > 0.5 ? 1 : meanVelocity < -0.5 ? -1 : 0;
+        const moving = following.filter((agent) => direction * agent.vx > 0.5);
+        if (direction !== 0 && moving.length) {
+          const edge =
+            direction > 0
+              ? Math.max(...moving.map((agent) => agent.x))
+              : Math.min(...moving.map((agent) => agent.x));
+          const next = pageCameraLeft(
+            this.cameraTarget,
+            edge,
+            direction,
+            this.world.width,
+            view.cameraViewWidth,
+            view.cameraPageStep,
+            view.cameraEdgeFraction,
+          );
+          this.moveToPage(next);
+        }
+      }
+    }
+    this.canvas.dataset.cameraTarget = String(this.cameraTarget);
+    this.canvas.dataset.cameraLeft = String(this.cameraLeft);
     this.paint.clear();
     const columns = snapshot.paintGrid.columns;
     const rows = snapshot.paintGrid.rows;
@@ -129,7 +243,7 @@ export class PixiRenderer {
       preview?.active || preview?.pending
         ? preview.stretched
         : tensionActive(selected, snapshot.tick);
-    const lineColor = tension ? view.colors.tension : view.colors.preview;
+    const lineColor = tension || preview?.blocked ? view.colors.tension : view.colors.preview;
     this.canvas.dataset.tensionActive = String(tension);
     this.line.clear();
     if (preview && preview.points.length >= 2) {
@@ -179,10 +293,18 @@ export class PixiRenderer {
     this.canvas.dataset.merging = String(snapshot.merge !== null);
     this.selection.clear();
     let selectionRingCount = 0;
-    if (this.generation !== restartCount) {
+    if (this.generation !== restartCount || this.markerDirty) {
+      this.markerDirty = false;
       for (const child of this.units.removeChildren()) child.destroy();
       this.markers.clear();
       this.generation = restartCount;
+    }
+    for (const [id, marker] of this.markers) {
+      if (!snapshot.agents.some((agent) => agent.id === id && agent.alive)) {
+        this.units.removeChild(marker);
+        marker.destroy();
+        this.markers.delete(id);
+      }
     }
     for (const agent of snapshot.agents) {
       if (!agent.alive) continue;
@@ -199,13 +321,19 @@ export class PixiRenderer {
             .bezierCurveTo(10, 10, 6, 11, 0, 10)
             .bezierCurveTo(-6, 11, -10, 8, -11, 2)
             .closePath()
-            .fill(view.colors.blue)
-            .stroke({ color: view.colors.blueEdge, width: 1 });
+            .fill(agent.factionId === 'blue' ? view.colors.blue : view.colors.red)
+            .stroke({
+              color: agent.factionId === 'blue' ? view.colors.blueEdge : view.colors.redEdge,
+              width: 1,
+            });
         } else {
           marker
             .circle(0, 0, view.markerRadius)
-            .fill(view.colors.blue)
-            .stroke({ color: view.colors.blueEdge, width: 1 });
+            .fill(agent.factionId === 'blue' ? view.colors.blue : view.colors.red)
+            .stroke({
+              color: agent.factionId === 'blue' ? view.colors.blueEdge : view.colors.redEdge,
+              width: 1,
+            });
         }
         marker
           .circle(view.highlightOffset, view.highlightOffset, view.highlightRadius)
@@ -214,8 +342,9 @@ export class PixiRenderer {
         this.units.addChild(marker);
         this.markers.set(agent.id, marker);
       }
-      // B-static: only position is written; shape, rotation and scale stay fixed.
+      // B-static: position changes; a short opacity cue indicates a hit.
       marker.position.set(agent.x, agent.y);
+      marker.alpha = (agent.hitUntilTick ?? 0) > snapshot.tick ? 0.5 : 1;
       if (
         snapshot.selectedGroupId === agent.groupId ||
         snapshot.groups.some(
@@ -234,20 +363,50 @@ export class PixiRenderer {
       });
     }
     this.app.canvas.dataset.markerCount = String(this.markers.size);
+    const sceneLeft = this.scene.position.x;
+    this.canvas.dataset.blueHealth = String(
+      snapshot.agents
+        .filter((agent) => agent.alive && agent.factionId === 'blue')
+        .reduce((sum, agent) => sum + agent.hp, 0),
+    );
+    this.canvas.dataset.visibleSelectedCount = String(
+      following.filter(
+        (agent) =>
+          sceneLeft + agent.x * this.cameraScale >= 0 &&
+          sceneLeft + agent.x * this.cameraScale <= this.viewport.width,
+      ).length,
+    );
+    this.canvas.dataset.visibleRedCount = String(
+      snapshot.agents.filter(
+        (agent) =>
+          agent.alive &&
+          agent.factionId === 'red' &&
+          sceneLeft + agent.x * this.cameraScale >= 0 &&
+          sceneLeft + agent.x * this.cameraScale <= this.viewport.width,
+      ).length,
+    );
+    this.app.canvas.dataset.redGroupCount = String(
+      snapshot.groups.filter((group) => group.factionId === 'red').length,
+    );
+    this.app.canvas.dataset.redCount = String(
+      snapshot.agents.filter((a) => a.alive && a.factionId === 'red').length,
+    );
     this.canvas.dataset.movingCount = String(
-      snapshot.agents.filter((a) => a.vx !== 0 || a.vy !== 0).length,
+      snapshot.agents.filter((a) => a.factionId === 'blue' && (a.vx !== 0 || a.vy !== 0)).length,
     );
     const agents = new Map(snapshot.agents.map((a) => [a.id, a]));
     this.canvas.dataset.maxSlotError = String(
       Math.max(
         0,
-        ...snapshot.groups.flatMap(
-          (g) =>
-            g.formation?.slots.map((s) => {
-              const a = agents.get(s.agentId)!;
-              return Math.hypot(s.x - a.x, s.y - a.y);
-            }) ?? [],
-        ),
+        ...snapshot.groups
+          .filter((group) => group.factionId === 'blue')
+          .flatMap(
+            (g) =>
+              g.formation?.slots.map((s) => {
+                const a = agents.get(s.agentId)!;
+                return Math.hypot(s.x - a.x, s.y - a.y);
+              }) ?? [],
+          ),
       ),
     );
     this.canvas.dataset.previewPath = JSON.stringify(preview?.points ?? []);

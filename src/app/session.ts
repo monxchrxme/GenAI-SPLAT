@@ -24,18 +24,24 @@ export class Session {
     const command: GameCommand =
       value.type === 'restart'
         ? Object.freeze({ type: value.type, tick })
-        : value.type === 'merge'
+        : value.type === 'split' || value.type === 'reinforce'
           ? Object.freeze({ ...value, tick })
-          : value.type === 'select-group-id'
-            ? Object.freeze({ type: value.type, tick, groupId: value.groupId })
-            : value.type === 'select-group'
-              ? Object.freeze({ type: value.type, tick, point: Object.freeze({ ...value.point }) })
-              : Object.freeze({
-                  type: value.type,
-                  tick,
-                  groupId: value.groupId,
-                  points: Object.freeze(value.points.map((point) => Object.freeze({ ...point }))),
-                });
+          : value.type === 'merge'
+            ? Object.freeze({ ...value, tick })
+            : value.type === 'select-group-id'
+              ? Object.freeze({ type: value.type, tick, groupId: value.groupId })
+              : value.type === 'select-group'
+                ? Object.freeze({
+                    type: value.type,
+                    tick,
+                    point: Object.freeze({ ...value.point }),
+                  })
+                : Object.freeze({
+                    type: value.type,
+                    tick,
+                    groupId: value.groupId,
+                    points: Object.freeze(value.points.map((point) => Object.freeze({ ...point }))),
+                  });
     this.pending.push(command);
     this.history.push(command);
   }
