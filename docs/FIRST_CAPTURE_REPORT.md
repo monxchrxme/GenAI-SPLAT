@@ -1,0 +1,28 @@
+# Первый захват территории [P] — 11.11.2026
+
+`implemented: true` · `awaiting_manual_acceptance: true`
+
+В рабочей карте первая покраска клетки для обеих фракций идёт со скоростью 0,8 вместо 0,5 единицы контроля в секунду. До порога владения 0,6 нужно около 0,75 секунды вместо 1,2. После первого владельца действует прежний темп, в том числе при переходе через нейтральный цвет. Начальная красная точка и зоны, покрашенные минами, считаются занятыми. Победа по 60% и финальной точке сохранена. Срез до эксперимента — локальный коммит `fc3e45b7c5007f7abe9f859081024e42f593628b`.
+
+В модельном прогоне с прежней последовательностью приказов и исходным seed к взятию точки за 1:54 было окрашено 27,0% вместо 24,1%. Победа наступила за 2:57 вместо 3:16, у игрока осталось 29 бойцов вместо 27. После взятия точки потребовалось ещё 1:03 на покраску вместо 1:22. Время относится к одному сценарию и измерено в симуляции.
+
+Код — `src/core/{config,types}.ts` и `src/simulation/paint.ts`. Проверки — `tests/unit/paint.test.ts` и историческая фикстура `tests/fixtures/delivery2Level.ts`.
+
+## Проверки
+
+В копии `/private/tmp/splat-first-capture.skD4gG`, `NODE=/private/tmp/node-v24.22.2-darwin-arm64/bin/node`:
+
+- `$NODE node_modules/typescript/bin/tsc --noEmit` и `$NODE node_modules/typescript/bin/tsc -p tsconfig.core.json --noEmit` — exit 0.
+- `$NODE node_modules/eslint/bin/eslint.js . --max-warnings 0`, `$NODE node_modules/prettier/bin/prettier.cjs --check .` и `$NODE node_modules/vite/bin/vite.js build` — exit 0.
+- `$NODE node_modules/vitest/vitest.mjs run` — exit 0, 154 теста в 26 файлах.
+- `SMOKE_BASE_URL=http://127.0.0.1:4210 PLAYWRIGHT_CHANNEL=chrome $NODE node_modules/@playwright/test/cli.js test tests/smoke/paint.spec.ts tests/smoke/hazards.spec.ts tests/smoke/threeSectors.spec.ts` — exit 0, 3 теста.
+- `$NODE --experimental-transform-types /private/tmp/splat-balance.PePgbe/audit.mjs` — exit 0, модельный прогон маршрута.
+- `git diff --check` — exit 0.
+
+## Ручная проверка и передача
+
+1. Открыть сборку на `http://127.0.0.1:4210/`.
+2. Провести растянутый отряд по нейтральной полосе и оценить след покраски.
+3. Перекрасить участок после боя и оценить разницу во времени.
+4. Дойти до финальной точки, записать накопленный процент и время добора территории.
+5. В следующей итерации сравнить варианты цели, которые можно выполнить по ходу продвижения. Ручная полная партия и общие QA-гейты остаются открыты.

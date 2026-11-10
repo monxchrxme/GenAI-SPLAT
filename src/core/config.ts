@@ -60,7 +60,11 @@ const FINAL_POST_DEFENSE = Object.freeze({ radius: 300, leash: 200 }); // [P]
 export const GAME_LEVEL: LevelConfig = Object.freeze({
   ...S0_LEVEL,
   world: Object.freeze({ width: 6000, height: 1000 }),
-  paint: Object.freeze({ ...S0_LEVEL.paint, columns: 75 }),
+  paint: Object.freeze({
+    ...S0_LEVEL.paint,
+    columns: 75,
+    firstCaptureRatePerSecond: 0.8, // [P] allow a moving formation to claim fresh ground
+  }),
   objective: Object.freeze({ x: 5600, y: 400, width: 320, height: 200 }), // [P] final capture area
   obstacles: Object.freeze([
     Object.freeze({ x: 1440, y: 0, width: 80, height: 200 }),

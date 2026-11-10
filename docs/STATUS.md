@@ -1,11 +1,11 @@
 ---
-updated_at: 2026-11-10
-current_stage: s6_s7_final_defense_camera
-stage_state: final_defense_camera_awaiting_manual_acceptance
+updated_at: 2026-11-11
+current_stage: s6_s7_first_capture
+stage_state: first_capture_awaiting_manual_acceptance
 implemented: true
-implementation_scope: final post engagement, deviant durability and camera paging; awaiting manual review
+implementation_scope: faster first territory capture
 preparation_implemented: true
-tests_verified: see FINAL_DEFENSE_CAMERA_REPORT for local scope
+tests_verified: see FIRST_CAPTURE_REPORT for local scope
 document_checks_verified: closure pass; 159 local links, 53 original tasks/gates/artifacts, unchanged D-register/protected files, 10 handoff lines, accepted runtime/tests unchanged, deploy guard false, source SHA verified
 awaiting_manual_acceptance: true
 preview_gate: verified_for_S0_only
@@ -50,6 +50,12 @@ handoff_notes:
   - S0 explicitly accepted through user confirmation of all checklist items on 2026-11-06.
   - Delivery 1 accepted; next chat S4+S5, see S4_S5_HANDOFF_PROMPT.md.
 ---
+
+## Первый захват территории — 11.11.2026
+
+- implemented — пробное ускорение первого захвата клетки для обеих сторон. Контрольная версия перед изменением сохранена локальным коммитом `fc3e45b7c5007f7abe9f859081024e42f593628b`.
+- tests_verified — 154 unit/integration, 3 Chrome smoke, обе типизации, линтер и сборка. Сценарий с теми же приказами набрал 27,0% территории к финальной точке вместо 24,1%. [Отчёт](FIRST_CAPTURE_REPORT.md).
+- awaiting_manual_acceptance — оценка покраски в ручной партии. Альтернативы порогу территории обсуждаются в следующей итерации.
 
 ## Финальная оборона и камера — 10.11.2026
 

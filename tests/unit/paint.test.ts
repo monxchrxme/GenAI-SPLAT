@@ -46,6 +46,33 @@ describe('territory prototype', () => {
     expect(state.paintCells[0]).toEqual({ control: 1, owner: 'blue' });
   });
 
+  it.each(['blue', 'red'] as const)('speeds up the first %s capture', (factionId) => {
+    const fast = { ...config, paint: { ...config.paint, firstCaptureRatePerSecond: 2 } };
+    const state = createInitialState(fast);
+    state.agents = [{ ...state.agents[0]!, factionId, x: 800, y: 500 }];
+    for (let i = 0; i < 2; i++) updatePaint(state, fast);
+    expect(state.paintCells[0]!.owner).toBeNull();
+    updatePaint(state, fast);
+    expect(state.paintCells[0]!.owner).toBe(factionId);
+  });
+
+  it('repaints an already red cell at the original rate, including its neutral interval', () => {
+    const fast = { ...config, paint: { ...config.paint, firstCaptureRatePerSecond: 2 } };
+    const state = createInitialState(fast);
+    const baseline = createInitialState(config);
+    for (const match of [state, baseline]) {
+      match.agents = [{ ...match.agents[0]!, x: 800, y: 500 }];
+      match.paintCells[0] = { control: -1, owner: 'red' };
+    }
+    for (let i = 0; i < 17; i++) {
+      updatePaint(state, fast);
+      updatePaint(baseline, config);
+      expect(state.paintCells[0]!.control).toBe(baseline.paintCells[0]!.control);
+      expect(state.paintCells[0]!.owner).toBe(baseline.paintCells[0]!.owner);
+    }
+    expect(state.paintCells[0]!.owner).toBe('blue');
+  });
+
   it('is deterministic, snapshots are detached, and Restart clears paint', () => {
     const run = () => {
       const session = new Session(S0_LEVEL, S0_CLOCK);
@@ -66,6 +93,7 @@ describe('territory prototype', () => {
     for (const paint of [
       { ...config.paint, columns: 0 },
       { ...config.paint, radius: NaN },
+      { ...config.paint, firstCaptureRatePerSecond: 0 },
       { ...config.paint, ownerThreshold: 1.1 },
     ])
       expect(() => validatePaint(paint)).toThrow();

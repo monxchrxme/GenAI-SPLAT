@@ -73,6 +73,7 @@ export interface PaintCell {
   control: number;
   blocked?: boolean;
   owner: FactionId | null;
+  hasBeenOwned?: true;
 }
 
 export interface PaintConfig {
@@ -80,6 +81,7 @@ export interface PaintConfig {
   readonly rows: number;
   readonly radius: number;
   readonly ratePerSecond: number;
+  readonly firstCaptureRatePerSecond?: number;
   readonly ownerThreshold: number;
 }
 

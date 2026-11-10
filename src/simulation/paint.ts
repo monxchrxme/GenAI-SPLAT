@@ -10,6 +10,9 @@ export function validatePaint(paint: PaintConfig): void {
     paint.radius <= 0 ||
     !Number.isFinite(paint.ratePerSecond) ||
     paint.ratePerSecond <= 0 ||
+    (paint.firstCaptureRatePerSecond !== undefined &&
+      (!Number.isFinite(paint.firstCaptureRatePerSecond) ||
+        paint.firstCaptureRatePerSecond <= 0)) ||
     !Number.isFinite(paint.ownerThreshold) ||
     paint.ownerThreshold <= 0 ||
     paint.ownerThreshold > 1
@@ -20,8 +23,11 @@ export function validatePaint(paint: PaintConfig): void {
 // [P] Presence is binary per faction: concentration does not increase paint speed.
 // Equal opposing presence cancels; unoccupied cells retain their control.
 export function updatePaint(state: MatchState, config: LevelConfig): void {
-  const { columns, rows, radius, ratePerSecond, ownerThreshold } = config.paint;
+  const { columns, rows, radius, ratePerSecond, firstCaptureRatePerSecond, ownerThreshold } =
+    config.paint;
   const delta = (ratePerSecond * config.fixedStepMs) / 1000;
+  const firstCaptureDelta =
+    ((firstCaptureRatePerSecond ?? ratePerSecond) * config.fixedStepMs) / 1000;
   for (let index = 0; index < state.paintCells.length; index++) {
     if (state.paintCells[index]!.blocked) continue;
     const x = (((index % columns) + 0.5) * state.world.width) / columns;
@@ -35,8 +41,13 @@ export function updatePaint(state: MatchState, config: LevelConfig): void {
       if (blue && red) break;
     }
     const cell = state.paintCells[index]!;
-    cell.control = Math.max(-1, Math.min(1, cell.control + (Number(blue) - Number(red)) * delta));
+    // A mine or the initial objective can assign ownership before painting runs.
+    const wasOwned = cell.owner !== null || cell.hasBeenOwned;
+    const step = wasOwned ? delta : firstCaptureDelta;
+    cell.control = Math.max(-1, Math.min(1, cell.control + (Number(blue) - Number(red)) * step));
     cell.owner =
       cell.control >= ownerThreshold ? 'blue' : cell.control <= -ownerThreshold ? 'red' : null;
+    if (firstCaptureRatePerSecond !== undefined && (wasOwned || cell.owner !== null))
+      cell.hasBeenOwned = true;
   }
 }
