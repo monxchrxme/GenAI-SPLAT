@@ -11,6 +11,9 @@ import { pickGroupAtPoint } from './selection';
 import { createFormation } from '../core/formation';
 import { moveAgents, validateMovement, type RouteCache } from './movement';
 import { pointBlocked, UNIT_CLEARANCE } from './obstacles';
+import { groupMoveFormation } from './groupMove';
+import { updateObjective } from './objective';
+import { updateHazards } from './hazards';
 import { isStretched, validateTension } from '../core/tension';
 
 export class Simulation {
@@ -22,7 +25,7 @@ export class Simulation {
   constructor(private readonly config: LevelConfig) {
     validateMovement(config);
     validatePaint(config.paint);
-    for (const obstacle of config.obstacles ?? []) {
+    for (const obstacle of [...(config.obstacles ?? []), ...(config.shorePonds ?? [])]) {
       if (
         ![obstacle.x, obstacle.y, obstacle.width, obstacle.height].every(Number.isFinite) ||
         obstacle.x < 0 ||
@@ -36,6 +39,104 @@ export class Simulation {
     }
     const enemy = config.enemy;
     const combat = config.combat;
+    for (const generated of [config.ponds, config.randomWalls]) {
+      if (
+        generated &&
+        (!Number.isSafeInteger(generated.count) ||
+          generated.count < 0 ||
+          generated.count > generated.candidates.length ||
+          generated.candidates.some(
+            (r) =>
+              ![r.x, r.y, r.width, r.height].every(Number.isFinite) ||
+              r.x < 0 ||
+              r.y < 0 ||
+              r.width <= 0 ||
+              r.height <= 0 ||
+              r.x + r.width > config.world.width ||
+              r.y + r.height > config.world.height,
+          ))
+      )
+        throw new Error('Invalid generated obstacles');
+    }
+    if (config.hazards) {
+      const h = config.hazards;
+      if (
+        !Number.isSafeInteger(h.mineCount) ||
+        h.mineCount < 0 ||
+        h.mineCount > h.mines.length ||
+        !Number.isSafeInteger(h.minePaintCells) ||
+        h.minePaintCells < 0 ||
+        ![
+          h.slowRadius,
+          h.slowFactor,
+          h.mineRadius,
+          h.mineDamage,
+          h.cannonRange,
+          h.cannonDamage,
+          h.cannonCooldown,
+          h.cannonSweepTicks,
+          h.cannonProjectileSpeed,
+          h.cannonHitRadius,
+        ].every((n) => Number.isFinite(n) && n > 0) ||
+        h.slowFactor > 1 ||
+        h.slow.some(
+          (point) =>
+            point.radius !== undefined && (!Number.isFinite(point.radius) || point.radius <= 0),
+        ) ||
+        !Number.isSafeInteger(h.cannonCooldown) ||
+        !Number.isSafeInteger(h.cannonSweepTicks) ||
+        [...h.slow, ...h.mines, ...h.cannons].some(
+          (p) =>
+            !Number.isFinite(p.x) ||
+            !Number.isFinite(p.y) ||
+            p.x < 0 ||
+            p.x > config.world.width ||
+            p.y < 0 ||
+            p.y > config.world.height,
+        )
+      )
+        throw new Error('Invalid hazards');
+    }
+    if (
+      config.objective &&
+      (![
+        config.objective.x,
+        config.objective.y,
+        config.objective.width,
+        config.objective.height,
+      ].every(Number.isFinite) ||
+        config.objective.x < 0 ||
+        config.objective.y < 0 ||
+        config.objective.width <= 0 ||
+        config.objective.height <= 0 ||
+        config.objective.x + config.objective.width > config.world.width ||
+        config.objective.y + config.objective.height > config.world.height)
+    )
+      throw new Error('Invalid objective');
+    if (
+      config.enemyPosts &&
+      (!enemy ||
+        config.enemyPosts.length === 0 ||
+        config.enemyPosts.some(
+          (post) =>
+            !Number.isSafeInteger(post.count) ||
+            post.count < 1 ||
+            !Number.isSafeInteger(post.columns) ||
+            post.columns < 1 ||
+            !Number.isFinite(post.centerX) ||
+            !Number.isFinite(post.centerY) ||
+            post.centerX < 0 ||
+            post.centerX > config.world.width ||
+            post.centerY < 0 ||
+            post.centerY > config.world.height ||
+            (post.localDefense !== undefined &&
+              (!Number.isFinite(post.localDefense.radius) ||
+                !Number.isFinite(post.localDefense.leash) ||
+                post.localDefense.leash <= 0 ||
+                post.localDefense.radius < post.localDefense.leash)),
+        ))
+    )
+      throw new Error('Invalid enemy posts');
     if (
       enemy &&
       (!Number.isSafeInteger(enemy.count) ||
@@ -109,6 +210,17 @@ export class Simulation {
     )
       throw new Error('Invalid reinforcement configuration');
     this.state = createInitialState(config);
+    if (this.state.objective) {
+      const { area } = this.state.objective;
+      const { columns, rows } = this.state.paintGrid;
+      const cells = this.state.paintCells.filter((_, index) => {
+        const x = (((index % columns) + 0.5) * this.state.world.width) / columns;
+        const y = ((Math.floor(index / columns) + 0.5) * this.state.world.height) / rows;
+        return x >= area.x && x < area.x + area.width && y >= area.y && y < area.y + area.height;
+      });
+      if (!cells.length || cells.some((cell) => cell.blocked))
+        throw new Error('Invalid objective cells');
+    }
     this.nextAgentId = Math.max(...this.state.agents.map((agent) => Number(agent.id.slice(6)))) + 1;
     assertInvariants(this.state);
     if (
@@ -130,7 +242,9 @@ export class Simulation {
           !group ||
           !this.config.enemy ||
           group.agentIds.length < this.config.enemy.minSquadSize * 2 ||
-          this.state.groups.filter((item) => item.factionId === 'red').length !== 1
+          this.state.groups.filter(
+            (item) => item.factionId === 'red' && item.enemyPost === group.enemyPost,
+          ).length !== 1
         )
           continue;
         const members = this.state.agents
@@ -141,6 +255,7 @@ export class Simulation {
           id: this.allocateGroupId(),
           factionId: 'red' as const,
           agentIds: agents.map((agent) => agent.id),
+          ...(group.enemyPost === undefined ? {} : { enemyPost: group.enemyPost }),
         }));
         this.state.groups.splice(this.state.groups.indexOf(group), 1, ...parts);
         for (const part of parts)
@@ -156,7 +271,8 @@ export class Simulation {
         const second = this.state.groups.find(
           (group) => group.id === command.second && group.factionId === 'red',
         );
-        if (!first || !second || first.id === second.id) continue;
+        if (!first || !second || first.id === second.id || first.enemyPost !== second.enemyPost)
+          continue;
         const agents = (id: GroupId) =>
           this.state.agents.filter((agent) => agent.alive && agent.groupId === id);
         const center = (id: GroupId) => {
@@ -189,7 +305,9 @@ export class Simulation {
       if (command.type === 'select-group-id') {
         if (
           command.groupId === null ||
-          this.state.groups.some((g) => g.id === command.groupId && g.agentIds.length > 0)
+          this.state.groups.some(
+            (g) => g.id === command.groupId && g.factionId === 'blue' && g.agentIds.length > 0,
+          )
         )
           this.select(command.groupId);
         continue;
@@ -350,6 +468,22 @@ export class Simulation {
         this.state.selectedGroupId = groups[0]!.id;
         continue;
       }
+      if (command.type === 'move-group') {
+        const group = this.state.groups.find(
+          (item) => item.id === command.groupId && item.factionId === 'blue',
+        );
+        if (!group || group.id !== this.state.selectedGroupId) continue;
+        const formation = groupMoveFormation(this.state, group.id, command.point);
+        if (!formation) continue;
+        if (
+          this.state.merge &&
+          [this.state.merge.first, this.state.merge.second].includes(group.id)
+        )
+          this.state.merge = null;
+        group.formation = formation;
+        delete group.tensionUntilTick;
+        continue;
+      }
       if (command.type === 'set-formation') {
         const group = this.state.groups.find((group) => group.id === command.groupId);
         if (
@@ -402,6 +536,8 @@ export class Simulation {
     moveAgents(this.state, this.config, targets, this.routes);
     resolveCombat(this.state, this.config);
     updatePaint(this.state, this.config);
+    updateHazards(this.state, this.config);
+    updateObjective(this.state);
     this.state.tick++;
     const accessible = this.state.paintCells.filter((cell) => !cell.blocked);
     const owned = accessible.filter((cell) => cell.owner === 'blue').length;
@@ -411,7 +547,10 @@ export class Simulation {
     ) {
       this.state.phase = 'finished';
       this.state.result = 'defeat';
-    } else if (owned / accessible.length >= this.config.victoryFraction) {
+    } else if (
+      owned / accessible.length >= this.config.victoryFraction &&
+      (!this.state.objective || this.state.objective.captured)
+    ) {
       this.state.phase = 'finished';
       this.state.result = 'victory';
     }

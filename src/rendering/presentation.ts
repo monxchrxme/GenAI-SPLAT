@@ -1,19 +1,13 @@
 // [P] S0 presentation values, pending D-10 scale/contrast acceptance.
 export const PRESENTATION = Object.freeze({
   padding: 24,
-  tiltY: 0.72, // [P] orthographic inclined view for visual review
   maxResolution: 2,
   cameraViewWidth: 1600, // [P] visible map width before viewport aspect-ratio margins
   cameraPageStep: 800, // [P] half-screen overlap between adjacent blocks
   cameraManualHoldMs: 4000,
   cameraTransitionMs: 320, // [P] quick, smooth transition between adjacent blocks
-  cameraEdgeFraction: 0.2, // [P] reveal the next block before the leading agent reaches the edge
-  // [P] Open lanes and landmarks are decorative, with no collision or bonuses.
-  landmarks: [
-    { x: 800, y: 500, radius: 80 },
-    { x: 1120, y: 245, radius: 58 },
-    { x: 1120, y: 755, radius: 58 },
-  ],
+  cameraEdgeFraction: 0.15, // [P] the group center must approach the edge before auto-paging
+  // [P] Lane markings indicate the two paths without changing movement.
   laneY: [250, 750],
   markerRadius: 11,
   shadowOffset: 3,

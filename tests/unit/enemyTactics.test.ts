@@ -1,10 +1,10 @@
+import { DELIVERY2_LEVEL } from '../fixtures/delivery2Level';
 import { expect, it } from 'vitest';
-import { GAME_LEVEL } from '../../src/core/config';
 import { Simulation } from '../../src/simulation/simulation';
 import { assertInvariants } from '../../src/simulation/invariants';
 
 it('keeps both armies alive for one minute without player commands', () => {
-  const sim = new Simulation(GAME_LEVEL);
+  const sim = new Simulation(DELIVERY2_LEVEL);
   for (let tick = 0; tick < 3600; tick++) sim.step();
   const state = sim.getSnapshot();
   expect(state.result).toBeNull();
@@ -15,7 +15,7 @@ it('keeps both armies alive for one minute without player commands', () => {
 
 it('splits to cover separated blue squads and reunites after their merge', () => {
   const run = () => {
-    const sim = new Simulation(GAME_LEVEL);
+    const sim = new Simulation(DELIVERY2_LEVEL);
     sim.step([{ tick: 0, type: 'select-group-id', groupId: 'group-1' }]);
     sim.step([
       {
@@ -104,7 +104,7 @@ it('splits to cover separated blue squads and reunites after their merge', () =>
 });
 
 it('a frontal assault causes losses on both sides', () => {
-  const sim = new Simulation(GAME_LEVEL);
+  const sim = new Simulation(DELIVERY2_LEVEL);
   sim.step([{ tick: 0, type: 'select-group-id', groupId: 'group-1' }]);
   sim.step([
     {

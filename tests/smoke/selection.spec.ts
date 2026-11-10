@@ -23,7 +23,7 @@ async function screenPoint(canvas: Locator, point: { x: number; y: number }) {
 for (const deviceScaleFactor of [1, 2]) {
   test.describe(`selection at DPR ${deviceScaleFactor}`, () => {
     test.use({ deviceScaleFactor });
-    test('selects and starts a formation in a dense gap; distant empty ground still clears', async ({
+    test('selects and starts a formation in a dense gap; empty ground moves the selected group', async ({
       page,
     }) => {
       const initial = createInitialState(S0_LEVEL);
@@ -59,10 +59,10 @@ for (const deviceScaleFactor of [1, 2]) {
       const start = JSON.parse((await canvas.getAttribute('data-formation-path'))!)[0];
       expect(start.x).toBeCloseTo(gap.x, 2);
       expect(start.y).toBeCloseTo(gap.y, 2);
-      const blank = await screenPoint(canvas, { x: 1500, y: 950 });
+      const blank = await screenPoint(canvas, { x: 1000, y: 700 });
       await page.mouse.click(blank.x, blank.y);
-      await expect(canvas).toHaveAttribute('data-selected-group', '');
-      await expect(canvas).toHaveAttribute('data-slot-count', '0');
+      await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
+      await expect(canvas).toHaveAttribute('data-slot-count', '40');
       await page.getByRole('button', { name: 'Заново' }).click();
       await page.setViewportSize({ width: 900, height: 650 });
       await expect.poll(async () => (await canvas.boundingBox())?.width).toBe(900);
@@ -102,10 +102,12 @@ for (const deviceScaleFactor of [1, 2]) {
       if (deviceScaleFactor === 1)
         await page.screenshot({ path: 'reports/s1-action1-selected.png' });
 
-      const blank = await screenPoint(canvas, { x: 1300, y: 800 });
+      const blank = await screenPoint(canvas, { x: 900, y: 700 });
       await page.mouse.click(blank.x, blank.y);
+      await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
+      await expect(canvas).toHaveAttribute('data-selection-ring-count', '40');
+      await page.getByRole('button', { name: 'Заново' }).click();
       await expect(canvas).toHaveAttribute('data-selected-group', '');
-      await expect(canvas).toHaveAttribute('data-selection-ring-count', '0');
       await page.mouse.click(selectPoint.x, selectPoint.y);
       await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
       const bounds = (await canvas.boundingBox())!;
@@ -131,8 +133,10 @@ for (const deviceScaleFactor of [1, 2]) {
         await page.setViewportSize(viewport);
         await expect.poll(async () => (await canvas.boundingBox())?.width).toBe(viewport.width);
         await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
-        const empty = await screenPoint(canvas, { x: 1300, y: 800 });
+        const empty = await screenPoint(canvas, { x: 900, y: 700 });
         await page.mouse.click(empty.x, empty.y);
+        await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
+        await page.getByRole('button', { name: 'Заново' }).click();
         await expect(canvas).toHaveAttribute('data-selected-group', '');
         const marker = await screenPoint(canvas, first);
         await page.mouse.click(marker.x, marker.y);
@@ -143,8 +147,10 @@ for (const deviceScaleFactor of [1, 2]) {
         element.style.transformOrigin = 'top left';
         element.style.transform = 'translate(41px, 23px) scale(0.8)';
       });
-      const empty = await screenPoint(canvas, { x: 1300, y: 800 });
+      const empty = await screenPoint(canvas, { x: 900, y: 700 });
       await page.mouse.click(empty.x, empty.y);
+      await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
+      await page.getByRole('button', { name: 'Заново' }).click();
       await expect(canvas).toHaveAttribute('data-selected-group', '');
       const marker = await screenPoint(canvas, first);
       await page.mouse.click(marker.x, marker.y);

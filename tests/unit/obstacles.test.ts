@@ -1,5 +1,6 @@
+import { DELIVERY2_LEVEL } from '../fixtures/delivery2Level';
 import { expect, it } from 'vitest';
-import { GAME_LEVEL, S0_LEVEL } from '../../src/core/config';
+import { S0_LEVEL } from '../../src/core/config';
 import { Simulation } from '../../src/simulation/simulation';
 import {
   findRoute,
@@ -12,11 +13,11 @@ import { createInitialState } from '../../src/simulation/initialState';
 it('routes through one of two openings and never crosses the expanded obstacle', () => {
   const start = { x: 1300, y: 500 },
     target = { x: 1700, y: 500 };
-  const obstacles = GAME_LEVEL.obstacles!;
+  const obstacles = DELIVERY2_LEVEL.obstacles!;
   expect(segmentClear(start, target, obstacles, UNIT_CLEARANCE)).toBe(false);
   for (const y of [300, 700])
     expect(segmentClear({ x: 1300, y }, { x: 1700, y }, obstacles, UNIT_CLEARANCE)).toBe(true);
-  const route = findRoute(start, target, GAME_LEVEL.world, obstacles)!;
+  const route = findRoute(start, target, DELIVERY2_LEVEL.world, obstacles)!;
   expect(route.length).toBeGreaterThan(1);
   let previous = start;
   for (const point of route) {
@@ -29,8 +30,8 @@ it('routes through one of two openings and never crosses the expanded obstacle',
 it('moves an agent around obstacles without crossing them and rejects targets inside', () => {
   const config = {
     ...S0_LEVEL,
-    world: GAME_LEVEL.world,
-    obstacles: GAME_LEVEL.obstacles!,
+    world: DELIVERY2_LEVEL.world,
+    obstacles: DELIVERY2_LEVEL.obstacles!,
     victoryFraction: 1,
     spawn: { ...S0_LEVEL.spawn, count: 1, columns: 1, centerX: 1300, centerY: 500, jitter: 0 },
   };
@@ -69,18 +70,19 @@ it('moves an agent around obstacles without crossing them and rejects targets in
 });
 
 it('excludes obstacle cells from paint and leaves less than the win threshold on the starting side', () => {
-  const state = createInitialState(GAME_LEVEL);
+  const state = createInitialState(DELIVERY2_LEVEL);
   const blocked = state.paintCells.filter((cell) => cell.blocked);
   expect(blocked).toHaveLength(6);
   expect(blocked.every((cell) => cell.owner === null && cell.control === 0)).toBe(true);
   const cellWidth = state.world.width / state.paintGrid.columns;
-  const barrierEnd = GAME_LEVEL.obstacles![0]!.x + GAME_LEVEL.obstacles![0]!.width;
+  const barrierEnd = DELIVERY2_LEVEL.obstacles![0]!.x + DELIVERY2_LEVEL.obstacles![0]!.width;
   const reachableBeforeCrossing = state.paintCells.filter(
     (cell, index) =>
       !cell.blocked &&
-      ((index % state.paintGrid.columns) + 0.5) * cellWidth <= barrierEnd + GAME_LEVEL.paint.radius,
+      ((index % state.paintGrid.columns) + 0.5) * cellWidth <=
+        barrierEnd + DELIVERY2_LEVEL.paint.radius,
   ).length;
   expect(reachableBeforeCrossing / (state.paintCells.length - blocked.length)).toBeLessThan(
-    GAME_LEVEL.victoryFraction,
+    DELIVERY2_LEVEL.victoryFraction,
   );
 });

@@ -1,11 +1,11 @@
 ---
 updated_at: 2026-11-10
-current_stage: delivery_2_handoff
-stage_state: awaiting_manual_acceptance
+current_stage: s6_s7_final_defense_camera
+stage_state: final_defense_camera_awaiting_manual_acceptance
 implemented: true
-implementation_scope: S4/S5 integration and accurate territory progress display; awaiting manual review
+implementation_scope: final post engagement, deviant durability and camera paging; awaiting manual review
 preparation_implemented: true
-tests_verified: local_pass; see delivery 2 integration report for scope
+tests_verified: see FINAL_DEFENSE_CAMERA_REPORT for local scope
 document_checks_verified: closure pass; 159 local links, 53 original tasks/gates/artifacts, unchanged D-register/protected files, 10 handoff lines, accepted runtime/tests unchanged, deploy guard false, source SHA verified
 awaiting_manual_acceptance: true
 preview_gate: verified_for_S0_only
@@ -32,10 +32,10 @@ last_verified_checks:
   - python3 /private/tmp/splat-input-doccheck.py: exit 0; 154 local file links, 53 original tasks and gates/artifacts, unchanged D-register/protected files/HEAD, 10 handoff lines; nothing staged
   - historical remote verification before action 1: git ls-remote exit 0; f64af0a / 8519f19 / 29946cd; not rerun in action 5
   - historical Vercel verification before action 1: CLI list exit 0; only two S0 deployments; not rerun in action 5
-manual_acceptance: delivery_2_step_2_accepted_by_user_on_2026-11-09
-last_accepted_intermediate_action: delivery_2_step_2_map_and_objective
-last_accepted_intermediate_commit: 34e4f2264d0bea346998f1f5c4b10170eba34a34
-last_accepted_at: 2026-11-09
+manual_acceptance: click_move_accepted_by_user_on_2026-11-10; overall_gates_pending
+last_accepted_intermediate_action: click_move
+last_accepted_intermediate_commit: not_available
+last_accepted_at: 2026-11-10
 known_issues:
   - Historical MASTER_SPEC §8 uses old PRD.md and SPLAT_FINAL_TZ_v2.md names; see BOOTSTRAP_REPORT.
   - Preview requires Vercel SSO for anonymous access; external automated smoke not_run, manual user smoke accepted.
@@ -50,6 +50,101 @@ handoff_notes:
   - S0 explicitly accepted through user confirmation of all checklist items on 2026-11-06.
   - Delivery 1 accepted; next chat S4+S5, see S4_S5_HANDOFF_PROMPT.md.
 ---
+
+## Финальная оборона и камера — 10.11.2026
+
+- implemented: три финальных гарнизона вступают в бой в локальной зоне, девианты получили 8 HP, перелистывание следует за центром группы. [Отчёт и ручной чеклист](FINAL_DEFENSE_CAMERA_REPORT.md).
+- tests_verified: 151 unit/integration, 11 Chrome smoke, оба typecheck, lint, format и build; подробности в отчёте.
+- awaiting_manual_acceptance: сложность финала и удобство камеры в бою; исходные QA и гейты сохранены.
+
+## Движение девиантов и интерфейс — 10.11.2026
+
+- implemented: отдельная реакция на ближайшего синего, ограниченная погоня и возврат девианта; обычные группы сохранены. Удалены наклонный режим, пробные формы и маркировка прототипа из игры. [Отчёт и демо](DEVIANT_MOVEMENT_REPORT.md).
+- tests_verified: 148 unit/integration, оба typecheck, lint, format и build; 21 Chrome smoke — в отчёте. Проверки во временной копии.
+- awaiting_manual_acceptance: реакция и сложность финала; полная партия и прежние QA/гейты остаются открыты.
+- Handoff: 1) проверить приближение к девиантам; 2) оценить атаку/возврат; 3) оценить 240 единиц охраны; 4) проверить обычные группы; 5) пройти финал и Restart; 6) завершить QA/UX/FPS; 7) внешние действия только отдельно.
+
+## Квадратные зоны и левый берег — 10.11.2026
+
+- implemented: зоны замедления стали квадратными в рендере и симуляции; вода слева соединена с верхним и нижним водоёмами. [Отчёт и демо](SQUARE_SHORE_REPORT.md).
+- tests_verified: 147 unit/integration, 21 Chrome smoke, оба typecheck, lint, format и build во временной копии; подробности в отчёте.
+- awaiting_manual_acceptance: вид и действие квадратов, начальные маршруты и баланс. Полная партия и прежние QA/гейты остаются открыты.
+- Handoff: 1) оценить квадраты; 2) проверить замедление в углах; 3) проверить единство берега и непроходимость воды; 4) пройти оба маршрута; 5) оценить финал; 6) завершить QA/UX/FPS; 7) внешние действия только отдельно.
+
+## Начальные водоёмы и защита финала — 10.11.2026
+
+- implemented: два непроходимых водоёма с неровной кромкой у начала; три финальные группы уменьшены с 12 до 8, HP девиантов с 7 до 5. [Отчёт и демо](SHORES_BALANCE_REPORT.md).
+- tests_verified: 145 unit/integration, оба typecheck, lint, format и build; Chrome smoke 20/21, затем исправленный затронутый файл 3/3, всё во временной копии; подробности в отчёте.
+- awaiting_manual_acceptance: форма берегов, маршруты и баланс финала; полная партия и общие QA/гейты остаются открыты.
+- Handoff: 1) оценить начало; 2) проверить проходимость у берегов; 3) пройти оба маршрута; 4) оценить финальные потери и пополнение; 5) проверить победу/поражение и Restart; 6) продолжить QA и UX; 7) внешние действия только отдельно.
+
+## Доработка боя и кликов — 10.11.2026
+
+- implemented: пушки стреляют в 6 раз чаще, мины красят до 7×7 клеток, красные не выбираются, слоты около преград корректируются, три круга замедляют, три стены выбираются по seed. [Отчёт и демо](BATTLE_TUNING_REPORT.md).
+- tests_verified: 144 unit/integration, оба typecheck, lint, format, build и 21 выбранный Chrome smoke во временной копии; полная партия и полный browser suite остаются открыты.
+- awaiting_manual_acceptance: удобство приказов в бою, проходимость, сила мин/пушек и баланс. Прежние ручные гейты и QA сохраняются.
+- Handoff: 1) проверить клики по красным и стенам; 2) оценить частоту пушек; 3) проверить 7×7 окраску мин; 4) оценить замедляющие круги; 5) оценить стены и оба пути; 6) проверить полную партию и баланс; 7) выполнить UX/FPS и QA; 8) внешние действия только отдельно.
+
+## Опасности, девианты и конечная точка — 10.11.2026
+
+- implemented: зоны замедления, seed-выбор водоёмов и мин, постоянно стреляющие пушки, два девианта и победа по 60% + конечная точка. [Отчёт и демо](HAZARDS_OBJECTIVE_REPORT.md).
+- tests_verified: 144 unit/integration, оба typecheck, lint, format, build и 18 выбранных Chrome smoke во временной копии; полная партия и браузерная регрессия новой конфигурации не проверены.
+- awaiting_manual_acceptance: новая механика, проходимость, баланс и визуальная читаемость; QA и предыдущие общие гейты остаются открыты. Пользователь явно принял движение кликом, отдельного commit нет.
+- Handoff: 1) оценить замедления/мины; 2) проверить стрельбу и обход пушек; 3) оценить двух девиантов; 4) пройти цель и проверить поражение/Restart; 5) балансировать; 6) выполнить полную регрессию, UX и FPS; 7) внешние действия только отдельно.
+
+## Движение кликом — 10.11.2026
+
+- implemented: пустой клик направляет выбранную синюю группу в текущем расположении, сохраняя выделение; выбор другой группы и рисование линии сохранены. [Отчёт](CLICK_MOVE_REPORT.md).
+- tests_verified: 134 unit/integration, оба typecheck, lint, format, build и 17 выборочных Chrome smoke во временной копии; детали в отчёте.
+- awaiting_manual_acceptance: удобство в бою, поведение на препятствиях и общий гейт карты/поставки; полный QA остаётся открытым.
+- Handoff: 1) проверить клики и смену групп в бою; 2) оценить маршруты и препятствия; 3) проверить X/M/Restart; 4) собрать замечания; 5) согласовать дальнейшие шаги карты и цели; 6) сохранить QA и UX; 7) внешние действия — только по запросу.
+
+## Три участка и гарнизоны — 10.11.2026
+
+- implemented: карта 6000×1000, две основные преграды с двумя проходами, препятствия третьего участка, семь независимых начальных гарнизонов; абстрактный вид сохранён. [Отчёт](THREE_SECTOR_REPORT.md).
+- tests_verified: 132 unit/integration и 12 выборочных Chrome smoke, оба typecheck, lint, format и build во временной копии; прежние тесты S4/S5 используют фикстуру старой карты.
+- awaiting_manual_acceptance: карта, состав и баланс; цель 80% с конечной точкой, девианты, полная партия и полная browser-регрессия ещё не выполнены. Текущие 60% не гарантируют достижения конца; прежние QA и гейты сохраняются.
+- Handoff: 1) оценить три участка; 2) пройти два фланга; 3) оценить столкновение и баланс; 4) проверить дальние позиции; 5) согласовать реализацию конечной точки; 6) отдельно реализовать девиантов; 7) выполнить полный QA/UX и производительность; 8) внешние действия — отдельно.
+
+## Возврат к абстрактному виду — 10.11.2026
+
+- implemented: по запросу заказчика визуальный эксперимент отменён; рендер и палитра восстановлены по HEAD до эксперимента. Изображения эксперимента сохранены как неиспользуемые файлы, без включения в сборку.
+- tests_verified: точное совпадение восстановленных файлов с HEAD и локальная проверка сборки/браузера; результаты в [отчёте](VISUAL_SLICE_REPORT.md). Исторические тесты эксперимента не означают его приёмки.
+- awaiting_manual_acceptance: проверка возврата пользователем; общий ручной гейт S4/S5, QA и дальнейшая карта остаются открыты.
+- Handoff: 1) показать восстановленный вид; 2) учесть абстрактный минимализм; 3) сохранить планы трёх участков; 4) отдельно согласовать реализацию; 5) не менять правило победы заранее; 6) сохранить QA и UX; 7) внешние действия только по отдельному запросу.
+
+## Исправление визуального среза — 10.11.2026
+
+- implemented: после замечания заказчика добавлены пробные оригинальные фактура камня и изображение стены с зеленью; геометрия и правила сохранены. [Отчёт](VISUAL_SLICE_REPORT.md).
+- tests_verified: 127 unit/integration, оба typecheck, lint, format, build и 7 относящихся Chrome smoke во временной копии. Полный набор 26 относится к предшествующему срезу.
+- awaiting_manual_acceptance: true; срез не является полной реализацией окружения по референсу, размер ассетов и композиция требуют дальнейшей оценки. Старые гейты сохраняются.
+
+## Локальный визуальный срез — 10.11.2026
+
+- implemented: пробные каменная поверхность и кладка существующих препятствий, прежний переключаемый наклон; игровой мир и правила сохранены. [Отчёт и демо](VISUAL_SLICE_REPORT.md).
+- tests_verified: 127 unit/integration, 26 Chrome smoke, оба typecheck, lint, format и build во временной копии; подробности и ограничения в отчёте.
+- awaiting_manual_acceptance: true для визуального среза и ранее незакрытого гейта S4/S5; финальный дизайн и ракурс не приняты. Firefox, FPS, полный проигрыш через UI и внешний smoke не проверялись.
+- Handoff: 1) оценить поверхность и кладку; 2) сравнить ракурсы; 3) проверить проходы и читаемость; 4) собрать замечания; 5) согласовать следующую работу над картой; 6) сохранить план точки и девиантов; 7) выполнить оставшиеся UX/QA гейты; 8) внешние действия — отдельно.
+
+## План заключительной поставки — 10.11.2026
+
+- implemented: согласованные пробные условия конечной точки и роль девианта-защитника включены в [план](PLAN.md); исходные задачи и гейты S6/S7 сохранены. Игровой код не менялся.
+- tests_verified: документальная проверка и git diff --check; игровые тесты не запускались.
+- awaiting_manual_acceptance: реализация, баланс, финальный дизайн и общий ручной гейт остаются открыты. Ловушки и реализация второй карты требуют отдельного решения.
+- Handoff: 1) выбрать ближайший размер работы; 2) показать визуальный срез; 3) согласовать планировку первой карты; 4) реализовывать геометрию и противников по шагам; 5) проверить точку и девианта; 6) сохранить UX/QA/release гейты; 7) внешние действия только по отдельному запросу.
+
+## Уточнение цели и девиантов — 10.11.2026
+
+- implemented: [концепции](MAP_CONCEPTS.md) дополнены обязательной конечной точкой, предложенным порогом 80% и рабочей гипотезой девианта; игровая реализация остаётся прежней.
+- tests_verified: документальная проверка и git diff --check; игровые тесты не запускались.
+- awaiting_manual_acceptance: конкретные правила захвата точки, порог, численность и поведение девиантов ожидают оценки; ручной гейт S4/S5 и QA сохраняются.
+
+## Концепции карт — 10.11.2026
+
+- implemented: подготовлены [две проектные схемы карт](MAP_CONCEPTS.md) с тремя участками, противниками, непроходимыми зонами и кандидатами ловушек; игровой код и карты не изменены.
+- tests_verified: проверки игры не запускались: работа документальная; прежние результаты интеграции остаются историческими. Проверены Git diff и документальная целостность.
+- awaiting_manual_acceptance: концепции, ракурс, противники, цель и ловушки ожидают обсуждения. Вторая карта — будущая идея; её реализация требует отдельного согласования. Ручной гейт S4/S5 и QA-01—QA-12 сохраняются.
+- Handoff: 1) обсудить обе схемы; 2) выбрать изменения первой; 3) решить вопрос достижения третьего участка; 4) определить девиантов; 5) согласовать ловушки и границу потерь; 6) согласовать ближайшую реализацию; 7) не выполнять push/merge/deploy без отдельного запроса.
 
 ## Публикация второй поставки — 10.11.2026
 

@@ -87,49 +87,6 @@ it('maps exact world edges and rejects invalid rectangles, points and dimensions
   }
 });
 
-it.each([
-  [1440, 760, 1],
-  [900, 520, 2],
-  [390, 600, 0.75],
-])('maps inclined view with offset and CSS scaling %dx%d', (width, height, cssScale) => {
-  const bounds = { left: 45, top: 80, width: width * cssScale, height: height * cssScale };
-  const viewport = { width, height };
-  const camera = fitWorld(width, height, S0_LEVEL.world, PRESENTATION.padding);
-  const tilt = PRESENTATION.tiltY;
-  for (const expected of [
-    { x: 0, y: 0 },
-    { x: 430, y: 500 },
-    { x: 1599, y: 999 },
-  ]) {
-    const client = {
-      x: bounds.left + (camera.x + expected.x * camera.scale) * cssScale,
-      y:
-        bounds.top +
-        ((height - 1000 * camera.scale * tilt) / 2 + expected.y * camera.scale * tilt) * cssScale,
-    };
-    const actual = clientToWorld(
-      client,
-      bounds,
-      viewport,
-      S0_LEVEL.world,
-      PRESENTATION.padding,
-      tilt,
-    );
-    expect(actual?.x).toBeCloseTo(expected.x, 8);
-    expect(actual?.y).toBeCloseTo(expected.y, 8);
-  }
-  expect(
-    clientToWorld(
-      { x: bounds.left, y: bounds.top },
-      bounds,
-      viewport,
-      S0_LEVEL.world,
-      PRESENTATION.padding,
-      tilt,
-    ),
-  ).toBeNull();
-});
-
 it('maps world coordinates with a scrolled camera and clamps at map edges', async () => {
   const { fitCamera } = await import('../../src/rendering/viewport');
   const world = { width: 3200, height: 1000 };
@@ -141,7 +98,7 @@ it('maps world coordinates with a scrolled camera and clamps at map edges', asyn
     x: bounds.left + camera.x + expected.x * camera.scale,
     y: bounds.top + camera.y + expected.y * camera.scale,
   };
-  const result = clientToWorld(client, bounds, viewport, world, 24, 1, 1600, 900);
+  const result = clientToWorld(client, bounds, viewport, world, 24, 1600, 900);
   expect(result?.x).toBeCloseTo(expected.x, 8);
   expect(result?.y).toBeCloseTo(expected.y, 8);
   expect(fitCamera(viewport.width, viewport.height, world, 24, 1600, -50).left).toBe(0);
@@ -167,4 +124,24 @@ it('interpolates a page change smoothly and clamps its endpoints', async () => {
   expect(cameraTransition(0, 800, 0.5)).toBe(400);
   expect(cameraTransition(0, 800, 1)).toBe(800);
   expect(cameraTransition(0, 800, 2)).toBe(800);
+});
+
+it('keeps the current page as the group reverses in the shared combat area', async () => {
+  const { pageCameraLeft } = await import('../../src/rendering/viewport');
+  const page = (left: number, center: number, direction: -1 | 1) =>
+    pageCameraLeft(
+      left,
+      center,
+      direction,
+      6000,
+      PRESENTATION.cameraViewWidth,
+      PRESENTATION.cameraPageStep,
+      PRESENTATION.cameraEdgeFraction,
+    );
+  expect(page(0, 1360, 1)).toBe(800);
+  expect(page(800, 1100, -1)).toBe(800);
+  expect(page(800, 1320, 1)).toBe(800);
+  expect(page(800, 1040, -1)).toBe(0);
+  expect(page(4000, 5360, 1)).toBe(4400);
+  expect(page(4400, 5000, -1)).toBe(4400);
 });

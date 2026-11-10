@@ -19,12 +19,29 @@ export interface Agent {
   alive: boolean;
   nextAttackTick?: number;
   hitUntilTick?: number;
+  variant?: 'deviant';
+}
+
+export interface Hazard extends Point {
+  kind: 'slow' | 'mine' | 'cannon';
+  active: boolean;
+  nextFireTick: number;
+  radius?: number;
+}
+
+export interface Projectile {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  remaining: number;
 }
 
 export interface Group {
   id: GroupId;
   factionId: FactionId;
   agentIds: AgentId[];
+  enemyPost?: number;
   formation?: Formation;
   tensionUntilTick?: number;
   mergeHighlightUntilTick?: number;
@@ -76,6 +93,10 @@ export interface MatchState {
   obstacles: Obstacle[];
   paintGrid: { columns: number; rows: number };
   paintCells: PaintCell[];
+  objective: { area: Obstacle; captured: boolean } | null;
+  hazards: Hazard[];
+  ponds: Obstacle[];
+  projectiles: Projectile[];
   reinforcementCredits: number;
   agents: Agent[];
   groups: Group[];
@@ -86,6 +107,43 @@ export interface MatchState {
 export interface LevelConfig {
   readonly paint: PaintConfig;
   readonly obstacles?: readonly Obstacle[];
+  readonly objective?: Obstacle;
+  readonly enemyPosts?: readonly {
+    readonly count: number;
+    readonly columns: number;
+    readonly centerX: number;
+    readonly centerY: number;
+    readonly deviant?: boolean;
+    readonly localDefense?: { readonly radius: number; readonly leash: number };
+  }[];
+  readonly hazards?: {
+    readonly slow: readonly (Point & { readonly radius?: number })[];
+    readonly mines: readonly Point[];
+    readonly cannons: readonly Point[];
+    readonly mineCount: number;
+    readonly slowRadius: number;
+    readonly slowFactor: number;
+    readonly mineRadius: number;
+    readonly minePaintCells: number;
+    readonly mineDamage: number;
+    readonly cannonRange: number;
+    readonly cannonDamage: number;
+    readonly cannonCooldown: number;
+    readonly cannonSweepTicks: number;
+    readonly cannonProjectileSpeed: number;
+    readonly cannonHitRadius: number;
+  };
+  readonly ponds?: { readonly candidates: readonly Obstacle[]; readonly count: number };
+  readonly shorePonds?: readonly Obstacle[];
+  readonly randomWalls?: { readonly candidates: readonly Obstacle[]; readonly count: number };
+  readonly deviant?: {
+    readonly hp: number;
+    readonly speedFactor: number;
+    readonly attackRange: number;
+    readonly attackCooldown: number;
+    readonly threatRadius: number;
+    readonly defenseDepth: number;
+  };
   readonly victoryFraction: number;
   readonly reinforcement?: {
     readonly cost: number;
@@ -164,6 +222,7 @@ export type CommandIntent =
   | { readonly type: 'cut'; readonly groupId: GroupId; readonly points: readonly Point[] }
   | { readonly type: 'select-group'; readonly point: Point }
   | { readonly type: 'select-group-id'; readonly groupId: GroupId | null }
+  | { readonly type: 'move-group'; readonly groupId: GroupId; readonly point: Point }
   | {
       readonly type: 'set-formation';
       readonly groupId: GroupId;

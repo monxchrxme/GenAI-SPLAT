@@ -35,6 +35,19 @@ export function moveAgents(
     ),
   );
   const updates = ordered.map((agent) => {
+    const slowed =
+      config.hazards &&
+      state.hazards.some(
+        (hazard) =>
+          hazard.kind === 'slow' &&
+          hazard.active &&
+          Math.abs(agent.x - hazard.x) <= (hazard.radius ?? config.hazards!.slowRadius) &&
+          Math.abs(agent.y - hazard.y) <= (hazard.radius ?? config.hazards!.slowRadius),
+      );
+    const maxSpeed =
+      m.maxSpeed *
+      (agent.variant === 'deviant' ? (config.deviant?.speedFactor ?? 1) : 1) *
+      (slowed ? config.hazards!.slowFactor : 1);
     const goal = mergeTargets.get(agent.id) ?? targets.get(agent.id);
     if (!goal) {
       routes.delete(agent.id);
@@ -59,10 +72,10 @@ export function moveAgents(
     const dx = target.x - agent.x,
       dy = target.y - agent.y;
     const distance = Math.hypot(dx, dy);
-    if (distance <= Math.min(m.settleDistance, m.maxSpeed * dt)) {
+    if (distance <= Math.min(m.settleDistance, maxSpeed * dt)) {
       return { agent, x: target.x, y: target.y, vx: 0, vy: 0 };
     }
-    const speed = Math.min(m.maxSpeed, distance * m.arrivalGain);
+    const speed = Math.min(maxSpeed, distance * m.arrivalGain);
     let sx = 0,
       sy = 0;
     for (const other of ordered) {
@@ -86,7 +99,7 @@ export function moveAgents(
     let vx = (dx / distance) * speed + sx * gain,
       vy = (dy / distance) * speed + sy * gain;
     const magnitude = Math.hypot(vx, vy);
-    const scale = Math.min(1, m.maxSpeed / magnitude, distance / (magnitude * dt));
+    const scale = Math.min(1, maxSpeed / magnitude, distance / (magnitude * dt));
     vx *= scale;
     vy *= scale;
     let x = Math.max(0, Math.min(state.world.width, agent.x + vx * dt));

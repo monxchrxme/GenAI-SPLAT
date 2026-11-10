@@ -9,16 +9,14 @@ async function screen(canvas: Locator, x: number, y: number) {
       const scale = Math.min((width - 48) / 1600, (height - 48) / 1000);
       return {
         x: bounds.left + (((width - 1600 * scale) / 2 + point.x * scale) * bounds.width) / width,
-        y:
-          bounds.top +
-          (((height - 1000 * scale * 0.72) / 2 + point.y * scale * 0.72) * bounds.height) / height,
+        y: bounds.top + (((height - 1000 * scale) / 2 + point.y * scale) * bounds.height) / height,
       };
     },
     { x, y },
   );
 }
 for (const deviceScaleFactor of [1, 2]) {
-  test.describe(`inclined prototype DPR ${deviceScaleFactor}`, () => {
+  test.describe(`top-down view DPR ${deviceScaleFactor}`, () => {
     test.use({ deviceScaleFactor });
     test('dense selection, world drawing, split and resize retain correct mapping', async ({
       page,
@@ -26,10 +24,9 @@ for (const deviceScaleFactor of [1, 2]) {
       await page.goto('/');
       await expect(page.locator('#arena')).toHaveAttribute('data-ready', 'true');
       const canvas = page.locator('canvas');
-      const tilt = page.getByRole('button', { name: 'Наклонный ракурс' });
-      await tilt.click();
-      await expect(tilt).toHaveAttribute('aria-pressed', 'true');
-      await expect(page.getByLabel('Пробные формы Сплатов')).toBeVisible();
+      await expect(page).toHaveTitle('SPLAT!');
+      await expect(page.getByRole('button', { name: 'Наклонный ракурс' })).toHaveCount(0);
+      await expect(page.locator('body')).not.toContainText(/прототип|демо|S4/i);
       const center = await screen(canvas, 430, 500);
       await page.mouse.click(center.x, center.y);
       await expect(canvas).toHaveAttribute('data-selection-ring-count', '40');
@@ -55,8 +52,6 @@ for (const deviceScaleFactor of [1, 2]) {
       const resized = await screen(canvas, 430, 500);
       await page.mouse.click(resized.x, resized.y);
       await expect(canvas).toHaveAttribute('data-selection-ring-count', '40');
-      await tilt.click();
-      await expect(tilt).toHaveAttribute('aria-pressed', 'false');
       await page.setViewportSize({ width: 390, height: 600 });
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),

@@ -154,7 +154,7 @@ it('preserves the curved path of a quick out-and-back gesture from coalesced sam
   }
 });
 
-it('last order wins before acknowledgement; cancelling another draft keeps it, clearing removes it', () => {
+it('last order wins before acknowledgement; a click replaces the order without clearing selection', () => {
   const { session, input, draw, event } = setup();
   draw({ x: 800, y: 200 }, { x: 1400, y: 200 });
   draw({ x: 1400, y: 850 }, { x: 800, y: 850 });
@@ -165,11 +165,12 @@ it('last order wins before acknowledgement; cancelling another draft keeps it, c
   expect(input.preview().points).toEqual(last);
   session.advance(S0_CLOCK.stepMs);
   expect(session.getSnapshot().groups[0]?.formation?.points).toEqual(last);
-  event('pointerdown', { x: 1550, y: 950 });
-  event('pointerup', { x: 1550, y: 950 });
+  event('pointerdown', { x: 1000, y: 500 });
+  event('pointerup', { x: 1000, y: 500 });
   expect(input.preview().points).toEqual([]);
   session.advance(S0_CLOCK.stepMs);
-  expect(session.getSnapshot().groups[0]?.formation).toBeUndefined();
+  expect(session.getSnapshot().groups[0]?.formation?.slots).toHaveLength(40);
+  expect(session.getSnapshot().selectedGroupId).toBe('group-1');
   input.reset();
   expect(input.preview().pending).toBe(false);
   input.dispose();

@@ -7,11 +7,116 @@ const centerOf = (agents: readonly LiveAgent[]): Point => ({
 });
 const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 
+const agentOrder = (a: LiveAgent, b: LiveAgent): number =>
+  Number(a.id.slice(6)) - Number(b.id.slice(6));
+
+function withinLeash(home: Point, target: Point, leash: number): Point {
+  const scale = Math.min(1, leash / (distance(home, target) || 1));
+  return { x: home.x + (target.x - home.x) * scale, y: home.y + (target.y - home.y) * scale };
+}
+
+function makeFormation(
+  state: Snapshot,
+  groupId: GroupId,
+  point: Point,
+  halfWidth = 60,
+): GameCommand {
+  const x = Math.max(halfWidth, Math.min(state.world.width - halfWidth, point.x));
+  const y = Math.max(48, Math.min(state.world.height - 48, point.y));
+  const points: Point[] = [];
+  for (let row = 0; row < 4; row++) {
+    const left = { x: x - halfWidth, y: y - 36 + row * 24 };
+    const right = { x: x + halfWidth, y: left.y };
+    points.push(...(row % 2 === 0 ? [left, right] : [right, left]));
+  }
+  return { type: 'enemy-formation', tick: state.tick, groupId, points };
+}
+
 // [P] Controller emits fixed-tick commands. Two squads deploy against separated
 // fronts and converge before merging; a defensive leash avoids suicidal pursuit.
 export function enemyCommands(state: Snapshot, config: LevelConfig): GameCommand[] {
   const enemy = config.enemy;
   if (!enemy || state.tick % enemy.decisionTicks !== 0) return [];
+  if (config.enemyPosts) {
+    const { enemyPosts, ...baseConfig } = config;
+    return enemyPosts.flatMap((post, index) => {
+      if (post.deviant && config.deviant) {
+        const group = state.groups.find(
+          (item) => item.factionId === 'red' && item.enemyPost === index,
+        );
+        const defender = state.agents.find((agent) => agent.alive && agent.groupId === group?.id);
+        if (!group || !defender) return [];
+        const home = { x: post.centerX, y: post.centerY };
+        const target = state.agents
+          .filter(
+            (agent) =>
+              agent.alive &&
+              agent.factionId === 'blue' &&
+              distance(agent, defender) <= config.deviant!.threatRadius,
+          )
+          .sort((a, b) => distance(a, defender) - distance(b, defender) || agentOrder(a, b))[0];
+        const { x: targetX, y: targetY } = withinLeash(
+          home,
+          target ?? home,
+          config.deviant.defenseDepth,
+        );
+        const x = Math.max(12, Math.min(state.world.width - 12, targetX));
+        const y = Math.max(0, Math.min(state.world.height, targetY));
+        return [
+          {
+            type: 'enemy-formation' as const,
+            tick: state.tick,
+            groupId: group.id,
+            points: [
+              { x: x - 12, y },
+              { x: x + 12, y },
+            ],
+          },
+        ];
+      }
+      if (post.localDefense) {
+        const { radius, leash } = post.localDefense;
+        const home = { x: post.centerX, y: post.centerY };
+        const intruders = state.agents.filter(
+          (agent) => agent.alive && agent.factionId === 'blue' && distance(agent, home) <= radius,
+        );
+        return state.groups
+          .filter((group) => group.factionId === 'red' && group.enemyPost === index)
+          .map((group) => {
+            const center = centerOf(state.agents.filter((a) => a.alive && a.groupId === group.id));
+            const target = intruders.reduce<LiveAgent | undefined>((closest, agent) => {
+              if (!closest) return agent;
+              const difference = distance(agent, center) - distance(closest, center);
+              return difference < 0 || (difference === 0 && agentOrder(agent, closest) < 0)
+                ? agent
+                : closest;
+            }, undefined);
+            return makeFormation(state, group.id, withinLeash(home, target ?? home, leash), 24);
+          });
+      }
+      const threatened = state.agents.some(
+        (agent) =>
+          agent.alive &&
+          agent.factionId === 'blue' &&
+          distance(agent, { x: post.centerX, y: post.centerY }) <=
+            enemy.threatRadius + enemy.defenseDepth,
+      );
+      const groups = state.groups.filter(
+        (group) => (threatened && group.factionId === 'blue') || group.enemyPost === index,
+      );
+      const ids = new Set(groups.map((group) => group.id));
+      return enemyCommands(
+        { ...state, groups, agents: state.agents.filter((agent) => ids.has(agent.groupId)) },
+        {
+          ...baseConfig,
+          enemy: {
+            ...enemy,
+            ...post,
+          },
+        },
+      );
+    });
+  }
   const reds = state.groups.filter((group) => group.factionId === 'red');
   if (reds.length === 0) return [];
   const blue = state.agents.filter((agent) => agent.alive && agent.factionId === 'blue');
@@ -52,24 +157,13 @@ export function enemyCommands(state: Snapshot, config: LevelConfig): GameCommand
   if (reds.length === 2 && !separate && distance(centers[0]!, centers[1]!) <= config.mergeDistance)
     return [{ type: 'enemy-merge', tick: state.tick, first: reds[0]!.id, second: reds[1]!.id }];
 
-  const makeFormation = (groupId: GroupId, point: Point): GameCommand => {
-    const x = Math.max(60, Math.min(state.world.width - 60, point.x));
-    const y = Math.max(48, Math.min(state.world.height - 48, point.y));
-    const points: Point[] = [];
-    for (let row = 0; row < 4; row++) {
-      const left = { x: x - 60, y: y - 36 + row * 24 };
-      const right = { x: x + 60, y: y - 36 + row * 24 };
-      points.push(...(row % 2 === 0 ? [left, right] : [right, left]));
-    }
-    return { type: 'enemy-formation', tick: state.tick, groupId, points };
-  };
   const retreatX = enemy.centerX - enemy.advanceDistance;
   const mergeCenter =
     reds.length === 2 && !separate
       ? { x: (centers[0]!.x + centers[1]!.x) / 2, y: (centers[0]!.y + centers[1]!.y) / 2 }
       : null;
   return reds.map((group, index) => {
-    if (mergeCenter) return makeFormation(group.id, mergeCenter);
+    if (mergeCenter) return makeFormation(state, group.id, mergeCenter);
     const center = centers[index]!;
     const targetFront =
       fronts.length >= 2 && reds.length === 2 && separate
@@ -94,6 +188,6 @@ export function enemyCommands(state: Snapshot, config: LevelConfig): GameCommand
     if (targetFront && distance(targetFront, center) <= enemy.threatRadius && !disadvantaged) {
       target = { x: Math.max(enemy.centerX - enemy.defenseDepth, targetFront.x), y: targetFront.y };
     }
-    return makeFormation(group.id, target);
+    return makeFormation(state, group.id, target);
   });
 }

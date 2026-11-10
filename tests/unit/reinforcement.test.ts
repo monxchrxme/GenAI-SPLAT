@@ -1,13 +1,14 @@
+import { DELIVERY2_LEVEL } from '../fixtures/delivery2Level';
 import { expect, it } from 'vitest';
 import { Session } from '../../src/app/session';
-import { GAME_LEVEL, S0_CLOCK } from '../../src/core/config';
+import { S0_CLOCK } from '../../src/core/config';
 import { assertInvariants } from '../../src/simulation/invariants';
 import { Simulation } from '../../src/simulation/simulation';
 
 const level = {
-  ...GAME_LEVEL,
+  ...DELIVERY2_LEVEL,
   enemy: {
-    ...GAME_LEVEL.enemy!,
+    ...DELIVERY2_LEVEL.enemy!,
     count: 10,
     columns: 5,
     centerX: 430,
@@ -15,7 +16,7 @@ const level = {
     spacing: 20,
     decisionTicks: 10000,
   },
-  combat: { ...GAME_LEVEL.combat!, range: 80, cooldownTicks: 1 },
+  combat: { ...DELIVERY2_LEVEL.combat!, range: 80, cooldownTicks: 1 },
 };
 
 it('earns credits only from kills, spends them once to restore a selected blue group and resets cleanly', () => {
@@ -70,7 +71,7 @@ it('earns credits only from kills, spends them once to restore a selected blue g
 });
 
 it('does not spend or create agents without credits, a selected blue group, or available capacity', () => {
-  const session = new Session(GAME_LEVEL, S0_CLOCK);
+  const session = new Session(DELIVERY2_LEVEL, S0_CLOCK);
   session.submit({ type: 'reinforce', groupId: 'group-1' });
   const state = session.advance(S0_CLOCK.stepMs);
   expect(state.reinforcementCredits).toBeLessThan(5);

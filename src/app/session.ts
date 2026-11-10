@@ -30,9 +30,9 @@ export class Session {
             ? Object.freeze({ ...value, tick })
             : value.type === 'select-group-id'
               ? Object.freeze({ type: value.type, tick, groupId: value.groupId })
-              : value.type === 'select-group'
+              : value.type === 'select-group' || value.type === 'move-group'
                 ? Object.freeze({
-                    type: value.type,
+                    ...value,
                     tick,
                     point: Object.freeze({ ...value.point }),
                   })

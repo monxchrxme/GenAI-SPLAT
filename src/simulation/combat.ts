@@ -16,21 +16,40 @@ export function resolveCombat(state: MatchState, config: LevelConfig): void {
         candidate,
         distance: Math.hypot(candidate.x - attacker.x, candidate.y - attacker.y),
       }))
-      .filter((item) => item.distance <= combat.range)
+      .filter(
+        (item) =>
+          item.distance <=
+          (attacker.variant === 'deviant'
+            ? (config.deviant?.attackRange ?? combat.range)
+            : combat.range),
+      )
       .sort(
         (a, b) =>
           a.distance - b.distance ||
           Number(a.candidate.id.slice(6)) - Number(b.candidate.id.slice(6)),
       )[0]?.candidate;
     if (!target) continue;
-    attacker.nextAttackTick = state.tick + combat.cooldownTicks;
+    attacker.nextAttackTick =
+      state.tick +
+      (attacker.variant === 'deviant'
+        ? (config.deviant?.attackCooldown ?? combat.cooldownTicks)
+        : combat.cooldownTicks);
     damage.set(target.id, (damage.get(target.id) ?? 0) + combat.damage);
   }
+  applyDamage(state, damage, config);
+}
+
+export function applyDamage(
+  state: MatchState,
+  damage: ReadonlyMap<AgentId, number>,
+  config: LevelConfig,
+): void {
+  const alive = state.agents.filter((agent) => agent.alive);
   for (const agent of alive) {
     const amount = damage.get(agent.id);
     if (!amount) continue;
     agent.hp = Math.max(0, agent.hp - amount);
-    agent.hitUntilTick = state.tick + combat.hitFeedbackTicks;
+    agent.hitUntilTick = state.tick + (config.combat?.hitFeedbackTicks ?? 1);
     if (agent.hp === 0) {
       if (agent.factionId === 'red' && config.reinforcement) state.reinforcementCredits++;
       agent.alive = false;

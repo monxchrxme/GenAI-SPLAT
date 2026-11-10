@@ -9,6 +9,7 @@ export class Hud {
     private readonly groupCount: HTMLElement,
     private readonly redCount: HTMLElement,
     private readonly paintProgress: HTMLElement,
+    private readonly objectiveStatus: HTMLElement,
     private readonly credits: HTMLElement,
     private readonly hint: HTMLElement,
   ) {}
@@ -26,10 +27,15 @@ export class Hud {
     this.credits.textContent = String(snapshot.reinforcementCredits);
     const accessibleCells = snapshot.paintCells.filter((cell) => !cell.blocked);
     this.paintProgress.textContent = `${territoryPercent(accessibleCells.filter((cell) => cell.owner === 'blue').length, accessibleCells.length)}%`;
+    this.objectiveStatus.textContent = snapshot.objective
+      ? snapshot.objective.captured
+        ? 'захвачена'
+        : 'не захвачена'
+      : '—';
     const selected = snapshot.groups.find((group) => group.id === snapshot.selectedGroupId);
     if (preview?.blocked) {
       this.hint.textContent =
-        'Построение попадает на препятствие. Нарисуйте линию на свободной земле.';
+        'Построение попадает на препятствие или за край поля. Выберите свободное место.';
       return;
     }
     if (selected?.factionId === 'red') {
@@ -49,7 +55,7 @@ export class Hud {
       return;
     }
     const text = selected
-      ? `Выбрана группа · ${selected.agentIds.length} Сплатов (${selected.id}). ${preview?.active ? (preview.limited ? 'Достигнут предел линии — отпустите кнопку.' : 'Рисуйте линию; отпустите для перестроения. Esc — отмена текущего жеста.') : preview && preview.points.length >= 2 ? `${moving ? 'Занимаем форму' : 'Форма занята'} · ${preview.slots.length} мест. Пустой клик — остановить и очистить; Esc отменяет только текущий жест.` : 'Зажмите ЛКМ на свободном поле и нарисуйте линию.'}`
+      ? `Выбрана группа · ${selected.agentIds.length} Сплатов (${selected.id}). ${preview?.active ? (preview.limited ? 'Достигнут предел линии — отпустите кнопку.' : 'Рисуйте линию; отпустите для перестроения. Esc — отмена текущего жеста.') : preview && preview.slots.length > 0 ? `${moving ? 'Движение' : 'Позиция занята'} · ${preview.slots.length} мест. Клик по полю — движение; линия — новое построение.` : 'Клик по полю — движение; зажмите ЛКМ и нарисуйте линию для построения.'}`
       : 'Выберите группу: нажмите на синий маркер или между близкими маркерами.';
     if (this.hint.textContent !== text) this.hint.textContent = text;
   }

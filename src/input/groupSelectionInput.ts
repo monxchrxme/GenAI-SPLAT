@@ -12,6 +12,7 @@ import { isStretched } from '../core/tension';
 import { createFormation } from '../core/formation';
 import { pickGroupAtPoint } from '../simulation/selection';
 import { pointBlocked, UNIT_CLEARANCE } from '../simulation/obstacles';
+import { groupMoveFormation } from '../simulation/groupMove';
 
 export interface DrawingPreview {
   readonly points: readonly Point[];
@@ -81,20 +82,6 @@ export function bindGroupSelectionInput(
       }
       return;
     }
-    const redGroup = pickGroupAtPoint(state, point, S0_LEVEL.selection, 'red');
-    if (!mergeMode && redGroup && !pickGroupAtPoint(state, point, S0_LEVEL.selection)) {
-      select(redGroup, state.tick);
-      cancel();
-      return;
-    }
-    const selectedGroup = state.groups.find((group) => group.id === effectiveSelection(state));
-    if (selectedGroup?.factionId === 'red') {
-      if (!pickGroupAtPoint(state, point, S0_LEVEL.selection)) {
-        select(null, state.tick);
-        return;
-      }
-      mergeMode = false;
-    }
     pressedGroup = pickGroupAtPoint(state, point, S0_LEVEL.selection);
     gestureGroup = pressedGroup ?? effectiveSelection(state);
     if (pressedGroup) select(pressedGroup, state.tick);
@@ -127,7 +114,15 @@ export function bindGroupSelectionInput(
     if (!draft) return;
     if (!dragged) {
       // The intent is latched at pointerdown; moving agents cannot turn a blank click into a hit.
-      if (!pressedGroup) select(null, snapshot().tick);
+      if (!pressedGroup && gestureGroup) {
+        const state = snapshot();
+        const point = toWorld({ x: event.clientX, y: event.clientY });
+        const formation = point ? groupMoveFormation(state, gestureGroup, point) : null;
+        if (point && formation) {
+          pendingFormation = { groupId: gestureGroup, tick: state.tick, formation };
+          submit({ type: 'move-group', groupId: gestureGroup, point });
+        } else blockedFormation = true;
+      }
     } else if (draft.valid) {
       const state = snapshot();
       const group = state.groups.find((g) => g.id === gestureGroup);
@@ -225,7 +220,7 @@ export function bindGroupSelectionInput(
         slots: draft && dragged ? (provisional?.slots ?? []) : (formation?.slots ?? []),
         stretched: provisional
           ? isStretched(provisional, S0_LEVEL.tension)
-          : pending
+          : pending && pending.formation.points.length >= 2
             ? isStretched(pending.formation, S0_LEVEL.tension)
             : false,
         active: draft !== null && dragged,

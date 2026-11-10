@@ -1,6 +1,7 @@
+import { DELIVERY2_LEVEL } from '../fixtures/delivery2Level';
 import { expect, it } from 'vitest';
 import { Session } from '../../src/app/session';
-import { GAME_LEVEL, S0_CLOCK } from '../../src/core/config';
+import { S0_CLOCK } from '../../src/core/config';
 import type { CommandIntent, GameCommand, GroupId, Snapshot } from '../../src/core/types';
 import { assertInvariants } from '../../src/simulation/invariants';
 import { Simulation } from '../../src/simulation/simulation';
@@ -17,7 +18,7 @@ const orders = (groupId: GroupId, y: number): CommandIntent => ({
 });
 
 it('replays a complete victory with two routes, battle, reinforcement, merge losses and clean restart', () => {
-  const session = new Session(GAME_LEVEL, S0_CLOCK);
+  const session = new Session(DELIVERY2_LEVEL, S0_CLOCK);
   const initial = session.getSnapshot();
   const step = (...intents: CommandIntent[]) => {
     for (const intent of intents) session.submit(intent);
@@ -85,11 +86,11 @@ it('replays a complete victory with two routes, battle, reinforcement, merge los
   expect(
     state.paintCells.filter((cell) => cell.owner === 'blue').length /
       state.paintCells.filter((cell) => !cell.blocked).length,
-  ).toBeGreaterThanOrEqual(GAME_LEVEL.victoryFraction);
+  ).toBeGreaterThanOrEqual(DELIVERY2_LEVEL.victoryFraction);
   expect(red(state).length).toBeGreaterThan(0);
   const victory = state;
   const log = session.commandLog;
-  const replay = new Simulation(GAME_LEVEL);
+  const replay = new Simulation(DELIVERY2_LEVEL);
   const byTick = new Map<number, GameCommand[]>();
   for (const command of log)
     byTick.set(command.tick, [...(byTick.get(command.tick) ?? []), command]);
@@ -104,7 +105,7 @@ it('replays a complete victory with two routes, battle, reinforcement, merge los
 
 it('handles an actual combat death on the same tick as a player split', () => {
   const setup = () => {
-    const sim = new Simulation(GAME_LEVEL);
+    const sim = new Simulation(DELIVERY2_LEVEL);
     sim.step([
       { tick: 0, type: 'select-group-id', groupId: 'group-1' },
       { tick: 0, type: 'split', groupId: 'group-1' },
@@ -151,7 +152,7 @@ it(
   'reaches defeat on the real map when isolated blue agents attack one at a time',
   { timeout: 30000 },
   () => {
-    const sim = new Simulation(GAME_LEVEL);
+    const sim = new Simulation(DELIVERY2_LEVEL);
     const log: GameCommand[] = [];
     const issue = (...commands: CommandIntent[]) => {
       const ticked = commands.map((command) => ({ ...command, tick: sim.tick }) as GameCommand);
@@ -195,7 +196,7 @@ it(
     const byTick = new Map<number, GameCommand[]>();
     for (const command of log)
       byTick.set(command.tick, [...(byTick.get(command.tick) ?? []), command]);
-    const replay = new Simulation(GAME_LEVEL);
+    const replay = new Simulation(DELIVERY2_LEVEL);
     for (let tick = 0; tick < defeat.tick; tick++) replay.step(byTick.get(tick) ?? []);
     expect(replay.getSnapshot()).toEqual(defeat);
     sim.step([{ tick: sim.tick, type: 'select-group-id', groupId: null }]);
@@ -205,7 +206,7 @@ it(
 
 it('shows a coverage-versus-concentration tradeoff on the current map in controlled scenarios', () => {
   const coverage = (split: boolean) => {
-    const sim = new Simulation(GAME_LEVEL);
+    const sim = new Simulation(DELIVERY2_LEVEL);
     sim.step([{ tick: 0, type: 'select-group-id', groupId: 'group-1' }]);
     if (split) {
       sim.step([{ tick: 1, type: 'split', groupId: 'group-1' }]);
@@ -249,7 +250,7 @@ it('shows a coverage-versus-concentration tradeoff on the current map in control
     return sim.getSnapshot().paintCells.filter((cell) => cell.owner === 'blue').length;
   };
   const fight = (split: boolean) => {
-    const sim = new Simulation(GAME_LEVEL);
+    const sim = new Simulation(DELIVERY2_LEVEL);
     sim.step([
       { tick: 0, type: 'select-group-id', groupId: 'group-1' },
       ...(split ? [{ tick: 0, type: 'split' as const, groupId: 'group-1' as const }] : []),

@@ -16,7 +16,7 @@ async function point(page: Page, x: number, y: number) {
   );
 }
 test.use({ viewport: { width: 446, height: 760 } });
-test('narrow viewport keeps canvas geometry fixed across prompts, stop and immediate reselection', async ({
+test('narrow viewport keeps canvas geometry fixed across prompts, click movement and selection', async ({
   page,
 }) => {
   await page.goto('/');
@@ -37,11 +37,11 @@ test('narrow viewport keeps canvas geometry fixed across prompts, stop and immed
   expect(await canvas.boundingBox()).toEqual(original);
   await page.mouse.up();
   await expect(canvas).toHaveAttribute('data-slot-count', '40');
-  const blank = await point(page, 1500, 950);
+  const blank = await point(page, 900, 700);
   await page.mouse.click(blank.x, blank.y);
-  await expect(canvas).toHaveAttribute('data-selected-group', '');
+  await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
   expect(await canvas.boundingBox()).toEqual(original);
-  // Stop occurs shortly after release, so the first marker is still close to its spawn.
+  // The group remains selected and can be targeted again immediately.
   const again = await point(page, first.x, first.y);
   await page.mouse.click(again.x, again.y);
   await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
@@ -98,11 +98,11 @@ test('tension is visible while drawing and is not hidden by the length limit', a
   await page.mouse.click(pick.x, pick.y);
   await expect(canvas).toHaveAttribute('data-selected-group', 'group-1');
   const box = await canvas.boundingBox();
-  const a = await point(page, 200, 100),
-    b = await point(page, 1400, 100),
-    c = await point(page, 1400, 900),
-    d = await point(page, 200, 900),
-    e = await point(page, 200, 100);
+  const a = await point(page, 200, 250),
+    b = await point(page, 1350, 250),
+    c = await point(page, 1350, 750),
+    d = await point(page, 200, 750),
+    e = await point(page, 200, 250);
   await page.mouse.move(a.x, a.y);
   await page.mouse.down();
   for (const p of [b, c, d, e]) await page.mouse.move(p.x, p.y, { steps: 15 });

@@ -10,6 +10,8 @@ import {
 } from './viewport';
 import type { DrawingPreview } from '../input/groupSelectionInput';
 import { tensionActive } from '../core/tension';
+import { GAME_LEVEL } from '../core/config';
+import { cannonAngle } from '../simulation/hazards';
 
 export class PixiRenderer {
   private readonly app = new Application();
@@ -17,12 +19,11 @@ export class PixiRenderer {
   private readonly units = new Container();
   private readonly decor = new Container();
   private readonly paint = new Graphics();
-  private tilted = false;
+  private readonly hazardGraphics = new Graphics();
   private readonly selection = new Graphics();
   private readonly line = new Graphics();
   private readonly markers = new Map<AgentId, Graphics>();
   private generation = -1;
-  private markerDirty = false;
   private world: Readonly<World> = { width: 1, height: 1 };
   private viewport = { width: 1, height: 1 };
   private cameraScale = 1;
@@ -44,7 +45,6 @@ export class PixiRenderer {
       this.viewport,
       this.world,
       view.padding,
-      this.tilted ? view.tiltY : 1,
       view.cameraViewWidth,
       this.cameraLeft,
     );
@@ -88,27 +88,35 @@ export class PixiRenderer {
     for (const y of view.laneY) {
       lanes.roundRect(500, y - 85, 860, 170, 85).fill({ color: 0xd8ddcf, alpha: 0.22 });
     }
-    for (const landmark of view.landmarks) {
-      lanes
-        .circle(landmark.x, landmark.y, landmark.radius)
-        .fill({ color: 0xd8d0bc, alpha: 0.33 })
-        .stroke({ color: 0xaaa38f, width: 2, alpha: 0.55 });
-      lanes.circle(landmark.x, landmark.y, 8).fill({ color: 0x9a9f8d, alpha: 0.65 });
-    }
     this.decor.addChild(lanes);
     const obstacles = new Graphics();
+    const objective = new Graphics();
+    if (snapshot.objective) {
+      const area = snapshot.objective.area;
+      objective
+        .rect(area.x, area.y, area.width, area.height)
+        .stroke({ color: 0x9d3f3b, width: 5, alpha: 0.9 });
+    }
     for (const block of snapshot.obstacles) {
       obstacles
         .rect(block.x, block.y, block.width, block.height)
         .fill({ color: 0x6e8891, alpha: 0.9 })
         .stroke({ color: 0x465e68, width: 3 });
     }
+    for (const pond of snapshot.ponds) {
+      obstacles
+        .rect(pond.x, pond.y, pond.width, pond.height)
+        .fill(0x549aa7)
+        .stroke({ color: 0x316d79, width: 3 });
+    }
     this.scene.addChild(
       field,
       this.decor,
       this.paint,
+      objective,
       grid,
       obstacles,
+      this.hazardGraphics,
       this.line,
       this.selection,
       this.units,
@@ -119,12 +127,6 @@ export class PixiRenderer {
     this.app.canvas.dataset.worldSize = `${this.world.width}×${this.world.height}`;
     host.append(this.app.canvas);
     this.resize(host.clientWidth, host.clientHeight);
-  }
-
-  setTilt(tilted: boolean): void {
-    this.tilted = tilted;
-    this.markerDirty = true;
-    this.updateCamera();
   }
 
   resize(width: number, height: number): void {
@@ -144,12 +146,8 @@ export class PixiRenderer {
     );
     this.cameraLeft = camera.left;
     this.cameraScale = camera.scale;
-    const tiltY = this.tilted ? view.tiltY : 1;
-    this.scene.scale.set(camera.scale, camera.scale * tiltY);
-    this.scene.position.set(
-      camera.x,
-      (this.viewport.height - this.world.height * camera.scale * tiltY) / 2,
-    );
+    this.scene.scale.set(camera.scale);
+    this.scene.position.set(camera.x, camera.y);
   }
 
   private moveToPage(target: number): void {
@@ -203,15 +201,11 @@ export class PixiRenderer {
       } else if (following.length && now >= this.manualCameraUntil) {
         const meanVelocity = following.reduce((sum, agent) => sum + agent.vx, 0) / following.length;
         const direction = meanVelocity > 0.5 ? 1 : meanVelocity < -0.5 ? -1 : 0;
-        const moving = following.filter((agent) => direction * agent.vx > 0.5);
-        if (direction !== 0 && moving.length) {
-          const edge =
-            direction > 0
-              ? Math.max(...moving.map((agent) => agent.x))
-              : Math.min(...moving.map((agent) => agent.x));
+        if (direction !== 0) {
+          const centerX = following.reduce((sum, agent) => sum + agent.x, 0) / following.length;
           const next = pageCameraLeft(
             this.cameraTarget,
-            edge,
+            centerX,
             direction,
             this.world.width,
             view.cameraViewWidth,
@@ -225,6 +219,55 @@ export class PixiRenderer {
     this.canvas.dataset.cameraTarget = String(this.cameraTarget);
     this.canvas.dataset.cameraLeft = String(this.cameraLeft);
     this.paint.clear();
+    this.hazardGraphics.clear();
+    this.canvas.dataset.pondCount = String(snapshot.ponds.length);
+    this.canvas.dataset.mineCount = String(
+      snapshot.hazards.filter((hazard) => hazard.kind === 'mine' && hazard.active).length,
+    );
+    this.canvas.dataset.slowCount = String(
+      snapshot.hazards.filter((hazard) => hazard.kind === 'slow' && hazard.active).length,
+    );
+    this.canvas.dataset.cannonCount = String(
+      snapshot.hazards.filter((hazard) => hazard.kind === 'cannon' && hazard.active).length,
+    );
+    this.canvas.dataset.projectileCount = String(snapshot.projectiles.length);
+    this.canvas.dataset.deviantCount = String(
+      snapshot.agents.filter((agent) => agent.alive && agent.variant === 'deviant').length,
+    );
+    for (const hazard of snapshot.hazards) {
+      if (!hazard.active) continue;
+      if (hazard.kind === 'slow') {
+        const halfWidth = hazard.radius ?? GAME_LEVEL.hazards!.slowRadius;
+        this.hazardGraphics
+          .rect(hazard.x - halfWidth, hazard.y - halfWidth, halfWidth * 2, halfWidth * 2)
+          .fill({ color: 0xc39038, alpha: 0.15 })
+          .stroke({ color: 0x9d6a22, width: 3, alpha: 0.8 });
+      } else if (hazard.kind === 'mine') {
+        this.hazardGraphics
+          .poly([
+            hazard.x,
+            hazard.y - 13,
+            hazard.x + 13,
+            hazard.y,
+            hazard.x,
+            hazard.y + 13,
+            hazard.x - 13,
+            hazard.y,
+          ])
+          .fill(0x9d3f3b)
+          .stroke({ color: 0x542b2b, width: 2 });
+      } else {
+        const angle = cannonAngle(hazard, snapshot.tick, GAME_LEVEL);
+        this.hazardGraphics
+          .circle(hazard.x, hazard.y, 17)
+          .fill(0x7c443c)
+          .moveTo(hazard.x, hazard.y)
+          .lineTo(hazard.x + Math.cos(angle) * 30, hazard.y + Math.sin(angle) * 30)
+          .stroke({ color: 0x6a302d, width: 8 });
+      }
+    }
+    for (const projectile of snapshot.projectiles)
+      this.hazardGraphics.circle(projectile.x, projectile.y, 5).fill(0xd8554d);
     const columns = snapshot.paintGrid.columns;
     const rows = snapshot.paintGrid.rows;
     const width = snapshot.world.width / columns;
@@ -293,8 +336,7 @@ export class PixiRenderer {
     this.canvas.dataset.merging = String(snapshot.merge !== null);
     this.selection.clear();
     let selectionRingCount = 0;
-    if (this.generation !== restartCount || this.markerDirty) {
-      this.markerDirty = false;
+    if (this.generation !== restartCount) {
       for (const child of this.units.removeChildren()) child.destroy();
       this.markers.clear();
       this.generation = restartCount;
@@ -313,37 +355,23 @@ export class PixiRenderer {
         marker = new Graphics()
           .ellipse(0, view.shadowOffset, view.markerRadius, view.markerRadius * view.shadowScaleY)
           .fill({ color: view.colors.shadow, alpha: 0.12 });
-        if (this.tilted) {
-          marker
-            .moveTo(-11, 2)
-            .bezierCurveTo(-12, -7, -6, -11, 0, -10)
-            .bezierCurveTo(7, -12, 12, -6, 11, 2)
-            .bezierCurveTo(10, 10, 6, 11, 0, 10)
-            .bezierCurveTo(-6, 11, -10, 8, -11, 2)
-            .closePath()
-            .fill(agent.factionId === 'blue' ? view.colors.blue : view.colors.red)
-            .stroke({
-              color: agent.factionId === 'blue' ? view.colors.blueEdge : view.colors.redEdge,
-              width: 1,
-            });
-        } else {
-          marker
-            .circle(0, 0, view.markerRadius)
-            .fill(agent.factionId === 'blue' ? view.colors.blue : view.colors.red)
-            .stroke({
-              color: agent.factionId === 'blue' ? view.colors.blueEdge : view.colors.redEdge,
-              width: 1,
-            });
-        }
+        marker
+          .circle(0, 0, view.markerRadius)
+          .fill(agent.factionId === 'blue' ? view.colors.blue : view.colors.red)
+          .stroke({
+            color: agent.factionId === 'blue' ? view.colors.blueEdge : view.colors.redEdge,
+            width: 1,
+          });
         marker
           .circle(view.highlightOffset, view.highlightOffset, view.highlightRadius)
           .fill({ color: view.colors.highlight, alpha: 0.7 });
-        marker.scale.y = this.tilted ? 1 / view.tiltY : 1;
         this.units.addChild(marker);
         this.markers.set(agent.id, marker);
       }
       // B-static: position changes; a short opacity cue indicates a hit.
       marker.position.set(agent.x, agent.y);
+      marker.scale.x = agent.variant === 'deviant' ? 1.45 : 1;
+      marker.scale.y = agent.variant === 'deviant' ? 1.45 : 1;
       marker.alpha = (agent.hitUntilTick ?? 0) > snapshot.tick ? 0.5 : 1;
       if (
         snapshot.selectedGroupId === agent.groupId ||

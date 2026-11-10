@@ -1,5 +1,6 @@
+import { DELIVERY2_LEVEL } from '../fixtures/delivery2Level';
 import { describe, expect, it } from 'vitest';
-import { GAME_LEVEL, S0_CLOCK } from '../../src/core/config';
+import { S0_CLOCK } from '../../src/core/config';
 import { Session } from '../../src/app/session';
 import { createInitialState } from '../../src/simulation/initialState';
 import { resolveCombat } from '../../src/simulation/combat';
@@ -9,9 +10,9 @@ import { enemyCommands } from '../../src/enemy/controller';
 
 const combat = { range: 40, damage: 1, cooldownTicks: 10, hitFeedbackTicks: 3 };
 const level = {
-  ...GAME_LEVEL,
+  ...DELIVERY2_LEVEL,
   spawn: {
-    ...GAME_LEVEL.spawn,
+    ...DELIVERY2_LEVEL.spawn,
     count: 2,
     columns: 2,
     centerX: 500,
@@ -19,7 +20,7 @@ const level = {
     spacing: 10,
     jitter: 0,
   },
-  enemy: { ...GAME_LEVEL.enemy!, count: 1, columns: 1, centerX: 510, centerY: 500 },
+  enemy: { ...DELIVERY2_LEVEL.enemy!, count: 1, columns: 1, centerX: 510, centerY: 500 },
   combat,
   initialHp: 3,
 };
@@ -105,9 +106,11 @@ describe('enemy and combat', () => {
 
   it('controller and combat replay deterministically from seed and player commands', () => {
     const run = () => {
-      const sim = new Simulation(GAME_LEVEL);
+      const sim = new Simulation(DELIVERY2_LEVEL);
       const initial = sim.getSnapshot();
-      expect(enemyCommands(initial, GAME_LEVEL)).toEqual(enemyCommands(initial, GAME_LEVEL));
+      expect(enemyCommands(initial, DELIVERY2_LEVEL)).toEqual(
+        enemyCommands(initial, DELIVERY2_LEVEL),
+      );
       sim.step([{ tick: 0, type: 'select-group-id', groupId: 'group-1' }]);
       sim.step([
         {
@@ -132,11 +135,11 @@ describe('enemy and combat', () => {
   });
 });
 
-it('allows inspecting red groups without granting player formation or cut control', () => {
-  const sim = new Simulation(GAME_LEVEL);
+it('does not select red groups or grant player formation or cut control', () => {
+  const sim = new Simulation(DELIVERY2_LEVEL);
   sim.step([{ tick: 0, type: 'select-group-id', groupId: 'group-1000' }]);
   const selected = sim.getSnapshot();
-  expect(selected.selectedGroupId).toBe('group-1000');
+  expect(selected.selectedGroupId).toBeNull();
   const formation = selected.groups.find((group) => group.id === 'group-1000')!.formation;
   sim.step([
     {

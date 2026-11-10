@@ -20,8 +20,6 @@ async function start(): Promise<void> {
     `Территория / цель ${Math.round(GAME_LEVEL.victoryFraction * 100)}%`;
   const cameraLeft = requiredElement<HTMLButtonElement>('camera-left');
   const cameraRight = requiredElement<HTMLButtonElement>('camera-right');
-  const tilt = requiredElement<HTMLButtonElement>('tilt');
-  const samples = requiredElement('visual-samples');
   const merge = requiredElement<HTMLButtonElement>('merge');
   const cut = requiredElement<HTMLButtonElement>('cut');
   const restart = requiredElement<HTMLButtonElement>('restart');
@@ -33,6 +31,7 @@ async function start(): Promise<void> {
     requiredElement('group-count'),
     requiredElement('red-count'),
     requiredElement('paint-progress'),
+    requiredElement('objective-status'),
     requiredElement('reinforcement-credits'),
     hint,
   );
@@ -93,15 +92,6 @@ async function start(): Promise<void> {
   window.addEventListener('keydown', reinforceKey);
   const toggleCut = () => drawing.splitSelected();
   cut.addEventListener('click', toggleCut);
-  let tilted = false;
-  const toggleTilt = () => {
-    drawing.cancel();
-    tilted = !tilted;
-    renderer.setTilt(tilted);
-    tilt.setAttribute('aria-pressed', String(tilted));
-    samples.hidden = !tilted;
-  };
-  tilt.addEventListener('click', toggleTilt);
   const toggleMerge = () => drawing.toggleMerge();
   merge.addEventListener('click', toggleMerge);
   let arenaWidth = arena.clientWidth;
@@ -179,7 +169,6 @@ async function start(): Promise<void> {
     window.removeEventListener('keydown', reinforceKey);
     cut.removeEventListener('click', toggleCut);
     merge.removeEventListener('click', toggleMerge);
-    tilt.removeEventListener('click', toggleTilt);
     document.removeEventListener('visibilitychange', discardHiddenTime);
     window.removeEventListener('pagehide', dispose);
     renderer.destroy();

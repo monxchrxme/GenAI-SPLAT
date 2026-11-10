@@ -86,7 +86,6 @@ export function clientToWorld(
   viewport: ViewportSize,
   world: Readonly<World>,
   padding: number,
-  tiltY = 1,
   viewWidth = world.width,
   cameraLeft = 0,
 ): Point | null {
@@ -103,7 +102,6 @@ export function clientToWorld(
       world.width,
       world.height,
       padding,
-      tiltY,
       viewWidth,
       cameraLeft,
     ].every(Number.isFinite) ||
@@ -114,20 +112,19 @@ export function clientToWorld(
     world.width <= 0 ||
     world.height <= 0 ||
     padding < 0 ||
-    tiltY <= 0 ||
     viewWidth <= 0
   )
     return null;
   const camera = fitCamera(viewport.width, viewport.height, world, padding, viewWidth, cameraLeft);
-  const cameraY = (viewport.height - world.height * camera.scale * tiltY) / 2;
+  const cameraY = (viewport.height - world.height * camera.scale) / 2;
   const localX = ((point.x - bounds.left) * viewport.width) / bounds.width;
   const localY = ((point.y - bounds.top) * viewport.height) / bounds.height;
   if (
     localX < camera.x ||
     localY < cameraY ||
     localX > camera.x + world.width * camera.scale ||
-    localY > cameraY + world.height * camera.scale * tiltY
+    localY > cameraY + world.height * camera.scale
   )
     return null;
-  return { x: (localX - camera.x) / camera.scale, y: (localY - cameraY) / (camera.scale * tiltY) };
+  return { x: (localX - camera.x) / camera.scale, y: (localY - cameraY) / camera.scale };
 }
