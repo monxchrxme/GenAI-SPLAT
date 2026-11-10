@@ -1,5 +1,8 @@
 # SPLAT! — GitHub → Vercel: фактическое состояние после S0
 
+**Результат 10.11.2026:** `git push --set-upstream origin codex/s4-s5-territory-combat` прошёл; `git ls-remote` подтвердил source `ebde2a22d77fd57821a6bece94439731c84bbace` на целевой ветке и неизменённый main `8519f198f501e9fba3bfd32693f0306f0043ccd5`. Push автоматически создал [Preview](https://genai-splat-ojajo75el-great-chr.vercel.app/), deployment `dpl_EXQ9UF4dzTJ5gMeSVi8EtT6vtuTJ`, target preview, статус READY; metadata связывает его с этой веткой и source SHA. Анонимный HTTP дал 302, полноценный внешний browser smoke не выполнялся; защиту не меняли. Preview не является production. Этот документ результатов может быть сохранён отдельным документационным коммитом поверх source; фактический HEAD и возможный следующий Preview проверять отдельно.
+
+
 **10.11.2026 — запрос публикации S4+S5.** Пользователь отдельно поручил commit, push текущей ветки и Preview, без merge и production. Перед push `vercel.json` отключает автоматический deployment только для `feature/s1-formations`, а не для `codex/s4-s5-territory-combat`; push может запустить Preview. Проверка Vercel Project API подтвердила GitHub `monxchrxme/GenAI-SPLAT` и production branch `main`; `gitProviderOptions.createDeployments = disabled` относится к настройке провайдера и не доказывает отсутствие автосборки Vercel. `git ls-remote --heads origin codex/s4-s5-territory-combat main` показал только `main` на `8519f198f501e9fba3bfd32693f0306f0043ccd5`: целевой удалённой ветки до push не было. Настройки интеграции не меняются. Точные результаты push и Preview фиксируются после их получения.
 
 

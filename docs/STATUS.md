@@ -14,7 +14,7 @@ external_automated_smoke: not_run_due_to_sso
 last_accepted_commit: 9ab767787df7c06b17250a41cc64b915e2796765
 last_accepted_stage: delivery_1
 working_branch: codex/s4-s5-territory-combat
-upstream: none
+upstream: origin/codex/s4-s5-territory-combat
 last_pushed_preparation_commit: f64af0adf12f87f295122066ecc283c363c219b7
 local_s0_acceptance_commit: 8452ba00fa30f8571f20625dbb0fd9bdb7d41084
 local_gitignore_commit: 8fe235ee7a630cb51751c0a450ede0dfda164efc
@@ -50,6 +50,10 @@ handoff_notes:
   - S0 explicitly accepted through user confirmation of all checklist items on 2026-11-06.
   - Delivery 1 accepted; next chat S4+S5, see S4_S5_HANDOFF_PROMPT.md.
 ---
+
+## Публикация второй поставки — 10.11.2026
+
+Source `ebde2a22d77fd57821a6bece94439731c84bbace` отправлен на `origin/codex/s4-s5-territory-combat`; автоматический [Preview](https://genai-splat-ojajo75el-great-chr.vercel.app/) для него READY. Анонимный HTTP — 302; внешний browser smoke не выполнялся. Запись результатов может находиться выше source; фактический HEAD смотреть в Git. Main не менялся. [Подробности](DEPLOYMENT.md).
 
 ## Передача к заключительному этапу — 10.11.2026
 
