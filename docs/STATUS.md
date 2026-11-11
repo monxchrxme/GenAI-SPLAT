@@ -1,7 +1,7 @@
 ---
 updated_at: 2026-11-11
 current_stage: s6_s7_izluchina
-stage_state: current_gameplay_accepted_for_preview
+stage_state: current_gameplay_saved_preview_ready
 implemented: true
 implementation_scope: checkpoint support squads and shared deviant tuning
 preparation_implemented: true
@@ -50,6 +50,13 @@ handoff_notes:
   - S0 explicitly accepted through user confirmation of all checklist items on 2026-11-06.
   - Delivery 1 accepted; next chat S4+S5, see S4_S5_HANDOFF_PROMPT.md.
 ---
+
+## Текущий игровой срез сохранён и опубликован — 11.11.2026
+
+- source commit — `09c68599bbe3798d2c9f64114643f6efa1ce9f05`.
+- Vercel Preview READY — [открыть](https://genai-splat-fkev9deqi-great-chr.vercel.app/), source CLI, окружение preview и SHA сверены. [Подробности](DEPLOYMENT.md).
+- tests_verified — сборка из коммита, статус и metadata. Обе карты перенаправляют анонимного посетителя на вход в Vercel. Внешний игровой smoke ожидает пользовательского доступа.
+- awaiting_manual_acceptance — общие QA/UX/FPS и финальная приёмка S6/S7.
 
 ## Текущий игровой срез принят для Preview — 11.11.2026
 

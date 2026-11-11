@@ -1,0 +1,38 @@
+{
+  "sourceCommit": "09c68599bbe3798d2c9f64114643f6efa1ce9f05",
+  "sourceBranch": "codex/s4-s5-territory-combat",
+  "deploymentId": "dpl_2zuktHcVMeapdMjjeYxN4iB9sDFB",
+  "projectId": "prj_xY00Pd9x8HbmTJOGycXBJlXjSGbj",
+  "url": "https://genai-splat-fkev9deqi-great-chr.vercel.app/",
+  "source": "cli",
+  "inspectTarget": "preview",
+  "apiTarget": null,
+  "readyState": "READY",
+  "productionUrl": null,
+  "meta": {
+    "gitCommitSha": "09c68599bbe3798d2c9f64114643f6efa1ce9f05",
+    "gitCommitRef": "codex/s4-s5-territory-combat",
+    "sourceCommit": "09c68599bbe3798d2c9f64114643f6efa1ce9f05"
+  },
+  "anonymousHttp": {
+    "/": 302,
+    "/?level=izluchina": 302
+  },
+  "browserAccess": "vercel_login_required",
+  "externalGameSmoke": "not_run_due_to_sso",
+  "localBuild": "git archive source; Vite build passed",
+  "gitPushPerformed": false,
+  "localDistSha256": {
+    "CanvasPool-D071ZhP4.js": "44913ef7802a1a6e2bd4f01a7be9610167c7150d750cb66dfc422b3d2beeeefa",
+    "RenderTargetSystem-BssNwx7J.js": "b78173f03fde1e21e3cc6f2d1b6bf430e02e0fc6bec4e151f4eb34896d3da981",
+    "browserAll-BHVRoUDm.js": "d39c2f6d9085c965b931dbee011a5433ab7c4813f534e200cde9dfbbaa629065",
+    "canvasUtils-G1F85v5_.js": "fb352b921bf5afdf267c173346925da334ba1ed1e799ecc1adc12330e27eba14",
+    "getTexelRangeRects-n9rC3yLB.js": "9ad39076b85e4f9cc32399b4ad2b9f3aea822128857a5d3d15c4cc540c6760b6",
+    "getTextureBatchBindGroup-hK4Xhp7N.js": "041148cd0c21419edc70d734fd57c7847503b4c168786960ed686f940038cd71",
+    "index-DALYAsNR.css": "0c33398e2cf28d21a833cdfe777aea31c0e0b4417224da52b84b23765a71ba76",
+    "index-iEYgeKPf.js": "146ff099863076a124fba2c843f55a569124b7170d9b61ac553a01036225110a",
+    "init-cgRWK-bI.js": "ef1a3a2b11e6cab673c1e6dc79fb80bf9865c918bfd8a8b222092e73c0bff0ab",
+    "webworkerAll-BO-S_jY6.js": "1d8601afd7e0fae57b6f164829a35d0fc572690cd9975b164966d08f902c36d9",
+    "index.html": "1e4363d10c7c7c8121b3783fa516d5b0c2fff6ddb170b01698a88fd9e4439e13"
+  }
+}

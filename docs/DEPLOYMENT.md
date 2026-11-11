@@ -1,5 +1,14 @@
 # SPLAT! — GitHub → Vercel: фактическое состояние после S0
 
+## Текущий Preview двух карт — 11.11.2026
+
+По отдельному запросу заказчика текущий игровой срез сохранён коммитом `09c68599bbe3798d2c9f64114643f6efa1ce9f05` и опубликован через Vercel CLI 65.11.0. [Открыть Preview](https://genai-splat-fkev9deqi-great-chr.vercel.app/). Deployment `dpl_2zuktHcVMeapdMjjeYxN4iB9sDFB`, существующий проект `genai-splat`, статус READY, окружение preview по `vercel inspect`, source CLI. В API поле target равно null. Метаданные `gitCommitSha` и `sourceCommit` совпали с сохранённым коммитом.
+
+Публикация выполнена из временного каталога `/private/tmp/splat-vercel-preview.4F04KT`, полученного через `git archive HEAD`. Локальная сборка Vite прошла, Vercel также завершил сборку успешно. Команда публикации — `vercel deploy --environment=preview --yes --json --meta gitCommitSha=09c68599bbe3798d2c9f64114643f6efa1ce9f05 --meta gitCommitRef=codex/s4-s5-territory-combat --meta sourceCommit=09c68599bbe3798d2c9f64114643f6efa1ce9f05`. Git push и merge в этом действии не выполнялись.
+
+Анонимный HTTP для обеих карт вернул 302 на Vercel. В браузере открылась страница входа, поэтому внешний игровой smoke ожидает доступа через пользовательскую сессию. Защита проекта действует. Предыдущие 159 unit/integration и локальные победные browser-прогоны относятся к исходному коду до публикации. В этом действии повторно проверены сборка из коммита, READY, окружение, SHA и HTTP-доступ. [Данные проверки](verification/izluchina-preview/deployment.json).
+
+
 **Результат 10.11.2026:** `git push --set-upstream origin codex/s4-s5-territory-combat` прошёл; `git ls-remote` подтвердил source `ebde2a22d77fd57821a6bece94439731c84bbace` на целевой ветке и неизменённый main `8519f198f501e9fba3bfd32693f0306f0043ccd5`. Push автоматически создал [Preview](https://genai-splat-ojajo75el-great-chr.vercel.app/), deployment `dpl_EXQ9UF4dzTJ5gMeSVi8EtT6vtuTJ`, target preview, статус READY; metadata связывает его с этой веткой и source SHA. Анонимный HTTP дал 302, полноценный внешний browser smoke не выполнялся; защиту не меняли. Preview не является production. Этот документ результатов может быть сохранён отдельным документационным коммитом поверх source; фактический HEAD и возможный следующий Preview проверять отдельно.
 
 
