@@ -1,20 +1,20 @@
 ---
 updated_at: 2026-11-11
-current_stage: s6_s7_redoubts
-stage_state: production_deployed_manual_qa_pending
+current_stage: completed
+stage_state: accepted_by_user
 implemented: true
 implementation_scope: stronger Redoubts checkpoints and final; checkpoint deviant guards lower approach
 preparation_implemented: true
 tests_verified: see REDOUBTS_BALANCE_REPORT for current local scope; earlier results retained below
 document_checks_verified: 216 local document links; SVG/JSON valid; original PLAN and D-register retained; only Redoubts runtime config changed this action; MASTER_SPEC unchanged; diff check passed
-awaiting_manual_acceptance: true
+awaiting_manual_acceptance: false
 preview_gate: verified_for_S0_only
 preview_gate_evidence: user browser checklist and agent READY/commit inspection
 external_automated_smoke: not_run_due_to_sso
-last_accepted_commit: 9ab767787df7c06b17250a41cc64b915e2796765
-last_accepted_stage: delivery_1
-working_branch: codex/s4-s5-territory-combat
-upstream: origin/codex/s4-s5-territory-combat
+last_accepted_commit: 4b77d4a5f488e1302dc03bc7aa97140083994fb3
+last_accepted_stage: S-1_through_S7_final_product
+working_branch: main
+upstream: origin/main
 last_pushed_preparation_commit: f64af0adf12f87f295122066ecc283c363c219b7
 local_s0_acceptance_commit: 8452ba00fa30f8571f20625dbb0fd9bdb7d41084
 local_gitignore_commit: 8fe235ee7a630cb51751c0a450ede0dfda164efc
@@ -32,7 +32,7 @@ last_verified_checks:
   - python3 /private/tmp/splat-input-doccheck.py: exit 0; 154 local file links, 53 original tasks and gates/artifacts, unchanged D-register/protected files/HEAD, 10 handoff lines; nothing staged
   - historical remote verification before action 1: git ls-remote exit 0; f64af0a / 8519f19 / 29946cd; not rerun in action 5
   - historical Vercel verification before action 1: CLI list exit 0; only two S0 deployments; not rerun in action 5
-manual_acceptance: click_move_accepted_by_user_on_2026-11-10; overall_gates_pending
+manual_acceptance: all_plan_items_accepted_by_user_on_2026-11-11
 last_accepted_intermediate_action: click_move
 last_accepted_intermediate_commit: not_available
 last_accepted_at: 2026-11-10
@@ -43,13 +43,16 @@ known_issues:
   - Main remains at S−1 (8519f19); no merge. Accepted S1 source 8330ed3 committed; user authorized push on feature/s1-formations with deploy disabled; verify actual Git.
   - Node/npm absent from system PATH; temporary Node 24.22.2 is available in /private/tmp, see README.
   - Firefox, WebGPU and performance measurements not_run; S4/S5 prototypes await complete manual gate, S6/S7 remain unimplemented.
-next_stage: s6_s7_audit_and_step_planning; outstanding delivery_2_manual_checks
-next_stage_workflow: accepted delivery 1 pushed with user authorization for possible Preview; next chat begins with audit and plan; git merge and future deployment remain separate authorization
+next_stage: none_until_new_user_request
+next_stage_workflow: final product accepted; further work requires a new user request
 publication_workflow: local after S0; Vercel deferred to final stages and a separate explicit request; push and merge only as a separate requested action after acceptance of that action's changes
 handoff_notes:
   - S0 explicitly accepted through user confirmation of all checklist items on 2026-11-06.
   - Delivery 1 accepted; next chat S4+S5, see S4_S5_HANDOFF_PROMPT.md.
 ---
+
+> **Актуальная приёмка, 11.11.2026:** заказчик принял все пункты плана и текущий финальный продукт в опубликованном виде. Более ранние статусы ожидания приёмки ниже — исторические записи на момент соответствующих действий. Это решение не означает, что ранее не выполненные проверки были запущены, и не утверждает автоматически отдельные открытые решения или нереализованные первоначальные варианты. [Текущий статус](STATUS.md).
+
 
 ## Production — 11.11.2026
 
