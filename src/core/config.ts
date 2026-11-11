@@ -168,7 +168,8 @@ export const GAME_LEVEL: LevelConfig = Object.freeze({
     cannonHitRadius: 12,
   }),
   initialHp: 3,
-  reinforcement: Object.freeze({ cost: 5, count: 2, maxBlue: 40 }), // [P] pending balance review
+  // [P] Cost/count/cap remain trial values; the deviant reward is explicitly requested.
+  reinforcement: Object.freeze({ cost: 5, count: 2, maxBlue: 40, deviantReward: 7 }),
   enemy: Object.freeze({
     count: 36,
     columns: 6,

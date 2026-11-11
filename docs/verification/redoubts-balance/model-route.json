@@ -1,0 +1,163 @@
+{
+  "base_commit": "8e8a0dc04d5f7c7f19d67b37acf15e18f02b5860",
+  "source": "local_working_tree",
+  "seed": 20261112,
+  "level_config_sha256": "cbe40caba10029da3a1418528db0ea5515d617faf54711d5af90458560a89dbe",
+  "route_fixture_sha256": "b883c51225463111c544b89f604a591025cc4911267c9d65b3f60cef87b92d56",
+  "scope": "one deterministic Simulation route; not human balance acceptance",
+  "stages": [
+    {
+      "stage": "upper courtyard",
+      "seconds": 23,
+      "blue": 36,
+      "hp": 94,
+      "deadBlue": 4,
+      "createdBlue": 40,
+      "red": 147,
+      "deviants": 3,
+      "credits": 21,
+      "checkpoints": [
+        true,
+        false,
+        false
+      ],
+      "result": null
+    },
+    {
+      "stage": "second courtyard supports via the northern approach",
+      "seconds": 54,
+      "blue": 32,
+      "hp": 80,
+      "deadBlue": 12,
+      "createdBlue": 44,
+      "red": 126,
+      "deviants": 3,
+      "credits": 32,
+      "checkpoints": [
+        true,
+        false,
+        false
+      ],
+      "result": null
+    },
+    {
+      "stage": "second garrison and checkpoint",
+      "seconds": 70,
+      "blue": 31,
+      "hp": 66,
+      "deadBlue": 21,
+      "createdBlue": 52,
+      "red": 102,
+      "deviants": 3,
+      "credits": 36,
+      "checkpoints": [
+        true,
+        true,
+        false
+      ],
+      "result": null
+    },
+    {
+      "stage": "checkpoint deviant from the lower flank",
+      "seconds": 105,
+      "blue": 32,
+      "hp": 71,
+      "deadBlue": 29,
+      "createdBlue": 61,
+      "red": 93,
+      "deviants": 2,
+      "credits": 26,
+      "checkpoints": [
+        true,
+        true,
+        false
+      ],
+      "result": null
+    },
+    {
+      "stage": "central redoubt",
+      "seconds": 129,
+      "blue": 22,
+      "hp": 51,
+      "deadBlue": 47,
+      "createdBlue": 69,
+      "red": 67,
+      "deviants": 2,
+      "credits": 32,
+      "checkpoints": [
+        true,
+        true,
+        true
+      ],
+      "result": null
+    },
+    {
+      "stage": "second deviant on the upper flank",
+      "seconds": 156,
+      "blue": 33,
+      "hp": 82,
+      "deadBlue": 48,
+      "createdBlue": 81,
+      "red": 66,
+      "deviants": 1,
+      "credits": 9,
+      "checkpoints": [
+        true,
+        true,
+        true
+      ],
+      "result": null
+    },
+    {
+      "stage": "lower final deviant and support from the rear",
+      "seconds": 172,
+      "blue": 33,
+      "hp": 74,
+      "deadBlue": 50,
+      "createdBlue": 83,
+      "red": 57,
+      "deviants": 0,
+      "credits": 19,
+      "checkpoints": [
+        true,
+        true,
+        true
+      ],
+      "result": null
+    },
+    {
+      "stage": "final garrison",
+      "seconds": 180,
+      "blue": 27,
+      "hp": 57,
+      "deadBlue": 62,
+      "createdBlue": 89,
+      "red": 35,
+      "deviants": 0,
+      "credits": 26,
+      "checkpoints": [
+        true,
+        true,
+        true
+      ],
+      "result": null
+    },
+    {
+      "stage": "final courtyard",
+      "seconds": 188,
+      "blue": 37,
+      "hp": 87,
+      "deadBlue": 62,
+      "createdBlue": 99,
+      "red": 35,
+      "deviants": 0,
+      "credits": 1,
+      "checkpoints": [
+        true,
+        true,
+        true
+      ],
+      "result": "victory"
+    }
+  ]
+}

@@ -1,12 +1,12 @@
 ---
 updated_at: 2026-11-11
-current_stage: s6_s7_izluchina
-stage_state: current_gameplay_saved_preview_ready
+current_stage: s6_s7_redoubts
+stage_state: local_redoubts_balance_awaiting_manual_review
 implemented: true
-implementation_scope: checkpoint support squads and shared deviant tuning
+implementation_scope: stronger Redoubts checkpoints and final; checkpoint deviant guards lower approach
 preparation_implemented: true
-tests_verified: see IZLUCHINA_REPORT for local scope
-document_checks_verified: closure pass; 159 local links, 53 original tasks/gates/artifacts, unchanged D-register/protected files, 10 handoff lines, accepted runtime/tests unchanged, deploy guard false, source SHA verified
+tests_verified: see REDOUBTS_BALANCE_REPORT for current local scope; earlier results retained below
+document_checks_verified: 216 local document links; SVG/JSON valid; original PLAN and D-register retained; only Redoubts runtime config changed this action; MASTER_SPEC unchanged; diff check passed
 awaiting_manual_acceptance: true
 preview_gate: verified_for_S0_only
 preview_gate_evidence: user browser checklist and agent READY/commit inspection
@@ -50,6 +50,60 @@ handoff_notes:
   - S0 explicitly accepted through user confirmation of all checklist items on 2026-11-06.
   - Delivery 1 accepted; next chat S4+S5, see S4_S5_HANDOFF_PROMPT.md.
 ---
+
+## Усиление «Редутов» по ручным замечаниям — 11.11.2026
+
+- implemented: усилены гарнизоны и поддержки рубежей 2/3 и финала. Девиант третьей точки перенесён к её нижнему краю; в финале два девианта и дополнительная нижняя пушка. Всего 168 красных, 3 девианта и 3 пушки. Первый участок, геометрия и общие правила сохранены.
+- tests_verified: 178 unit/integration, оба typecheck, lint, format:check и build; четыре направления атаки защитника проверены в симуляции. Четыре Chrome-сценария прошли, включая три полные партии и обучение/меню. Точные команды — в [текущем отчёте](REDOUBTS_BALANCE_REPORT.md).
+- awaiting_manual_acceptance: новая сложность, реакция при нижнем захвате, финальная пушка и возможности разделить бои. Параметры [P], общий гейт этапа не закрывается.
+- Новая локальная сборка: http://127.0.0.1:4219/?level=redoubts. Порт 4218 показывает предыдущую версию; Vercel не обновлён.
+
+### Handoff усиления (8 строк)
+
+1. HEAD `8e8a0dc`, прежняя ветка; исходные изменения награды, карты и доказательства сохранены, baseline скопирован во временный каталог.
+2. Рубеж 2: 24 основных, поддержки 7+7. Рубеж 3: 20 основных, 6 поддержки, фланги 10+10.
+3. Девиант третьего рубежа в (5300,600) атакует красившего клетку синего снизу, сверху, слева и справа в четырёх регрессионных тестах.
+4. Финал: 16 на нижнем подходе, 22 основных, 8 поддержки; девианты в (6880,300) и (7000,700), новая пушка (6520,900).
+5. Те же HP/урон/скорости, награда девианта 7, цена R=5. Другие две карты и камера не менялись.
+6. Модельная победа около 3:08 с пополнением между боями; после третьего рубежа 22 бойца до R, итог 37 после покупок, ресурс 1.
+7. Повторить ручную партию по нижнему подходу и оценить усиление; результаты и ограничения — REDOUBTS_BALANCE_REPORT.
+8. Commit/push/merge/deploy не выполнялись; MASTER_SPEC и D-06—D-10, исходные PLAN/QA сохранены, ручная приёмка ожидается.
+
+## История: реализация «Редутов» — 11.11.2026
+
+- implemented: отдельная карта 7200×1000 с тремя рубежами, финалом, 135 обычными красными, двумя девиантами и авторской геометрией; меню и переход после «Излучины». Общие игровые правила и прежние две карты сохранены.
+- tests_verified: 174 unit/integration, оба typecheck, lint, format:check и build; 36 уникальных Chrome-сценариев прошли (35 в полном запуске и исправленный повтор новой полной партии). Модельный replay/Restart после уточнения fixture повторён отдельно. Неудачные попытки и точные команды — в [отчёте](REDOUBTS_REPORT.md).
+- awaiting_manual_acceptance: читаемость маршрутов, удобство камеры, расстановка и баланс новой карты. Разрешение реализовать схему не означает её приёмку или закрытие S6/S7.
+- Локальное демо: http://127.0.0.1:4218/?level=redoubts. Награда 7 за девианта сохранена. Новых commit/push/merge/deployment нет.
+
+### Handoff реализации (8 строк)
+
+1. Ветка `codex/s4-s5-territory-combat`, HEAD `8e8a0dc`; исходные незакоммиченные изменения награды и схемы сохранены.
+2. `src/levels/redoubts.ts` задаёт третью карту; catalog добавляет её в меню и последовательность уровней без новой механики.
+3. Штатный seed 20261112, сетка 90×10, три последовательных рубежа и финал; общий процент окраски не является порогом победы.
+4. В модели победили концентрированная армия (27 живых) и маршрут через split/merge (22); поспешное раздельное наступление проиграло.
+5. Оба девианта участвуют в бою, первый расположен до третьего рубежа; общая награда 7 и цена R=5 сохранены.
+6. Модельный replay и Restart проверены; остальные команды и результаты браузера перечислены в REDOUBTS_REPORT.
+7. Следующий шаг — ручная партия и замечания, а не автоматическое принятие карты, баланса, дизайна или этапа.
+8. MASTER_SPEC, D-06 Open, D-07—D-10 Proposed и исходные QA/гейты сохранены; публикация требует отдельного поручения.
+
+## История: награда девианта и проект карты 3 — 11.11.2026
+
+- implemented: в обеих картах девиант приносит ровно 7 ресурса при гибели; обычный красный — 1. Цена R, лимит, здоровье и поведение не менялись. [Отчёт](DEVIANT_REWARD_REPORT.md).
+- tests_verified: 164 unit/integration, оба typecheck, lint, build и format:check; две полные Chrome-партии с проверкой награды в HUD. Все отчёты — во временной копии.
+- awaiting_manual_acceptance: проверить награду и комфортность пополнения вручную. Проект [«Редуты»](MAP3_CONCEPT.md) — [P], третьей карты в runtime нет.
+- Текущая основа до правок — `8e8a0dc04d5f7c7f19d67b37acf15e18f02b5860`; новые правки локальны и не входят в опубликованный Preview `09c6859`. Commit/push/merge/deploy в этом действии не выполнялись.
+
+### Handoff текущего действия (8 строк)
+
+1. Ветка `codex/s4-s5-territory-combat`; HEAD до правок `8e8a0dc`, дерево изначально чистое.
+2. Награда девианта 7 хранится в типизированном reinforcement.deviantReward; прежние конфигурации без поля сохраняют награду 1.
+3. Тесты проверяют однократность, смешанные потери, R, replay, Restart и фактический HUD первой карты.
+4. Локальное демо этой версии: http://127.0.0.1:4217/ и ?level=izluchina; временная сборка, не Vercel.
+5. «Редуты» — только проект: 7200×1000, три рубежа, финал, 135 обычных красных и 2 девианта; числа [P].
+6. Следующее согласование — схема карты и границы её первой реализации; текущая просьба не разрешает добавить третий уровень.
+7. Firefox/WebGPU/FPS/внешний smoke не запускались; общий ручной QA и S6/S7 не закрыты, D-06 Open, D-07—D-10 Proposed.
+8. Существующий Preview не обновлён; любые будущие commit/push/merge/deploy выполнять в рамках нового поручения.
 
 ## Текущий игровой срез сохранён и опубликован — 11.11.2026
 

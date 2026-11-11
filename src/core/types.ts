@@ -164,6 +164,8 @@ export interface LevelConfig {
     readonly cost: number;
     readonly count: number;
     readonly maxBlue: number;
+    /** Total credits per defeated deviant; legacy configurations default to 1. */
+    readonly deviantReward?: number;
   };
   readonly enemy?: {
     readonly count: number;

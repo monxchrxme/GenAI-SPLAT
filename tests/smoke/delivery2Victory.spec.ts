@@ -1,55 +1,5 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
-
-async function screen(canvas: Locator, x: number, y: number) {
-  return canvas.evaluate(
-    (element, point) => {
-      const rect = element.getBoundingClientRect();
-      const scale = Math.min((rect.width - 48) / 1600, (rect.height - 48) / 1000);
-      return {
-        x:
-          rect.left +
-          (rect.width - 1600 * scale) / 2 +
-          (point.x - Number(element.dataset.cameraLeft ?? 0)) * scale,
-        y: rect.top + (rect.height - 1000 * scale) / 2 + point.y * scale,
-      };
-    },
-    { x, y },
-  );
-}
-
-async function beginMatch(page: Page, path: string) {
-  await page.clock.install();
-  await page.goto(path);
-  await expect(page.locator('#arena')).toHaveAttribute('data-ready', 'true');
-  await page.clock.pauseAt(Date.now() + 1000);
-  const canvas = page.locator('#arena canvas');
-  const center = await screen(canvas, 430, 500);
-  await page.mouse.click(center.x, center.y);
-  await page.clock.runFor(50);
-  const form = async (x: number, y: number, seconds: number, height = 120) => {
-    for (let tries = 0; tries < 8; tries++) {
-      const left = Number(await canvas.getAttribute('data-camera-left'));
-      if (x >= left && x <= left + 1600) break;
-      await page.getByRole('button', { name: x < left ? 'Камера влево' : 'Камера вправо' }).click();
-      await page.clock.runFor(400);
-    }
-    const start = await screen(canvas, x, y - height / 2);
-    const end = await screen(canvas, x, y + height / 2);
-    await page.mouse.move(start.x, start.y);
-    await page.mouse.down();
-    await page.mouse.move(end.x, end.y);
-    await page.mouse.up();
-    await page.clock.runFor(seconds * 1000);
-  };
-  const refill = async () => {
-    const button = page.getByRole('button', { name: 'Пополнить (R)' });
-    for (let i = 0; i < 20 && (await button.isEnabled()); i++) {
-      await button.click();
-      await page.clock.runFor(50);
-    }
-  };
-  return { canvas, form, refill };
-}
+import { expect, test } from '@playwright/test';
+import { beginMatch } from '../fixtures/playMatch';
 
 test('first-map victory offers the next level and starts a fresh match', async ({ page }) => {
   test.setTimeout(180000);
@@ -74,10 +24,15 @@ test('first-map victory offers the next level and starts a fresh match', async (
   await form(4800, 230, 7);
   await form(5060, 220, 7);
   await refill();
+  const creditsBeforeDeviant = Number(await page.locator('#reinforcement-credits').textContent());
+  const redsBeforeDeviant = Number(await page.locator('#red-count').textContent());
   // Use the upper flank to fight the two deviants separately.
   await form(5360, 265, 6);
   await form(5540, 275, 6);
   await expect(canvas).toHaveAttribute('data-deviant-count', '1');
+  const creditsAfterDeviant = Number(await page.locator('#reinforcement-credits').textContent());
+  const otherKills = redsBeforeDeviant - Number(await page.locator('#red-count').textContent()) - 1;
+  expect(creditsAfterDeviant - creditsBeforeDeviant - otherKills).toBe(7);
   await refill();
   await form(5460, 520, 6);
   await refill();
@@ -146,7 +101,10 @@ test('Izluchina opens two camera boundaries in order and can be replayed', async
   await form(5720, 500, 5, 190);
   await form(5860, 500, 5, 190);
   await expect(page.getByRole('dialog', { name: 'Победа' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Следующий уровень' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Следующий уровень' })).toHaveAttribute(
+    'href',
+    '?level=redoubts',
+  );
   await expect(page.locator('#objective-status')).toHaveText('захвачена');
   await page.getByRole('button', { name: 'Повторить уровень' }).click();
   await page.clock.runFor(100);
@@ -155,4 +113,10 @@ test('Izluchina opens two camera boundaries in order and can be replayed', async
   await expect(canvas).toHaveAttribute('data-camera-left', '0');
   await expect(page.locator('#objective-status')).toHaveText('не захвачена');
   await expect(page).toHaveURL(/level=izluchina/);
+  await page.getByRole('button', { name: 'Меню' }).click();
+  await page.getByRole('link', { name: 'Редуты', exact: true }).click();
+  await expect(page).toHaveURL(/level=redoubts/);
+  await expect(page.locator('#arena')).toHaveAttribute('data-ready', 'true');
+  await expect(page.locator('#checkpoint-status')).toHaveText('0/3');
+  await expect(page.locator('#red-count')).toHaveText('168');
 });

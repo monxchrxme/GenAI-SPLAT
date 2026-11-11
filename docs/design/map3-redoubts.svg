@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="425" viewBox="0 0 1600 425">
+  <rect width="1600" height="425" fill="#f8f8f5" />
+  <style>text{font-family:Arial,sans-serif;fill:#27313d} .small{font-size:12px} .unit{font-size:11px;font-weight:bold;paint-order:stroke;stroke:#f8f8f5;stroke-width:3px;stroke-linejoin:round}</style>
+  <text x="40" y="30" font-size="23" font-weight="bold">Карта 3 · Редуты</text>
+  <text x="340" y="29" font-size="14">Локальная реализация · 7200 × 1000 · баланс [P] · ожидает ручной оценки</text>
+  <rect x="40" y="100" width="1512" height="210" fill="#eeeae4" stroke="#b8bdc5" />
+  <text x="61" y="70" font-size="17">I · Верхний двор</text>
+  <text x="523" y="70" font-size="17">II · Нижний двор</text>
+  <text x="901" y="70" font-size="17">III · Центральный редут</text>
+  <text x="1251.7" y="70" font-size="17">IV · Финал</text>
+  <path d="M 493.59999999999997 90 V 320" stroke="#aeb5bd" stroke-dasharray="5 5" />
+  <text x="471.6" y="338" font-size="12">2160</text>
+  <path d="M 846.4 90 V 320" stroke="#aeb5bd" stroke-dasharray="5 5" />
+  <text x="824.4" y="338" font-size="12">3840</text>
+  <path d="M 1216.0 90 V 320" stroke="#aeb5bd" stroke-dasharray="5 5" />
+  <text x="1194" y="338" font-size="12">5600</text>
+  <rect x="40" y="100" width="16.8" height="210" fill="#a5c9e2" stroke="#88a9bd" />
+  <rect x="56.8" y="100" width="33.6" height="21" fill="#a5c9e2" stroke="#88a9bd" />
+  <rect x="56.8" y="289" width="50.4" height="21" fill="#a5c9e2" stroke="#88a9bd" />
+  <rect x="90.4" y="100" width="33.6" height="42" fill="#a5c9e2" stroke="#88a9bd" />
+  <rect x="107.2" y="268" width="33.6" height="42" fill="#a5c9e2" stroke="#88a9bd" />
+  <rect x="279.4" y="139.9" width="25.2" height="25.2" fill="#d6b595" stroke="#ac8b6d" fill-opacity=".65" />
+  <rect x="618.76" y="244.06" width="26.88" height="26.88" fill="#d6b595" stroke="#ac8b6d" fill-opacity=".65" />
+  <rect x="972.4" y="192.4" width="25.2" height="25.2" fill="#d6b595" stroke="#ac8b6d" fill-opacity=".65" />
+  <rect x="1262.2" y="192.4" width="25.2" height="25.2" fill="#d6b595" stroke="#ac8b6d" fill-opacity=".65" />
+  <rect x="1393.45" y="254.35" width="23.1" height="23.1" fill="#d6b595" stroke="#ac8b6d" fill-opacity=".65" />
+  <rect x="224.8" y="184" width="218.4" height="21" fill="#636c77" stroke="none" />
+  <rect x="241.6" y="121" width="33.6" height="21" fill="#636c77" stroke="none" />
+  <rect x="527.2" y="163" width="84" height="21" fill="#636c77" stroke="none" />
+  <rect x="661.6" y="205" width="134.4" height="21" fill="#636c77" stroke="none" />
+  <rect x="980.8" y="142" width="117.6" height="21" fill="#636c77" stroke="none" />
+  <rect x="980.8" y="247" width="117.6" height="21" fill="#636c77" stroke="none" />
+  <rect x="1283.2" y="142" width="33.6" height="42" fill="#636c77" stroke="none" />
+  <rect x="1333.6" y="226" width="50.4" height="21" fill="#636c77" stroke="none" />
+  <rect x="1400.8" y="142" width="33.6" height="21" fill="#636c77" stroke="none" />
+  <rect x="392.8" y="142" width="33.6" height="42" fill="#f4d77f" stroke="#a37d21" stroke-width="2" />
+  <text x="409.6" y="168" font-size="16" text-anchor="middle" font-weight="bold">1</text>
+  <rect x="762.4" y="226" width="33.6" height="42" fill="#f4d77f" stroke="#a37d21" stroke-width="2" />
+  <text x="779.2" y="252" font-size="16" text-anchor="middle" font-weight="bold">2</text>
+  <rect x="1132" y="184" width="33.6" height="42" fill="#f4d77f" stroke="#a37d21" stroke-width="2" />
+  <text x="1148.8" y="210" font-size="16" text-anchor="middle" font-weight="bold">3</text>
+  <rect x="1468" y="184" width="67.2" height="42" fill="#f4d77f" stroke="#a37d21" stroke-width="2" />
+  <text x="1501.6" y="210" font-size="16" text-anchor="middle" font-weight="bold">Ф</text>
+  <path d="M 275.2 257.79999999999995 l 6 6 l -6 6 l -6 -6 Z" fill="#db9154" stroke="#9d5c2b" />
+  <path d="M 573.4 245.2 l 6 6 l -6 6 l -6 -6 Z" fill="#db9154" stroke="#9d5c2b" />
+  <path d="M 930.4 270.4 l 6 6 l -6 6 l -6 -6 Z" fill="#db9154" stroke="#9d5c2b" />
+  <path d="M 1266.3999999999999 266.2 l 6 6 l -6 6 l -6 -6 Z" fill="#db9154" stroke="#9d5c2b" />
+  <circle cx="632.1999999999999" cy="293.2" r="7" fill="#8c4f58" />
+  <path d="M 632.1999999999999 293.2 l 12 -7" stroke="#8c4f58" stroke-width="4" />
+  <text x="620.2" y="279.2" font-size="12">T</text>
+  <circle cx="1325.2" cy="121.0" r="7" fill="#8c4f58" />
+  <path d="M 1325.2 121.0 l 12 7" stroke="#8c4f58" stroke-width="4" />
+  <text x="1313.2" y="143" font-size="12">T</text>
+  <circle cx="376.0" cy="152.5" r="6" fill="#cc535d" />
+  <text x="375" y="142.5" font-size="11" text-anchor="middle" class="unit">16</text>
+  <circle cx="455.8" cy="146.2" r="6" fill="#cc535d" />
+  <text x="454.8" y="136.2" font-size="11" text-anchor="middle" class="unit">5</text>
+  <circle cx="308.8" cy="257.5" r="6" fill="#cc535d" />
+  <text x="307.8" y="247.5" font-size="11" text-anchor="middle" class="unit">6</text>
+  <circle cx="747.6999999999999" cy="253.29999999999998" r="6" fill="#cc535d" />
+  <text x="746.7" y="243.3" font-size="11" text-anchor="middle" class="unit">24</text>
+  <circle cx="819.1" cy="236.5" r="6" fill="#cc535d" />
+  <text x="818.1" y="226.5" font-size="11" text-anchor="middle" class="unit">7</text>
+  <circle cx="812.8" cy="282.7" r="6" fill="#cc535d" />
+  <text x="811.8" y="272.7" font-size="11" text-anchor="middle" class="unit">7</text>
+  <circle cx="565.0" cy="150.4" r="6" fill="#cc535d" />
+  <text x="564" y="140.4" font-size="11" text-anchor="middle" class="unit">8</text>
+  <circle cx="1119.3999999999999" cy="202.89999999999998" r="6" fill="#cc535d" />
+  <text x="1118.4" y="192.9" font-size="11" text-anchor="middle" class="unit">20</text>
+  <circle cx="1190.8" cy="169.3" r="6" fill="#cc535d" />
+  <text x="1189.8" y="159.3" font-size="11" text-anchor="middle" class="unit">6</text>
+  <circle cx="1071.1" cy="125.2" r="6" fill="#cc535d" />
+  <text x="1070.1" y="115.2" font-size="11" text-anchor="middle" class="unit">10</text>
+  <circle cx="1066.8999999999999" cy="280.6" r="6" fill="#cc535d" />
+  <text x="1065.9" y="270.6" font-size="11" text-anchor="middle" class="unit">10</text>
+  <circle cx="1388.2" cy="265.9" r="6" fill="#cc535d" />
+  <text x="1387.2" y="255.9" font-size="11" text-anchor="middle" class="unit">16</text>
+  <circle cx="1453.3" cy="205.0" r="6" fill="#cc535d" />
+  <text x="1452.3" y="195" font-size="11" text-anchor="middle" class="unit">22</text>
+  <circle cx="1507.8999999999999" cy="251.2" r="6" fill="#cc535d" />
+  <text x="1487" y="264" font-size="11" text-anchor="middle" class="unit">8</text>
+  <circle cx="1153.0" cy="226.0" r="9" fill="#a82f40" stroke="#7c2632" stroke-width="2" />
+  <text x="1153.0" y="246" font-size="12" text-anchor="middle" font-weight="bold">D</text>
+  <circle cx="1484.8" cy="163.0" r="9" fill="#a82f40" stroke="#7c2632" stroke-width="2" />
+  <text x="1484.8" y="150.0" font-size="12" text-anchor="middle" font-weight="bold">D</text>
+  <circle cx="130.3" cy="205.0" r="10" fill="#5689d2" />
+  <text x="130.3" y="188" font-size="14" text-anchor="middle" font-weight="bold">40</text>
+  <text x="40" y="375" font-size="15" style="fill:#a5c9e2">■ вода · непроходимо</text>
+  <text x="300" y="375" font-size="15" style="fill:#636c77">■ стена</text>
+  <text x="470" y="375" font-size="15" style="fill:#d6b595">■ замедление</text>
+  <text x="700" y="375" font-size="15" style="fill:#db9154">◆ слот мины (3 из 4)</text>
+  <text x="1010" y="375" font-size="15" style="fill:#8c4f58">T пушка</text>
+  <text x="1180" y="375" font-size="15" style="fill:#a82f40">D девиант · 7 ресурса</text>
+  <text x="40" y="407" font-size="15">165 обычных красных + 3 девианта · цели 1 → 2 → 3 → Ф · усилены рубежи 2/3 и финал · баланс ожидает ручной оценки</text>
+  <circle cx="1510.0" cy="247.0" r="9" fill="#a82f40" stroke="#7c2632" stroke-width="2" />
+  <text x="1532" y="247" font-size="12" text-anchor="middle" font-weight="bold">D</text>
+  <circle cx="1409.2" cy="289.0" r="7" fill="#8c4f58" />
+  <path d="M 1409.2 289 l 12 -7" stroke="#8c4f58" stroke-width="4" />
+  <text x="1397.2" y="275.0" font-size="12">T</text>
+</svg>

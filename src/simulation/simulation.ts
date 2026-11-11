@@ -215,9 +215,12 @@ export class Simulation {
     const reinforcement = config.reinforcement;
     if (
       reinforcement &&
-      (![reinforcement.cost, reinforcement.count, reinforcement.maxBlue].every(
-        (n) => Number.isSafeInteger(n) && n > 0,
-      ) ||
+      (![
+        reinforcement.cost,
+        reinforcement.count,
+        reinforcement.maxBlue,
+        reinforcement.deviantReward ?? 1,
+      ].every((n) => Number.isSafeInteger(n) && n > 0) ||
         reinforcement.maxBlue < config.spawn.count)
     )
       throw new Error('Invalid reinforcement configuration');

@@ -51,7 +51,10 @@ export function applyDamage(
     agent.hp = Math.max(0, agent.hp - amount);
     agent.hitUntilTick = state.tick + (config.combat?.hitFeedbackTicks ?? 1);
     if (agent.hp === 0) {
-      if (agent.factionId === 'red' && config.reinforcement) state.reinforcementCredits++;
+      if (agent.factionId === 'red' && config.reinforcement) {
+        state.reinforcementCredits +=
+          agent.variant === 'deviant' ? (config.reinforcement.deviantReward ?? 1) : 1;
+      }
       agent.alive = false;
       agent.vx = 0;
       agent.vy = 0;
