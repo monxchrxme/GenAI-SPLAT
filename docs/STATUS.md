@@ -1,7 +1,7 @@
 ---
 updated_at: 2026-11-11
 current_stage: s6_s7_redoubts
-stage_state: local_redoubts_balance_awaiting_manual_review
+stage_state: production_deployed_manual_qa_pending
 implemented: true
 implementation_scope: stronger Redoubts checkpoints and final; checkpoint deviant guards lower approach
 preparation_implemented: true
@@ -50,6 +50,12 @@ handoff_notes:
   - S0 explicitly accepted through user confirmation of all checklist items on 2026-11-06.
   - Delivery 1 accepted; next chat S4+S5, see S4_S5_HANDOFF_PROMPT.md.
 ---
+
+## Production — 11.11.2026
+
+- implemented: запрошенные commit, fast-forward merge и push в main; GitHub-интеграция Vercel выполнила production deployment. [Данные](DEPLOYMENT.md).
+- tests_verified: READY, production source `ccb2a215a2cea8e50edf5094f785587b698fe492`, анонимный HTTP 200 и открытие третьей карты в браузере. Полная внешняя партия не запускалась.
+- awaiting_manual_acceptance: общий QA, производительность и итоговый баланс; публикация сама по себе их не закрывает.
 
 ## Усиление «Редутов» по ручным замечаниям — 11.11.2026
 

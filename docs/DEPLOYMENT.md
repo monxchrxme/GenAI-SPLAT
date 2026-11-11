@@ -1,5 +1,11 @@
 # SPLAT! — GitHub → Vercel: фактическое состояние после S0
 
+## Production из main — 11.11.2026
+
+По отдельному запросу заказчика рабочая ветка объединена в main fast-forward и отправлена. Первый production deployment создан GitHub-интеграцией из `ccb2a215a2cea8e50edf5094f785587b698fe492`: `dpl_4KsYQxg2GjWo6vbMxn91SgUpesrg`, READY, [production](https://genai-splat.vercel.app/), [адрес deployment](https://genai-splat-5rphtujyc-great-chr.vercel.app/). Анонимный HTTP вернул 200; в браузере открылись «Редуты» с 40 синими, 168 красными и тремя рубежами. Полная внешняя партия не запускалась. Последующий документальный commit с этим отчётом может запустить новое развёртывание той же игровой сборки; его SHA следует сверять по Vercel и Git.
+
+Публикация не означает автоматической приёмки всех QA-гейтов, производительности или окончательного баланса; прежние результаты сохранены ниже.
+
 ## Текущий Preview двух карт — 11.11.2026
 
 По отдельному запросу заказчика текущий игровой срез сохранён коммитом `09c68599bbe3798d2c9f64114643f6efa1ce9f05` и опубликован через Vercel CLI 65.11.0. [Открыть Preview](https://genai-splat-fkev9deqi-great-chr.vercel.app/). Deployment `dpl_2zuktHcVMeapdMjjeYxN4iB9sDFB`, существующий проект `genai-splat`, статус READY, окружение preview по `vercel inspect`, source CLI. В API поле target равно null. Метаданные `gitCommitSha` и `sourceCommit` совпали с сохранённым коммитом.
